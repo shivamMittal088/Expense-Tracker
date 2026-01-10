@@ -1,9 +1,24 @@
-export default function App() {
+import { BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./Components/Layout";
+import HomePage from "./Components/HomePage";
+import Analytics from "./Components/Analytics";
+import Profile from "./Components/Profile";
+
+const App:React.FC = ()=> {
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-      <h1 className="text-4xl font-bold">
-        Expense Tracker 💰
-      </h1>
+    <div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout/>} >
+            <Route index element={<HomePage />} />
+          <Route path="/Analytics" element={<Analytics/>} />
+          <Route path="/Profile" element={<Profile/>} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
+
+export default App;
