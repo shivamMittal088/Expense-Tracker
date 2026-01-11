@@ -8,7 +8,7 @@ const Layout:React.FC = ()=> {
       <NavBar />
 
       {/* Prevent content hiding under fixed navbar */}
-      <main className="pt-16">
+      <main>
         <Outlet />
       </main>
 
