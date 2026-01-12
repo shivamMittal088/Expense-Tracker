@@ -17,6 +17,7 @@ const App:React.FC = ()=> {
           <Route path="/Profile" element={<Profile/>} />
           <Route path="/login" element={<Login />} />
           </Route>
+          
         </Routes>
       </BrowserRouter>
     </div>

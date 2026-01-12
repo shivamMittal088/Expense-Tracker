@@ -156,9 +156,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center pt-20">
+    <div className="min-h-screen bg-black flex items-center justify-center">
 
-      <div className="w-[280px] bg-[#0d0f14] border border-gray-800 rounded-xl shadow-2xl">
+      <div className="w-[250px] bg-[#0d0f14] border border-gray-800 rounded-xl shadow-2xl">
 
         {/* Header */}
         <div className="px-3 py-3 border-b border-gray-800 text-center">

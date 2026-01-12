@@ -1,20 +1,21 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 
-const Layout:React.FC = ()=> {
+export default function Layout() {
+  const location = useLocation();
+  const hideUI = location.pathname === "/login";
+
   return (
-    <>
+    <div className="h-screen bg-black flex flex-col">
       <NavBar />
 
-      {/* Prevent content hiding under fixed navbar */}
-      <main>
+      {/* This is the scrollable area */}
+      <div className="flex-1 overflow-y-auto">
         <Outlet />
-      </main>
+      </div>
 
-      <Footer />
-    </>
+      {!hideUI && <Footer />}
+    </div>
   );
-};
-
-export default Layout;
+}

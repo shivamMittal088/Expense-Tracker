@@ -5,7 +5,6 @@ import "react-day-picker/dist/style.css";
 
 
 
-
 const HomePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [open, setOpen] = useState<boolean>(false);
@@ -40,7 +39,7 @@ const HomePage: React.FC = () => {
   }, [open]);
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-4 py-4 mt-6">
 
       {/* ================= TOP SECTION ================= */}
       <section className="bg-white w-full max-w-xl rounded-xl shadow-sm px-4 py-3 mx-auto">
