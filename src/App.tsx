@@ -16,6 +16,7 @@ const App:React.FC = ()=> {
           <Route path="/Analytics" element={<Analytics/>} />
           <Route path="/Profile" element={<Profile/>} />
           <Route path="/login" element={<Login />} />
+          
           </Route>
           
         </Routes>
