@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Api from './Api';
+import Api from '../routeWrapper/Api';
 import { AxiosError } from 'axios';
 
 interface ProfileData {

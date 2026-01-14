@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AddCategoryModal from "./AddCategoryModal";
 
 type Category = {
   id: string;

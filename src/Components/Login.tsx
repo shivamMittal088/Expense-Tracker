@@ -10,7 +10,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import api from "./Api";
+import api from "../routeWrapper/Api";
 
 import type {
   ChangeEvent,
