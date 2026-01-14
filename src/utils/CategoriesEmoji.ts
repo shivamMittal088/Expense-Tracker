@@ -1,0 +1,51 @@
+export type CategoryEmoji = {
+	key: string;
+	label: string;
+	emoji: string;
+};
+
+// Used across category pickers and tiles
+export const categoryEmojis: CategoryEmoji[] = [
+	{ key: "groceries", label: "Groceries", emoji: "🛒" },
+	{ key: "dining", label: "Dining Out", emoji: "🍽️" },
+	{ key: "coffee", label: "Coffee", emoji: "☕" },
+	{ key: "transport", label: "Transport", emoji: "🚌" },
+	{ key: "fuel", label: "Fuel", emoji: "⛽" },
+	{ key: "ride", label: "Ride Hailing", emoji: "🚕" },
+	{ key: "rent", label: "Rent", emoji: "🏠" },
+	{ key: "utilities", label: "Utilities", emoji: "💡" },
+	{ key: "internet", label: "Internet", emoji: "📶" },
+	{ key: "mobile", label: "Mobile", emoji: "📱" },
+	{ key: "shopping", label: "Shopping", emoji: "🛍️" },
+	{ key: "entertainment", label: "Entertainment", emoji: "🎬" },
+	{ key: "gaming", label: "Gaming", emoji: "🎮" },
+	{ key: "music", label: "Music", emoji: "🎵" },
+	{ key: "travel", label: "Travel", emoji: "✈️" },
+	{ key: "hotel", label: "Hotel", emoji: "🏨" },
+	{ key: "health", label: "Health", emoji: "🩺" },
+	{ key: "fitness", label: "Fitness", emoji: "🏋️" },
+	{ key: "pharmacy", label: "Pharmacy", emoji: "💊" },
+	{ key: "education", label: "Education", emoji: "📚" },
+	{ key: "kids", label: "Kids", emoji: "🧸" },
+	{ key: "pets", label: "Pets", emoji: "🐾" },
+	{ key: "gifts", label: "Gifts", emoji: "🎁" },
+	{ key: "home", label: "Home", emoji: "🛋️" },
+	{ key: "car", label: "Car", emoji: "🚗" },
+	{ key: "insurance", label: "Insurance", emoji: "🛡️" },
+	{ key: "subscriptions", label: "Subscriptions", emoji: "🔁" },
+	{ key: "investments", label: "Investments", emoji: "📈" },
+	{ key: "savings", label: "Savings", emoji: "💰" },
+	{ key: "charity", label: "Charity", emoji: "🤝" },
+	{ key: "taxes", label: "Taxes", emoji: "🧾" },
+	{ key: "parking", label: "Parking", emoji: "🅿️" },
+	{ key: "laundry", label: "Laundry", emoji: "🧺" },
+	{ key: "salon", label: "Salon / Beauty", emoji: "💇" },
+	{ key: "drinks", label: "Drinks", emoji: "🍻" },
+	{ key: "bakery", label: "Bakery", emoji: "🥐" },
+	{ key: "electronics", label: "Electronics", emoji: "💻" },
+	{ key: "hardware", label: "Hardware / DIY", emoji: "🛠️" },
+	{ key: "office", label: "Office Supplies", emoji: "📎" },
+	{ key: "garden", label: "Garden", emoji: "🌱" },
+	{ key: "streaming", label: "Streaming", emoji: "📺" },
+	{ key: "misc", label: "Misc", emoji: "✨" },
+];

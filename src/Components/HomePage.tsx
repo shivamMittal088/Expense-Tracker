@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { CalendarPicker } from "./UI/CalendarPicker";
+import React, { useState, useEffect, useCallback } from "react";
+import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 
 type Expense = {
@@ -8,10 +8,12 @@ type Expense = {
   category: {
     name: string;
     color: string;
+    emoji?: string;
   };
-  emoji?: string; // Emoji stored outside category
+  emoji?: string; // Emoji may also be stored on category
   notes?: string;
-  occuredAt: string;
+  occurredAt: string;
+  payment_mode?: string;
 };
 
 export default function ExpenseTrackerHome() {
@@ -44,23 +46,43 @@ export default function ExpenseTrackerHome() {
 
   /* ---------------- Fetch expenses when date changes ---------------- */
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get(`/api/expense/${apiDate}`);
-        setExpenses(res.data. data || []);
-        setShowAll(false);
-      } catch (err) {
-        console.error("Failed to load expenses", err);
-        setExpenses([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchExpenses = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/api/expense/${apiDate}`, {
+        params: {
+          tzOffsetMinutes: new Date().getTimezoneOffset(),
+        },
+      });
 
-    fetchExpenses();
+      // Normalize field name so UI can rely on occurredAt
+      const normalized = (res.data.data || []).map((e: any) => ({
+        ...e,
+        occurredAt: e.occurredAt || e.occuredAt || e.createdAt || e.updatedAt || new Date().toISOString(),
+      }));
+
+      // Ensure newest → oldest on the client (defensive in case API ordering changes)
+      normalized.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime());
+
+      setExpenses(normalized);
+      setShowAll(false);
+    } catch (err) {
+      console.error("Failed to load expenses", err);
+      setExpenses([]);
+    } finally {
+      setLoading(false);
+    }
   }, [apiDate]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
+
+  useEffect(() => {
+    const handler = () => fetchExpenses();
+    window.addEventListener("expense:added", handler);
+    return () => window.removeEventListener("expense:added", handler);
+  }, [fetchExpenses]);
 
   /* ---------------- Compute total ---------------- */
 
@@ -91,100 +113,91 @@ export default function ExpenseTrackerHome() {
     setIsCalendarOpen(false);
   };
 
-  /* ---------------- Initial View - Glass Card Style ---------------- */
-  const GlassCard = ({ e, index }: { e: Expense; index: number }) => (
-    <div
-      className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1"
-      style={{
-        animation: `floatIn 0.6s ease-out ${index * 0.1}s both`,
-      }}
-    >
-      {/* Animated gradient border */}
+  /* ---------------- Initial View - Compact Tile Style ---------------- */
+  const GlassCard = ({ e, index }: { e: Expense; index: number }) => {
+    const emoji = e.emoji || e.category?.emoji || "✨";
+    const timeLabel = new Date(e.occurredAt).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    const amountLabel = e.amount.toLocaleString("en-IN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+
+    return (
       <div
-        className="absolute inset-0 rounded-2xl opacity-60 group-hover: opacity-100 transition-opacity duration-500"
+        className="group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
         style={{
-          background: `linear-gradient(135deg, ${e.category.color}40, transparent, ${e.category. color}20)`,
-          padding: '1px',
+          animation: `floatIn 0.5s ease-out ${index * 0.06}s both`,
+          background: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04), transparent 35%)",
         }}
-      />
+      >
+        {/* Pattern + tint */}
+        <div
+          className="absolute inset-0 rounded-xl"
+          style={{
+            background: `linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)), repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,0.02) 6px 12px)`,
+          }}
+        />
+        <div
+          className="absolute inset-0 rounded-xl"
+          style={{
+            boxShadow: `inset 0 0 0 1px ${e.category.color}20`,
+            background: "linear-gradient(145deg, rgba(0,0,0,0.85), rgba(10,10,10,0.9))",
+          }}
+        />
 
-      {/* Glass background */}
-      <div className="absolute inset-[1px] rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-950/90 to-black/95 backdrop-blur-xl" />
+        {/* Accent pill */}
+        <div
+          className="absolute -top-3 -right-3 w-16 h-16 rounded-full opacity-50 blur-2xl"
+          style={{ background: `${e.category.color}55` }}
+        />
 
-      {/* Floating orb effect */}
-      <div
-        className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover: opacity-40 transition-opacity duration-700"
-        style={{ backgroundColor: e.category. color }}
-      />
-
-      {/* Content */}
-      <div className="relative p-5">
-        {/* Top row - Emoji, Category & Time */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2">
-            {/* Emoji or Color Dot */}
-            {e.emoji ? (
-              <span className="text-xl" role="img" aria-label={e. category.name}>
-                {e.emoji}
-              </span>
-            ) : (
+        {/* Content */}
+        <div className="relative p-3.5 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <div
-                className="w-3 h-3 rounded-full ring-2 ring-offset-2 ring-offset-gray-900"
+                className="w-9 h-9 rounded-lg flex items-center justify-center text-base font-semibold"
                 style={{
-                  backgroundColor:  e.category.color,
-                  ringColor: `${e.category.color}50`
+                  background: `${e.category.color}22`,
+                  color: e.category.color,
                 }}
-              />
-            )}
-            <h3 className="text-sm font-semibold text-white">
-              {e.category.name}
-            </h3>
-          </div>
-          <span className="text-[10px] text-gray-500 bg-gray-800/50 px-2 py-1 rounded-full">
-            {new Date(e.occuredAt).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            })}
-          </span>
-        </div>
+              >
+                {emoji}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-400 leading-tight">{timeLabel}</p>
+                <p className="text-sm font-semibold text-white truncate">{e.category.name}</p>
+              </div>
+            </div>
 
-        {/* Amount - Hero style */}
-        <div className="mb-3">
-          <div className="flex items-baseline gap-1">
-            <span className="text-xs text-gray-500">₹</span>
-            <span
-              className="text-3xl font-bold tracking-tight"
-              style={{ color: e.category. color }}
-            >
-              {e. amount.toLocaleString('en-IN', { minimumFractionDigits:  2 })}
+            <div className="text-right">
+              <p className="text-[10px] text-gray-500">Amount</p>
+              <p className="text-lg font-bold" style={{ color: e.category.color }}>
+                ₹{amountLabel}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 text-[11px] text-gray-400">
+            <span className="truncate leading-tight">
+              {e.notes || "No notes"}
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[10px]" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
+              {e.payment_mode?.toUpperCase?.() || ""}
             </span>
           </div>
         </div>
-
-        {/* Notes */}
-        <p className="text-[11px] text-gray-500 line-clamp-2 min-h-[32px]">
-          {e.notes || 'No description added'}
-        </p>
-
-        {/* Bottom accent line */}
-        <div
-          className="absolute bottom-0 left-5 right-5 h-[2px] rounded-full opacity-30 group-hover:opacity-60 transition-opacity duration-500"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${e. category.color}, transparent)`
-          }}
-        />
       </div>
-
-      {/* Shine effect */}
-      <div className="absolute inset-0 opacity-0 group-hover: opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-      </div>
-    </div>
-  );
+    );
+  };
 
   /* ---------------- Show More View - Flippable Card ---------------- */
   const ExpenseCard = ({ e, index }:  { e: Expense; index: number }) => {
+    const emoji = e.emoji || e.category?.emoji || "✨";
     const hasLongNotes = e.notes && e.notes.length > 30;
 
     return (
@@ -231,9 +244,9 @@ export default function ExpenseTrackerHome() {
               {/* Emoji + Category */}
               <div className="flex items-center gap-2 min-w-[120px]">
                 {/* Emoji or Color Dot */}
-                {e.emoji ? (
+                {emoji ? (
                   <span className="text-lg flex-shrink-0" role="img" aria-label={e.category.name}>
-                    {e.emoji}
+                    {emoji}
                   </span>
                 ) : (
                   <div
@@ -248,7 +261,7 @@ export default function ExpenseTrackerHome() {
 
               {/* Time */}
               <span className="text-[11px] text-gray-500 flex-shrink-0">
-                {new Date(e.occuredAt).toLocaleTimeString('en-US', {
+                {new Date(e.occurredAt).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
                   hour12: true
@@ -318,9 +331,9 @@ export default function ExpenseTrackerHome() {
                   className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: `${e.category. color}20` }}
                 >
-                  {e.emoji ? (
-                    <span className="text-lg" role="img" aria-label={e. category.name}>
-                      {e. emoji}
+                  {emoji ? (
+                    <span className="text-lg" role="img" aria-label={e.category.name}>
+                      {emoji}
                     </span>
                   ) : (
                     <svg

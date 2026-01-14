@@ -9,6 +9,11 @@ type ToastOptions = {
   duration?: number;
 };
 
+type TopToastOptions = {
+  duration?: number;
+  tone?: "success" | "error" | "info";
+};
+
 /* ---------- Toast API ---------- */
 
 export const showToast = (
@@ -128,5 +133,82 @@ export const showToast = (
   overlay._timeoutId = window.setTimeout(() => {
     const current = document.getElementById("global-toast-overlay");
     current?.remove();
+  }, duration);
+};
+
+// Lightweight top toast (no overlay) for quick status messages
+export const showTopToast = (
+  message: string,
+  options: TopToastOptions = {}
+) => {
+  if (typeof document === "undefined") return;
+
+  const { duration = 2000, tone = "success" } = options;
+
+  const existing = document.getElementById("inline-toast");
+  existing?.remove();
+
+  const container = document.createElement("div");
+  container.id = "inline-toast";
+  container.style.cssText = [
+    "position:fixed",
+    "top:12px",
+    "left:50%",
+    "transform:translateX(-50%)",
+    "z-index:2147483000",
+    "width:min(96vw,420px)",
+    "display:flex",
+    "justify-content:center",
+    "pointer-events:none",
+  ].join(";");
+
+  const card = document.createElement("div");
+  const bg = tone === "error"
+    ? "linear-gradient(135deg,#3b1a1d,#2a0f10)"
+    : tone === "info"
+      ? "linear-gradient(135deg,#0f1e2f,#0c1723)"
+      : "linear-gradient(135deg,#0f2417,#0b1a12)";
+
+  const fg = tone === "error" ? "#fde2e2" : tone === "info" ? "#e0edff" : "#d9fbe6";
+  const border = tone === "error" ? "rgba(248,113,113,0.35)" : tone === "info" ? "rgba(96,165,250,0.35)" : "rgba(52,211,153,0.45)";
+  const glow = tone === "error" ? "0 18px 40px rgba(248,113,113,0.18)" : tone === "info" ? "0 18px 40px rgba(96,165,250,0.18)" : "0 18px 40px rgba(52,211,153,0.2)";
+
+  card.style.cssText = [
+    `background:${bg}`,
+    `color:${fg}`,
+    `border:1px solid ${border}`,
+    `box-shadow:${glow}, 0 8px 30px rgba(0,0,0,0.45)`,
+    "border-radius:14px",
+    "padding:12px 16px",
+    "font-family:'Space Grotesk','Inter',system-ui,-apple-system,sans-serif",
+    "font-weight:700",
+    "letter-spacing:0.15px",
+    "text-align:center",
+    "pointer-events:auto",
+    "font-size:13px",
+    "line-height:1.35",
+    "opacity:0",
+    "transform:translateY(-8px) scale(0.98)",
+    "transition:opacity 180ms ease, transform 180ms ease",
+  ].join(";");
+
+  card.textContent = message;
+
+  container.appendChild(card);
+  document.body.appendChild(container);
+
+  requestAnimationFrame(() => {
+    card.style.opacity = "1";
+    card.style.transform = "translateY(0) scale(1)";
+  });
+
+  window.clearTimeout((container as any)._timeoutId);
+  (container as any)._timeoutId = window.setTimeout(() => {
+    const current = document.getElementById("inline-toast");
+    if (current) {
+      (current.firstChild as HTMLElement).style.opacity = "0";
+      (current.firstChild as HTMLElement).style.transform = "translateY(-6px) scale(0.98)";
+      setTimeout(() => current.remove(), 200);
+    }
   }, duration);
 };

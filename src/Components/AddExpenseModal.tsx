@@ -1,11 +1,13 @@
-import { X, Wallet, CreditCard, Smartphone, Building2, Banknote,Utensils, Car, ShoppingBag, FileText, Sparkle, Heart } from "lucide-react";
+import { X, Wallet, CreditCard, Smartphone, Building2, Banknote } from "lucide-react";
 import { useEffect, useState } from "react";
+import Api from "../routeWrapper/Api";
+import { showToast, showTopToast } from "../utils/Redirecttoast";
 
 type Tile = {
   _id: string;
   name: string;
   color: string;
-  icon: any;
+  emoji?: string;
 };
 
 type Props = {
@@ -33,25 +35,43 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
 
+  const getLocalISOString = () => {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return [
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+    ].join("T");
+  };
+
   useEffect(() => {
     if (!open) return;
 
-    setTimeout(() => {
-      setTiles([
-        { _id: "1", name: "Food", color: "#ef4444", icon: Utensils },
-        { _id: "2", name: "Transport", color: "#3b82f6", icon: Car },
-        { _id: "3", name: "Shopping", color: "#8b5cf6", icon: ShoppingBag },
-        { _id: "4", name: "Bills", color: "#f59e0b", icon: FileText },
-        { _id: "5", name: "Entertainment", color: "#ec4899", icon: Sparkle },
-        { _id: "6", name: "Health", color: "#10b981", icon: Heart },
-      ]);
-      setLoadingTiles(false);
-    }, 300);
+    let cancelled = false;
+    setLoadingTiles(true);
+
+    Api.get<Tile[]>("/api/tiles")
+      .then(({ data }) => {
+        if (cancelled) return;
+        setTiles(data);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        showToast("Unable to load categories right now. Try again.");
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoadingTiles(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [open]);
 
   const handleSave = async () => {
     if (!amount || !category || !paymentMode) {
-      alert("Please fill amount, category and payment mode");
+      showTopToast("Please fill amount, category and payment mode", { tone: "error", duration: 2200 });
       return;
     }
 
@@ -62,23 +82,35 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       category: {
         name: selectedTile?.name || category,
         color: selectedTile?.color || "#CCCCCC",
+        emoji: selectedTile?.emoji || "✨",
       },
-      payment_mode:
-        paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
+      payment_mode: paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
       notes,
       currency: "INR",
+      occurredAt: getLocalISOString(),
     };
 
     setLoading(true);
-    setTimeout(() => {
-      console.log("Expense added:", payload);
+    try {
+      const { data } = await Api.post("/api/expense/add", payload, {
+        params: {
+          tzOffsetMinutes: new Date().getTimezoneOffset(),
+        },
+      });
+      showTopToast(data?.message || "Expense added successfully", { duration: 2000 });
+
       setAmount("");
       setCategory("");
       setPaymentMode("");
       setNotes("");
-      setLoading(false);
+      window.dispatchEvent(new CustomEvent("expense:added"));
       onClose();
-    }, 500);
+    } catch (err: any) {
+      const message = err?.response?.data?.message || "Failed to save expense. Please try again.";
+      showTopToast(message, { tone: "error", duration: 2500 });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -217,7 +249,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               ) : (
                 <div className="grid grid-cols-3 gap-2">
                   {tiles.map((tile) => {
-                    const Icon = tile.icon;
                     const isSelected = category === tile.name;
                     return (
                       <button
@@ -255,7 +286,13 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                                 : "none",
                             }}
                           >
-                            <Icon className={`w-4 h-4 transition-colors ${isSelected ? 'text-white' : 'text-gray-500'}`} />
+                            <span
+                              className={`text-sm transition-colors ${
+                                isSelected ? "text-white" : "text-gray-400"
+                              }`}
+                            >
+                              {tile.emoji || "✨"}
+                            </span>
                           </div>
                           <span className={`text-[10px] font-semibold transition-colors leading-tight ${isSelected ? 'text-white' : 'text-gray-500'}`}>
                             {tile.name}
