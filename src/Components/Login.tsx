@@ -158,7 +158,7 @@ const Login: React.FC = () => {
     <div>
       <NavBar />
     </div>
-    <div className="mt-[10vh] bg-black flex items-center justify-center">
+    <div className="mt-[20vh] bg-black flex items-center justify-center">
 
       <div className="w-[250px] bg-[#0d0f14] border border-gray-800 rounded-xl shadow-2xl">
 

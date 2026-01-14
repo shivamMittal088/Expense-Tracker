@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const Api = axios.create({
-  baseURL: "http://localhost:5000",
-  withCredentials: true, // 🔥 required for JWT cookies
+const api = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true, // VERY IMPORTANT for cookies
 });
 
-// 🔐 Global auth interceptor
-Api.interceptors.response.use(
+// 🔐 Global auth handler
+api.interceptors.response.use(
   (response) => response,
 
   (error) => {
@@ -21,7 +21,7 @@ Api.interceptors.response.use(
         alert("Your session expired. Please login again.");
       }
 
-      // Always redirect on auth failure
+      // Redirect always on auth failure
       window.location.href = "/login";
     }
 
@@ -29,4 +29,4 @@ Api.interceptors.response.use(
   }
 );
 
-export default Api;
+export default api;
