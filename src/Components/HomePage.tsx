@@ -156,7 +156,7 @@ export default function ExpenseTrackerHome() {
         />
 
         {/* Content */}
-        <div className="relative p-3.5 space-y-2">
+        <div className="relative p-3 space-y-2 sm:p-3.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
               <div
@@ -169,24 +169,24 @@ export default function ExpenseTrackerHome() {
                 {emoji}
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-gray-400 leading-tight">{timeLabel}</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 leading-tight">{timeLabel}</p>
                 <p className="text-sm font-semibold text-white truncate">{e.category.name}</p>
               </div>
             </div>
 
             <div className="text-right">
               <p className="text-[10px] text-gray-500">Amount</p>
-              <p className="text-lg font-bold" style={{ color: e.category.color }}>
+              <p className="text-base sm:text-lg font-bold" style={{ color: e.category.color }}>
                 ₹{amountLabel}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-[11px] text-gray-400">
+          <div className="flex items-center justify-between gap-2 text-[10px] sm:text-[11px] text-gray-400">
             <span className="truncate leading-tight">
               {e.notes || "No notes"}
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[10px]" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
+            <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px]" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
               {e.payment_mode?.toUpperCase?.() || ""}
             </span>
           </div>
@@ -390,10 +390,10 @@ export default function ExpenseTrackerHome() {
 
         {/* Top Bar */}
         <section className="mb-6">
-          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4">
 
             {/* Left – Date */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => changeDateBy(-1)}
                 className="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center"
@@ -401,7 +401,7 @@ export default function ExpenseTrackerHome() {
                 &lt;
               </button>
 
-              <span className="text-lg font-semibold min-w-[120px] text-center">{displayLabel}</span>
+              <span className="text-lg font-semibold min-w-[120px] text-center flex-1">{displayLabel}</span>
 
               <button
                 onClick={() => changeDateBy(1)}
@@ -409,7 +409,7 @@ export default function ExpenseTrackerHome() {
                 className={`w-9 h-9 rounded-md transition-colors flex items-center justify-center ${
                   isToday
                     ? "bg-gray-900 text-gray-600 cursor-not-allowed"
-                    : "bg-gray-800 hover: bg-gray-700"
+                    : "bg-gray-800 hover:bg-gray-700"
                 }`}
               >
                 &gt;
@@ -417,10 +417,11 @@ export default function ExpenseTrackerHome() {
             </div>
 
             {/* Right – Calendar + Total */}
-            <div className="flex items-center gap-4 sm:gap-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 w-full sm:w-auto">
               <button
                 onClick={() => setIsCalendarOpen(true)}
-                className={`px-4 py-2 rounded-md border text-sm font-medium transition-all
+                onTouchEnd={(e) => { e.preventDefault(); setIsCalendarOpen(true); }}
+                className={`px-4 py-2 rounded-md border text-sm font-medium transition-all w-full sm:w-auto text-center
                   ${
                     isToday
                       ?  "bg-blue-700 border-blue-600 text-white"
@@ -431,7 +432,7 @@ export default function ExpenseTrackerHome() {
                 Open Calendar
               </button>
 
-              <div className="text-right">
+              <div className="text-right w-full sm:w-auto">
                 <p className="text-xs text-gray-400">Total Expenses</p>
                 <p className="text-2xl font-bold">
                   ₹{totalForDay.toFixed(2)}

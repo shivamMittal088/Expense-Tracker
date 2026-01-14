@@ -133,8 +133,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       <div
         className={`fixed left-1/2 top-1/2 -translate-x-1/2 z-50 transition-all duration-700 w-full ${
           open 
-            ? "-translate-y-1/2 opacity-100 scale-100" 
-            : "-translate-y-full opacity-0 scale-95"
+            ? "-translate-y-1/2 opacity-100 scale-100 pointer-events-auto" 
+            : "-translate-y-full opacity-0 scale-95 pointer-events-none"
         }`}
         style={{
           maxWidth: "380px",
