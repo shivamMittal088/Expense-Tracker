@@ -1,28 +1,29 @@
-import { BrowserRouter } from "react-router-dom";
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
 import Analytics from "./Components/Analytics";
 import Profile from "./Components/Profile";
 import Login from "./Components/Login";
+import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
-const App:React.FC = ()=> {
+const App: React.FC = () => {
   return (
-    <div>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout/>} >
-          <Route index element={<HomePage />} />
-          <Route path="/Analytics" element={<Analytics/>} />
-          <Route path="/Profile" element={<Profile/>} />
-          <Route path="/login" element={<Login />} />
-          
+    <BrowserRouter>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
-          
-        </Routes>
-      </BrowserRouter>
-    </div>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

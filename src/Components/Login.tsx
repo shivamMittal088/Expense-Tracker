@@ -18,6 +18,7 @@ import type {
   InputHTMLAttributes,
   ReactNode,
 } from "react";
+import NavBar from "./NavBar";
 
 /* ---------------- Types ---------------- */
 
@@ -140,9 +141,6 @@ const Login: React.FC = () => {
           emailId: formData.emailId,
           password: formData.password,
         });
-
-        alert("Account created. Please login.");
-        setIsLogin(true);
         navigate("/");
       }
     } catch (error) {
@@ -156,7 +154,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <>
+    <div>
+      <NavBar />
+    </div>
+    <div className="mt-[10vh] bg-black flex items-center justify-center">
 
       <div className="w-[250px] bg-[#0d0f14] border border-gray-800 rounded-xl shadow-2xl">
 
@@ -287,6 +289,7 @@ const Login: React.FC = () => {
       )}
 
     </div>
+    </>
   );
 };
 

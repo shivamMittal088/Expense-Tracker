@@ -1,10 +1,10 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet} from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 
 export default function Layout() {
-  const location = useLocation();
-  const hideUI = location.pathname === "/login";
+  // const location = useLocation();
+  // const hideUI = location.pathname === "/login";
 
   return (
     <div className="h-screen bg-black flex flex-col">
@@ -15,7 +15,8 @@ export default function Layout() {
         <Outlet />
       </div>
 
-      {!hideUI && <Footer />}
+      {/* {!hideUI && <Footer />} */}
+      <Footer />
     </div>
   );
 }
