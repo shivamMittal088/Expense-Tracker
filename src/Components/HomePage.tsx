@@ -21,6 +21,9 @@ export default function ExpenseTrackerHome() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
   const today = new Date();
@@ -46,33 +49,79 @@ export default function ExpenseTrackerHome() {
 
   /* ---------------- Fetch expenses when date changes ---------------- */
 
+  const normalizeExpenses = (items: any[]) => {
+    const normalized = (items || []).map((e: any) => ({
+      ...e,
+      occurredAt: e.occurredAt || e.occuredAt || e.createdAt || e.updatedAt || new Date().toISOString(),
+    }));
+    normalized.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime());
+    return normalized;
+  };
+
+  const fetchPage = async (cursor?: string | null) => {
+    const res = await api.get(`/api/expense/${apiDate}/paged`, {
+      params: {
+        tzOffsetMinutes: new Date().getTimezoneOffset(),
+        limit: 20,
+        ...(cursor ? { cursor } : {}),
+      },
+    });
+
+    return {
+      items: normalizeExpenses(res.data.data || []),
+      hasNext: Boolean(res.data?.page?.hasNext),
+      nextCursor: res.data?.page?.nextCursor || null,
+    };
+  };
+
   const fetchExpenses = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await api.get(`/api/expense/${apiDate}`, {
-        params: {
-          tzOffsetMinutes: new Date().getTimezoneOffset(),
-        },
-      });
-
-      // Normalize field name so UI can rely on occurredAt
-      const normalized = (res.data.data || []).map((e: any) => ({
-        ...e,
-        occurredAt: e.occurredAt || e.occuredAt || e.createdAt || e.updatedAt || new Date().toISOString(),
-      }));
-
-      // Ensure newest → oldest on the client (defensive in case API ordering changes)
-      normalized.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime());
-
-      setExpenses(normalized);
+      const page = await fetchPage();
+      setExpenses(page.items);
+      setHasNext(page.hasNext);
+      setNextCursor(page.nextCursor);
       setShowAll(false);
     } catch (err) {
-      console.error("Failed to load expenses", err);
-      setExpenses([]);
+      // Fallback for environments where paged route is not yet deployed
+      try {
+        console.warn("Paged endpoint failed, falling back to legacy list", err);
+        const res = await api.get(`/api/expense/${apiDate}`, {
+          params: {
+            tzOffsetMinutes: new Date().getTimezoneOffset(),
+          },
+        });
+        const normalized = normalizeExpenses(res.data.data || []);
+        setExpenses(normalized);
+        setHasNext(false);
+        setNextCursor(null);
+        setShowAll(false);
+      } catch (fallbackErr) {
+        console.error("Failed to load expenses", fallbackErr);
+        setExpenses([]);
+        setHasNext(false);
+        setNextCursor(null);
+      }
     } finally {
       setLoading(false);
     }
   }, [apiDate]);
+
+  const loadMore = async () => {
+    if (!hasNext || !nextCursor) return;
+    try {
+      setLoadingMore(true);
+      const page = await fetchPage(nextCursor);
+
+      setExpenses(prev => [...prev, ...page.items]);
+      setHasNext(page.hasNext);
+      setNextCursor(page.nextCursor);
+    } catch (err) {
+      console.error("Failed to load more expenses", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     fetchExpenses();
@@ -460,18 +509,30 @@ export default function ExpenseTrackerHome() {
 
               <div className="flex items-center gap-4">
                 {/* Toggle Button */}
-                {hasMoreThanLimit && (
-                  <button
-                    onClick={() => setShowAll(! showAll)}
-                    className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 hover:scale-105 ${
-                      showAll
-                        ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
-                    }`}
-                  >
-                    {showAll ?  '← Back to Cards' : `View All (${expenses.length})`}
-                  </button>
-                )}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {hasMoreThanLimit && (
+                    <button
+                      onClick={() => setShowAll(! showAll)}
+                      className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 hover:scale-105 ${
+                        showAll
+                          ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
+                      }`}
+                    >
+                      {showAll ?  '← Back to Cards' : `View All (${expenses.length})`}
+                    </button>
+                  )}
+
+                  {showAll && hasNext && (
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 bg-gray-800 hover:bg-gray-700 text-white disabled:opacity-50"
+                    >
+                      {loadingMore ? 'Loading…' : 'Load more'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
