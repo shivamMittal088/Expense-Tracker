@@ -1,11 +1,5 @@
 import { useState } from "react";
-
-type Category = {
-  id: string;
-  label: string;
-  emoji: string;
-  amount: number;
-};
+import AddCategoryModal, { type Category } from "./AddCategoryModal";
 
 const defaultCategories: Category[] = [
   { id: "food", label: "Food", emoji: "🍔", amount: 0 },
@@ -22,7 +16,7 @@ const defaultCategories: Category[] = [
   { id: "other", label: "Other", emoji: "➕", amount: 0 },
 ];
 
-const CategoryTiles: React.FC = () => {
+const CategoryTiles = () => {
   const [categories, setCategories] =
     useState<Category[]>(defaultCategories);
   const [openAdd, setOpenAdd] = useState(false);
@@ -75,7 +69,7 @@ const CategoryTiles: React.FC = () => {
       <AddCategoryModal
         open={openAdd}
         onClose={() => setOpenAdd(false)}
-        onAdd={(newCategory) =>
+        onAdd={(newCategory: Category) =>
           setCategories((prev) => [...prev, newCategory])
         }
       />

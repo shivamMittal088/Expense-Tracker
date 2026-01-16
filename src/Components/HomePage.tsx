@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
@@ -25,7 +25,6 @@ export default function ExpenseTrackerHome() {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasNext, setHasNext] = useState(false);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
@@ -100,7 +99,7 @@ export default function ExpenseTrackerHome() {
 
       setExpenses(filtered);
       setHasNext(false);
-      setNextCursor(null);
+      setLoadingMore(false);
       setShowAll(false);
 
       if (!hidden) {
@@ -111,7 +110,7 @@ export default function ExpenseTrackerHome() {
       console.error("Failed to load expenses", err);
       setExpenses([]);
       setHasNext(false);
-      setNextCursor(null);
+      setLoadingMore(false);
       if (!hidden) setVisibleTotal(0);
     } finally {
       setLoading(false);
@@ -119,7 +118,10 @@ export default function ExpenseTrackerHome() {
   }, [apiDate]);
 
   const loadMore = async () => {
-    /* No pagination for daily view now */
+    if (loadingMore || !hasNext) return;
+    setLoadingMore(true);
+    // No pagination for daily view now
+    setLoadingMore(false);
   };
 
   const handleHide = async (id: string) => {

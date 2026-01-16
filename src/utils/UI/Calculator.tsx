@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, type ReactNode, type MouseEvent } from "react";
 import { Zap, RotateCcw, ChevronLeft } from "lucide-react";
 
 export default function BlackPremiumCalculator() {
@@ -59,7 +59,7 @@ export default function BlackPremiumCalculator() {
     }
   };
 
-  const createRipple = (e: React.MouseEvent<HTMLButtonElement>, buttonId: string) => {
+  const createRipple = (e: MouseEvent<HTMLButtonElement>, buttonId: string) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -78,7 +78,7 @@ export default function BlackPremiumCalculator() {
     glow = false,
     buttonId = ""
   }: { 
-    children: React.ReactNode; 
+    children: ReactNode; 
     onClick: () => void; 
     variant?: "default" | "operator" | "equals" | "special";
     className?: string;
