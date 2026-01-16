@@ -31,6 +31,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [category, setCategory] = useState("");
   const [paymentMode, setPaymentMode] = useState("");
   const [notes, setNotes] = useState("");
+  const [occurredAt, setOccurredAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
@@ -49,6 +50,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
     let cancelled = false;
     setLoadingTiles(true);
+    setOccurredAt(getLocalISOString());
 
     Api.get<Tile[]>("/api/tiles")
       .then(({ data }) => {
@@ -87,7 +89,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       payment_mode: paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
       notes,
       currency: "INR",
-      occurredAt: getLocalISOString(),
+      ...(occurredAt ? { occurredAt } : {}),
     };
 
     setLoading(true);
@@ -103,6 +105,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       setCategory("");
       setPaymentMode("");
       setNotes("");
+      setOccurredAt(getLocalISOString());
       window.dispatchEvent(new CustomEvent("expense:added"));
       onClose();
     } catch (err: any) {
@@ -392,6 +395,20 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Occurred At (optional) */}
+            <div className="grid grid-cols-1 gap-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
+                Date & Time <span className="text-gray-600 font-normal normal-case">(optional)</span>
+              </label>
+              <input
+                type="datetime-local"
+                value={occurredAt}
+                onChange={(e) => setOccurredAt(e.target.value)}
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-600 focus:border-white/20 focus:outline-none"
+              />
+              <p className="text-[10px] text-gray-600">If left blank, it will use now.</p>
             </div>
 
             {/* Notes Textarea */}

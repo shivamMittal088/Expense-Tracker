@@ -27,9 +27,12 @@ const NavBar: React.FC = () => {
               <Menu size={20} />
             </button>
             
-            <h1 className="font-brand text-lg font-semibold tracking-wide">
+            <a
+              href="/"
+              className="font-brand text-lg font-semibold tracking-wide hover:text-blue-400 transition-colors"
+            >
               Track-Expense
-            </h1>
+            </a>
           </div>
 
           {/* Actions */}

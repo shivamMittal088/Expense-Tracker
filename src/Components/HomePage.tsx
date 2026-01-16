@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
+import { showTopToast } from "../utils/Redirecttoast";
 
 type Expense = {
   _id: string;
@@ -14,6 +15,7 @@ type Expense = {
   notes?: string;
   occurredAt: string;
   payment_mode?: string;
+  deleted?: boolean;
 };
 
 export default function ExpenseTrackerHome() {
@@ -25,6 +27,13 @@ export default function ExpenseTrackerHome() {
   const [hasNext, setHasNext] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
+  const [visibleTotal, setVisibleTotal] = useState(0);
+  const [hiddenCount, setHiddenCount] = useState(0);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editAmount, setEditAmount] = useState<string>("");
+  const [editNotes, setEditNotes] = useState<string>("");
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -47,6 +56,16 @@ export default function ExpenseTrackerHome() {
 
   const apiDate = getFormattedDate(selectedDate);
 
+  const formatLocalTime = (iso: string) => {
+    const d = new Date(iso);
+    const adjusted = new Date(d.getTime() - new Date().getTimezoneOffset() * 60000);
+    return adjusted.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   /* ---------------- Fetch expenses when date changes ---------------- */
 
   const normalizeExpenses = (items: any[]) => {
@@ -58,84 +77,143 @@ export default function ExpenseTrackerHome() {
     return normalized;
   };
 
-  const fetchPage = async (cursor?: string | null) => {
-    const res = await api.get(`/api/expense/${apiDate}/paged`, {
-      params: {
-        tzOffsetMinutes: new Date().getTimezoneOffset(),
-        limit: 20,
-        ...(cursor ? { cursor } : {}),
-      },
-    });
-
-    return {
-      items: normalizeExpenses(res.data.data || []),
-      hasNext: Boolean(res.data?.page?.hasNext),
-      nextCursor: res.data?.page?.nextCursor || null,
-    };
-  };
-
-  const fetchExpenses = useCallback(async () => {
+  const fetchExpenses = useCallback(async (hidden = false) => {
     setLoading(true);
     try {
-      const page = await fetchPage();
-      setExpenses(page.items);
-      setHasNext(page.hasNext);
-      setNextCursor(page.nextCursor);
-      setShowAll(false);
-    } catch (err) {
-      // Fallback for environments where paged route is not yet deployed
-      try {
-        console.warn("Paged endpoint failed, falling back to legacy list", err);
-        const res = await api.get(`/api/expense/${apiDate}`, {
-          params: {
-            tzOffsetMinutes: new Date().getTimezoneOffset(),
-          },
-        });
-        const normalized = normalizeExpenses(res.data.data || []);
-        setExpenses(normalized);
-        setHasNext(false);
-        setNextCursor(null);
-        setShowAll(false);
-      } catch (fallbackErr) {
-        console.error("Failed to load expenses", fallbackErr);
-        setExpenses([]);
-        setHasNext(false);
-        setNextCursor(null);
+      const res = await api.get(`/api/expense/${apiDate}`, {
+        params: {
+          tzOffsetMinutes: new Date().getTimezoneOffset(),
+          ...(hidden ? { onlyHidden: true } : {}),
+          includeHidden: true,
+        },
+      });
+
+      const normalized = normalizeExpenses(res.data.data || []);
+      const filtered = hidden
+        ? normalized.filter((e) => e.deleted)
+        : normalized.filter((e) => !e.deleted);
+
+      if (!hidden && Array.isArray(res.data?.data)) {
+        const hiddenInResponse = normalized.filter(e => e.deleted).length;
+        setHiddenCount(hiddenInResponse);
       }
+
+      setExpenses(filtered);
+      setHasNext(false);
+      setNextCursor(null);
+      setShowAll(false);
+
+      if (!hidden) {
+        const total = filtered.reduce((sum, e) => sum + e.amount, 0);
+        setVisibleTotal(total);
+      }
+    } catch (err) {
+      console.error("Failed to load expenses", err);
+      setExpenses([]);
+      setHasNext(false);
+      setNextCursor(null);
+      if (!hidden) setVisibleTotal(0);
     } finally {
       setLoading(false);
     }
   }, [apiDate]);
 
   const loadMore = async () => {
-    if (!hasNext || !nextCursor) return;
-    try {
-      setLoadingMore(true);
-      const page = await fetchPage(nextCursor);
+    /* No pagination for daily view now */
+  };
 
-      setExpenses(prev => [...prev, ...page.items]);
-      setHasNext(page.hasNext);
-      setNextCursor(page.nextCursor);
+  const handleHide = async (id: string) => {
+    if (pendingId === id) return;
+    setPendingId(id);
+    const target = expenses.find(exp => exp._id === id);
+    try {
+      await api.patch(`/api/expense/${id}/hide`, { hide: true });
+      setExpenses(prev => prev.filter(exp => exp._id !== id));
+      if (!showHidden && target) {
+        setVisibleTotal(prev => Math.max(0, prev - target.amount));
+      }
+      setHiddenCount(prev => prev + 1);
+      showTopToast("Expense hidden from history", { tone: "info" });
     } catch (err) {
-      console.error("Failed to load more expenses", err);
+      console.error("Failed to hide expense", err);
+      showTopToast("Failed to hide expense", { tone: "error" });
     } finally {
-      setLoadingMore(false);
+      setPendingId(null);
+    }
+  };
+
+  const handleRestore = async (id: string) => {
+    if (pendingId === id) return;
+    setPendingId(id);
+    const target = expenses.find(exp => exp._id === id);
+    const remainingHidden = Math.max(0, hiddenCount - 1);
+    try {
+      await api.patch(`/api/expense/${id}/hide`, { hide: false });
+      setExpenses(prev => prev.filter(exp => exp._id !== id));
+      if (target) {
+        setVisibleTotal(prev => prev + target.amount);
+      }
+      setHiddenCount(remainingHidden);
+      showTopToast("Expense restored", { tone: "success" });
+
+      // If we just restored the last hidden expense, switch back to visible view
+      if (showHidden && remainingHidden === 0) {
+        setShowHidden(false);
+        await fetchExpenses(false);
+      }
+    } catch (err) {
+      console.error("Failed to restore expense", err);
+      showTopToast("Failed to restore expense", { tone: "error" });
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  const openEdit = (exp: Expense) => {
+    setEditingExpense(exp);
+    setEditAmount(String(exp.amount));
+    setEditNotes(exp.notes || "");
+  };
+
+  const submitEdit = async () => {
+    if (!editingExpense) return;
+    const amountNum = Number(editAmount);
+    if (!Number.isFinite(amountNum) || amountNum <= 0) {
+      showTopToast("Enter a valid amount", { tone: "error" });
+      return;
+    }
+    setPendingId(editingExpense._id);
+    try {
+      const payload: any = { amount: amountNum, notes: editNotes };
+      await api.patch(`/api/expense/${editingExpense._id}`, payload, {
+        params: { tzOffsetMinutes: new Date().getTimezoneOffset() }
+      });
+
+      setExpenses(prev => prev.map(e => e._id === editingExpense._id ? { ...e, amount: amountNum, notes: editNotes } : e));
+      showTopToast("Expense updated", { tone: "success" });
+      setEditingExpense(null);
+    } catch (err) {
+      console.error("Failed to update expense", err);
+      showTopToast("Failed to update", { tone: "error" });
+    } finally {
+      setPendingId(null);
     }
   };
 
   useEffect(() => {
-    fetchExpenses();
-  }, [fetchExpenses]);
+    fetchExpenses(showHidden);
+  }, [fetchExpenses, showHidden]);
 
   useEffect(() => {
-    const handler = () => fetchExpenses();
+    const handler = () => fetchExpenses(showHidden);
     window.addEventListener("expense:added", handler);
     return () => window.removeEventListener("expense:added", handler);
-  }, [fetchExpenses]);
+  }, [fetchExpenses, showHidden]);
 
   /* ---------------- Compute total ---------------- */
 
-  const totalForDay = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const visibleSum = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalForDay = showHidden ? visibleTotal : visibleSum;
 
   /* ---------------- Determine which expenses to show ---------------- */
   const INITIAL_LIMIT = 8;
@@ -163,13 +241,9 @@ export default function ExpenseTrackerHome() {
   };
 
   /* ---------------- Initial View - Compact Tile Style ---------------- */
-  const GlassCard = ({ e, index }: { e: Expense; index: number }) => {
+  const GlassCard = ({ e, index, onAction, isPending, actionLabel }: { e: Expense; index: number; onAction: (id: string) => void; isPending: boolean; actionLabel: string }) => {
     const emoji = e.emoji || e.category?.emoji || "✨";
-    const timeLabel = new Date(e.occurredAt).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    const timeLabel = formatLocalTime(e.occurredAt);
     const amountLabel = e.amount.toLocaleString("en-IN", {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
@@ -177,36 +251,20 @@ export default function ExpenseTrackerHome() {
 
     return (
       <div
-        className="group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
-        style={{
-          animation: `floatIn 0.5s ease-out ${index * 0.06}s both`,
-          background: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04), transparent 35%)",
-        }}
+        className="group relative overflow-hidden rounded-lg border border-gray-800 bg-[#0f1117] cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg/30"
+        style={{ animation: `floatIn 0.5s ease-out ${index * 0.06}s both` }}
       >
+        <button
+          onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
+          disabled={isPending}
+          className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50"
+        >
+          {isPending ? "Saving…" : actionLabel}
+        </button>
         {/* Pattern + tint */}
-        <div
-          className="absolute inset-0 rounded-xl"
-          style={{
-            background: `linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)), repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,0.02) 6px 12px)`,
-          }}
-        />
-        <div
-          className="absolute inset-0 rounded-xl"
-          style={{
-            boxShadow: `inset 0 0 0 1px ${e.category.color}20`,
-            background: "linear-gradient(145deg, rgba(0,0,0,0.85), rgba(10,10,10,0.9))",
-          }}
-        />
-
-        {/* Accent pill */}
-        <div
-          className="absolute -top-3 -right-3 w-16 h-16 rounded-full opacity-50 blur-2xl"
-          style={{ background: `${e.category.color}55` }}
-        />
-
         {/* Content */}
-        <div className="relative p-3 space-y-2 sm:p-3.5">
-          <div className="flex items-center justify-between gap-2">
+        <div className="relative z-10 p-2.5 sm:p-3 space-y-1.5 pr-2">
+          <div className="flex items-start gap-2 sm:gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center text-base font-semibold"
@@ -223,19 +281,36 @@ export default function ExpenseTrackerHome() {
               </div>
             </div>
 
-            <div className="text-right">
-              <p className="text-[10px] text-gray-500">Amount</p>
-              <p className="text-base sm:text-lg font-bold" style={{ color: e.category.color }}>
-                ₹{amountLabel}
-              </p>
+            <div className="ml-auto flex items-start gap-2">
+              <div className="text-right shrink-0 pr-1">
+                <p className="text-[10px] text-gray-500">Amount</p>
+                <p className="text-sm sm:text-base font-bold" style={{ color: e.category.color }}>
+                  ₹{amountLabel}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0 pt-0.5 sm:pt-0">
+                <button
+                  onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
+                  disabled={isPending}
+                  className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
+                >
+                  {isPending ? "Saving…" : actionLabel}
+                </button>
+                <button
+                  onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
+                  className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
+                >
+                  Edit
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-[10px] sm:text-[11px] text-gray-400">
-            <span className="truncate leading-tight">
+          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-gray-400 flex-wrap">
+            <span className="truncate leading-tight flex-1 min-w-0">
               {e.notes || "No notes"}
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px]" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
+            <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
               {e.payment_mode?.toUpperCase?.() || ""}
             </span>
           </div>
@@ -245,7 +320,7 @@ export default function ExpenseTrackerHome() {
   };
 
   /* ---------------- Show More View - Flippable Card ---------------- */
-  const ExpenseCard = ({ e, index }:  { e: Expense; index: number }) => {
+  const ExpenseCard = ({ e, index, onAction, isPending, actionLabel }:  { e: Expense; index: number; onAction: (id: string) => void; isPending: boolean; actionLabel: string }) => {
     const emoji = e.emoji || e.category?.emoji || "✨";
     const hasLongNotes = e.notes && e.notes.length > 30;
 
@@ -288,7 +363,7 @@ export default function ExpenseTrackerHome() {
             />
 
             {/* Content - Single row layout */}
-            <div className="relative flex items-center px-4 py-3 gap-4">
+            <div className="relative flex items-center px-4 py-3 gap-3 sm:gap-4">
 
               {/* Emoji + Category */}
               <div className="flex items-center gap-2 min-w-[120px]">
@@ -310,34 +385,52 @@ export default function ExpenseTrackerHome() {
 
               {/* Time */}
               <span className="text-[11px] text-gray-500 flex-shrink-0">
-                {new Date(e.occurredAt).toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: true
-                })}
+                {formatLocalTime(e.occurredAt)}
               </span>
 
-              {/* Notes - Middle section with small font */}
+              {/* Notes + Payment */}
               <div className="flex-1 min-w-0 flex items-center gap-2">
                 <p className="text-[11px] text-gray-500 truncate">
                   {e.notes || '—'}
                 </p>
                 {hasLongNotes && (
-                  <span className="text-[9px] text-gray-600 bg-gray-800 px-1. 5 py-0.5 rounded flex-shrink-0">
+                  <span className="text-[9px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded shrink-0">
                     hover to read
                   </span>
                 )}
+                <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] bg-gray-800/60" style={{ color: e.category.color }}>
+                  {e.payment_mode?.toUpperCase?.() || ''}
+                </span>
               </div>
 
               {/* Amount */}
-              <div className="flex items-baseline gap-0.5 flex-shrink-0">
-                <span className="text-[10px] text-gray-600">₹</span>
-                <span
-                  className="font-semibold text-base"
-                  style={{ color: e.category.color }}
-                >
-                  {e.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </span>
+              <div className="ml-auto flex items-start gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                <div className="flex items-baseline gap-0.5 shrink-0 pr-1 text-right">
+                  <span className="text-[10px] text-gray-600">₹</span>
+                  <span
+                    className="font-semibold text-base"
+                    style={{ color: e.category.color }}
+                  >
+                    {e.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
+                    disabled={isPending}
+                    className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
+                  >
+                    {isPending ? "Saving…" : actionLabel}
+                  </button>
+
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
+                    className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -470,7 +563,7 @@ export default function ExpenseTrackerHome() {
               <button
                 onClick={() => setIsCalendarOpen(true)}
                 onTouchEnd={(e) => { e.preventDefault(); setIsCalendarOpen(true); }}
-                className={`px-4 py-2 rounded-md border text-sm font-medium transition-all w-full sm:w-auto text-center
+                className={`px-3 py-1.5 sm:px-3 sm:py-1.5 rounded-md border text-xs sm:text-sm font-medium transition-all w-full sm:w-auto text-center
                   ${
                     isToday
                       ?  "bg-blue-700 border-blue-600 text-white"
@@ -481,11 +574,23 @@ export default function ExpenseTrackerHome() {
                 Open Calendar
               </button>
 
+              {(showHidden || hiddenCount > 0) && (
+                <button
+                  onClick={() => setShowHidden(prev => !prev)}
+                  className="relative px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md border text-[11px] sm:text-xs font-semibold transition-all w-full sm:w-auto text-center bg-slate-900 border-slate-700 hover:border-white hover:bg-slate-800 text-slate-100"
+                >
+                  {showHidden ? "Back to visible" : `${hiddenCount} hidden`}
+                </button>
+              )}
+
               <div className="text-right w-full sm:w-auto">
                 <p className="text-xs text-gray-400">Total Expenses</p>
                 <p className="text-2xl font-bold">
                   ₹{totalForDay.toFixed(2)}
                 </p>
+                {showHidden && (
+                  <p className="text-[10px] text-gray-500">Hidden items not counted</p>
+                )}
               </div>
             </div>
           </div>
@@ -556,16 +661,30 @@ export default function ExpenseTrackerHome() {
               <>
                 {! showAll ? (
                   /* Initial View - Glass Cards Grid */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
                     {displayedExpenses.map((e, index) => (
-                      <GlassCard key={e._id} e={e} index={index} />
+                      <GlassCard
+                        key={e._id}
+                        e={e}
+                        index={index}
+                        onAction={showHidden ? handleRestore : handleHide}
+                        isPending={pendingId === e._id}
+                        actionLabel={showHidden ? "Restore" : "Hide"}
+                      />
                     ))}
                   </div>
                 ) : (
                   /* Show More View - Flippable Slim Rows */
                   <div className="space-y-2">
                     {expenses.map((e, index) => (
-                      <ExpenseCard key={e._id} e={e} index={index} />
+                      <ExpenseCard
+                        key={e._id}
+                        e={e}
+                        index={index}
+                        onAction={showHidden ? handleRestore : handleHide}
+                        isPending={pendingId === e._id}
+                        actionLabel={showHidden ? "Restore" : "Hide"}
+                      />
                     ))}
                   </div>
                 )}
@@ -574,7 +693,7 @@ export default function ExpenseTrackerHome() {
           </div>
         </section>
 
-        <style jsx>{`
+        <style>{`
           @keyframes floatIn {
             from {
               opacity:  0;
@@ -606,6 +725,58 @@ export default function ExpenseTrackerHome() {
         onDateSelect={handleDateSelect}
         maxDate={today}
       />
+
+      {editingExpense && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="w-full max-w-sm rounded-xl border border-gray-800 bg-gray-900 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-lg font-semibold">Edit Expense</h4>
+              <button
+                onClick={() => setEditingExpense(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <label className="text-sm text-gray-300 flex flex-col gap-1">
+              Amount
+              <input
+                type="number"
+                value={editAmount}
+                onChange={(e) => setEditAmount(e.target.value)}
+                className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </label>
+
+            <label className="text-sm text-gray-300 flex flex-col gap-1">
+              Notes (optional)
+              <textarea
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                rows={3}
+                className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              />
+            </label>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setEditingExpense(null)}
+                className="px-3 py-2 rounded-md border border-gray-700 text-sm text-gray-200 hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitEdit}
+                disabled={pendingId === editingExpense._id}
+                className="px-3 py-2 rounded-md text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
+              >
+                {pendingId === editingExpense._id ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

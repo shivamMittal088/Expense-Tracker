@@ -2,7 +2,7 @@ import axios from "axios";
 import { showToast } from "../utils/Redirecttoast";
 
 const Api = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
   withCredentials: true, // 🔥 required for JWT cookies
 });
 
