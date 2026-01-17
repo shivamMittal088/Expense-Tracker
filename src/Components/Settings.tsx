@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronRight,
   Loader2,
+  Key,
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
@@ -41,6 +42,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     // Load settings from localStorage and API
@@ -218,6 +220,12 @@ export default function Settings() {
         </h2>
         <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
           <SettingButton
+            icon={Key}
+            label="Update Password"
+            onClick={() => setShowPasswordModal(true)}
+          />
+          <div className="h-px bg-white/5" />
+          <SettingButton
             icon={Shield}
             label="Privacy & Security"
             onClick={() => showTopToast("Coming soon", { tone: "info" })}
@@ -271,6 +279,13 @@ export default function Settings() {
           danger
           onCancel={() => setShowDeleteConfirm(false)}
           onConfirm={handleDeleteAccount}
+        />
+      )}
+
+      {/* Update Password Modal */}
+      {showPasswordModal && (
+        <PasswordModal
+          onClose={() => setShowPasswordModal(false)}
         />
       )}
     </div>
@@ -370,6 +385,117 @@ function ConfirmModal({ title, message, confirmLabel, danger, onCancel, onConfir
             }`}
           >
             {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface PasswordModalProps {
+  onClose: () => void;
+}
+
+function PasswordModal({ onClose }: PasswordModalProps) {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    setError("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setError("All fields are required");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("New password must be at least 6 characters");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await Api.patch("/api/auth/update/password", {
+        oldPassword: currentPassword,
+        newPassword: newPassword,
+      });
+      showTopToast("Password updated. Please login again.", { duration: 2500 });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError?.response?.data?.message || "Failed to update password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="w-full max-w-[300px] rounded-xl border border-white/10 bg-[#1a1a1a] p-4">
+        <h3 className="text-sm font-semibold text-white mb-4 text-center">Update Password</h3>
+        
+        <div className="space-y-3">
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 uppercase mb-1">Current Password</label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              placeholder="Enter current password"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 uppercase mb-1">New Password</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              placeholder="Enter new password"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 uppercase mb-1">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              placeholder="Confirm new password"
+            />
+          </div>
+
+          {error && (
+            <p className="text-[10px] text-red-400 text-center">{error}</p>
+          )}
+        </div>
+
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-blue-500 hover:bg-blue-600 disabled:opacity-50 transition-colors"
+          >
+            {loading ? "..." : "Update"}
           </button>
         </div>
       </div>
