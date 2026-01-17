@@ -1,16 +1,18 @@
 import React, { useState } from "react";
-import { Search, Bell, Menu, X, Home, TrendingUp, PieChart, Settings, CreditCard, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Search, Bell, Menu, X, Home, TrendingUp, PieChart, Settings, CreditCard, FileText, User } from "lucide-react";
 
 const NavBar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const menuItems = [
-    { icon: Home, label: "Dashboard", href: "#" },
-    { icon: CreditCard, label: "Expenses", href: "#" },
-    { icon: TrendingUp, label: "Analytics", href: "#" },
-    { icon: PieChart, label: "Budget", href: "#" },
-    { icon: FileText, label: "Reports", href: "#" },
-    { icon: Settings, label: "Settings", href: "#" },
+    { icon: Home, label: "Dashboard", href: "/" },
+    { icon: CreditCard, label: "Expenses", href: "/" },
+    { icon: TrendingUp, label: "Analytics", href: "/analytics" },
+    { icon: PieChart, label: "Budget", href: "/" },
+    { icon: FileText, label: "Reports", href: "/" },
+    { icon: User, label: "Profile", href: "/profile" },
+    { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
   return (
@@ -79,8 +81,8 @@ const NavBar: React.FC = () => {
           <ul className="space-y-2">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <a
-                  href={item.href}
+                <Link
+                  to={item.href}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all duration-200 group"
                   onClick={() => setIsSidebarOpen(false)}
                 >
@@ -89,7 +91,7 @@ const NavBar: React.FC = () => {
                     className="text-gray-500 group-hover:text-blue-500 transition-colors" 
                   />
                   <span className="font-medium">{item.label}</span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
