@@ -57,8 +57,8 @@ export default function ExpenseTrackerHome() {
 
   const formatLocalTime = (iso: string) => {
     const d = new Date(iso);
-    const adjusted = new Date(d.getTime() - new Date().getTimezoneOffset() * 60000);
-    return adjusted.toLocaleTimeString("en-US", {
+    // Backend stores IST time directly, just display it as-is
+    return d.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
