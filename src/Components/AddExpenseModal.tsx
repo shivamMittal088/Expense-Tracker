@@ -4,6 +4,7 @@ import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import { TimePicker } from "../utils/UI/TimePicker";
+import AddTileModal from "./AddTileModal";
 
 type Tile = {
   _id: string;
@@ -38,6 +39,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [selectedTime, setSelectedTime] = useState({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
+  const [addTileOpen, setAddTileOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
@@ -239,7 +241,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                     );
                   })}
                   <button
-                    onClick={() => alert("Add new category feature coming soon!")}
+                    onClick={() => setAddTileOpen(true)}
                     className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-gray-700 hover:border-gray-500 transition-colors"
                   >
                     <span className="text-gray-600 text-sm">+</span>
@@ -369,6 +371,18 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Add Tile Modal */}
+      <AddTileModal
+        open={addTileOpen}
+        onClose={() => setAddTileOpen(false)}
+        onAdded={() => {
+          // Refresh tiles after adding new one
+          Api.get<Tile[]>("/api/tiles")
+            .then(({ data }) => setTiles(data))
+            .catch(() => {});
+        }}
+      />
     </>
   );
 }
