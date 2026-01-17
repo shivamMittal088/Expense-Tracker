@@ -1,4 +1,4 @@
-import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock } from "lucide-react";
+import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
@@ -11,6 +11,7 @@ type Tile = {
   name: string;
   color: string;
   emoji?: string;
+  isBuiltIn?: boolean;
 };
 
 type Props = {
@@ -43,6 +44,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
+  const [deletingTileId, setDeletingTileId] = useState<string | null>(null);
+  const [tileToDelete, setTileToDelete] = useState<Tile | null>(null);
 
   const getLocalISOString = () => {
     const now = new Date();
@@ -51,6 +54,32 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
       `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
     ].join("T");
+  };
+
+  const handleDeleteTile = (tile: Tile, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTileToDelete(tile);
+  };
+
+  const confirmDeleteTile = async () => {
+    if (!tileToDelete || deletingTileId) return;
+    
+    const tileId = tileToDelete._id;
+    setDeletingTileId(tileId);
+    try {
+      await Api.delete(`/api/tiles/remove/${tileId}`);
+      setTiles((prev) => prev.filter((t) => t._id !== tileId));
+      if (category === tileToDelete.name) {
+        setCategory("");
+      }
+      showTopToast("Tile deleted", { duration: 1500 });
+    } catch (err: any) {
+      const message = err?.response?.data?.message || "Failed to delete tile";
+      showTopToast(message, { tone: "error", duration: 2000 });
+    } finally {
+      setDeletingTileId(null);
+      setTileToDelete(null);
+    }
   };
 
   useEffect(() => {
@@ -223,16 +252,29 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 <div className="grid grid-cols-4 gap-1.5">
                   {tiles.map((tile) => {
                     const isSelected = category === tile.name;
+                    const isDeleting = deletingTileId === tile._id;
                     return (
                       <button
                         key={tile._id}
                         onClick={() => setCategory(tile.name)}
-                        className="p-2 flex flex-col items-center gap-1 rounded-lg transition-all"
+                        className="group relative p-2 flex flex-col items-center gap-1 rounded-lg transition-all"
                         style={{
                           background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.02)",
                           border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
+                          opacity: isDeleting ? 0.5 : 1,
                         }}
+                        disabled={isDeleting}
                       >
+                        {/* Delete button for user tiles */}
+                        {!tile.isBuiltIn && (
+                          <button
+                            onClick={(e) => handleDeleteTile(tile, e)}
+                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            title="Delete tile"
+                          >
+                            <Trash2 className="w-2.5 h-2.5 text-white" />
+                          </button>
+                        )}
                         <span className="text-sm">{tile.emoji || "✨"}</span>
                         <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-gray-500'}`}>
                           {tile.name}
@@ -383,6 +425,39 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             .catch(() => {});
         }}
       />
+
+      {/* Delete Confirmation Modal */}
+      {tileToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
+          <div className="w-full max-w-[240px] rounded-xl border border-white/10 bg-[#1a1a1a] p-4 text-center">
+            <div
+              className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: tileToDelete.color }}
+            >
+              <span className="text-lg">{tileToDelete.emoji || "✨"}</span>
+            </div>
+            <h3 className="text-sm font-semibold text-white mb-1">Delete Tile?</h3>
+            <p className="text-[11px] text-gray-400 mb-4">
+              Are you sure you want to delete <span className="text-white font-medium">"{tileToDelete.name}"</span>?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTileToDelete(null)}
+                className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteTile}
+                disabled={deletingTileId !== null}
+                className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-red-500/90 hover:bg-red-600 disabled:opacity-50 transition-colors"
+              >
+                {deletingTileId ? "..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
