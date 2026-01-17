@@ -44,11 +44,11 @@ interface PasswordInputProps {
 /* ---------------- Inputs ---------------- */
 
 const Input = ({ label, icon, ...props }: InputProps) => (
-  <div>
-    <label className="text-[11px] text-gray-500">{label}</label>
+  <div className="group">
+    <label className="text-[10px] font-medium text-neutral-500 mb-1 block tracking-wide uppercase">{label}</label>
     <div className="relative">
       {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-white transition-colors duration-200">
           {icon}
         </span>
       )}
@@ -56,7 +56,7 @@ const Input = ({ label, icon, ...props }: InputProps) => (
         {...props}
         className={`w-full ${
           icon ? "pl-9" : "pl-3"
-        } py-1.5 bg-[#111318] border border-gray-800 rounded-md text-white text-xs focus:outline-none focus:ring-1 focus:ring-gray-600`}
+        } py-2 bg-black/60 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 focus:bg-black transition-all duration-200`}
       />
     </div>
   </div>
@@ -68,24 +68,24 @@ const PasswordInput = ({
   show,
   toggle,
 }: PasswordInputProps) => (
-  <div>
-    <label className="text-[11px] text-gray-500">Password</label>
+  <div className="group">
+    <label className="text-[10px] font-medium text-neutral-500 mb-1 block tracking-wide uppercase">Password</label>
     <div className="relative">
       <Lock
         size={14}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-white transition-colors duration-200"
       />
       <input
         type={show ? "text" : "password"}
         name="password"
         value={value}
         onChange={onChange}
-        className="w-full pl-9 pr-9 py-1.5 bg-[#111318] border border-gray-800 rounded-md text-white text-xs focus:outline-none focus:ring-1 focus:ring-gray-600"
+        className="w-full pl-9 pr-9 py-2 bg-black/60 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 focus:bg-black transition-all duration-200"
       />
       <button
         type="button"
         onClick={toggle}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition-colors duration-200"
       >
         {show ? <EyeOff size={14} /> : <Eye size={14} />}
       </button>
@@ -158,49 +158,62 @@ const Login: React.FC = () => {
     <div>
       <NavBar />
     </div>
-    <div className="mt-[20vh] bg-black flex items-center justify-center">
+    <div className="min-h-[80vh] bg-black flex items-center justify-center px-4 lg:pt-16 xl:pt-20">
+      
+      {/* Subtle background texture */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-neutral-900/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-neutral-800/20 rounded-full blur-3xl"></div>
+      </div>
 
-      <div className="w-[250px] bg-[#0d0f14] border border-gray-800 rounded-xl shadow-2xl">
+      <div className="relative w-full max-w-[320px] lg:max-w-[300px] bg-neutral-950 border border-neutral-800/80 rounded-2xl shadow-2xl shadow-black overflow-hidden">
+        
+        {/* Decorative top line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent"></div>
 
         {/* Header */}
-        <div className="px-3 py-3 border-b border-gray-800 text-center">
-          <h1 className="text-sm font-semibold text-white">
+        <div className="px-6 pt-6 pb-4 lg:px-5 lg:pt-5 lg:pb-3 text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10 rounded-xl bg-white mb-3 lg:mb-2 shadow-lg shadow-white/10">
+            <User size={22} className="text-black lg:hidden" />
+            <User size={18} className="text-black hidden lg:block" />
+          </div>
+          <h1 className="text-lg lg:text-base font-bold text-white mb-1 tracking-tight">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-xs text-neutral-500">
             {isLogin
-              ? "Sign in to continue"
-              : "Start tracking your expenses"}
+              ? "Sign in to continue tracking"
+              : "Start your expense journey"}
           </p>
         </div>
 
-        <div className="p-2">
+        <div className="px-6 pb-6 lg:px-5 lg:pb-5">
 
           {/* Toggle */}
-          <div className="flex mb-1.5 bg-[#111318] rounded-lg p-1">
+          <div className="flex mb-5 lg:mb-4 bg-black rounded-lg p-0.5 border border-neutral-800">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-1 text-xs rounded-md ${
+              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all duration-300 ${
                 isLogin
-                  ? "bg-[#1b1f2a] text-white"
-                  : "text-gray-500"
+                  ? "bg-white text-black shadow-lg"
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              Login
+              Sign In
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-1 text-xs rounded-md ${
+              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all duration-300 ${
                 !isLogin
-                  ? "bg-[#1b1f2a] text-white"
-                  : "text-gray-500"
+                  ? "bg-white text-black shadow-lg"
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
               Sign Up
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3 lg:space-y-2.5">
 
             {!isLogin && (
               <Input
@@ -242,7 +255,7 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowForgot(true)}
-                  className="text-[11px] text-gray-500 hover:text-white"
+                  className="text-[10px] text-neutral-500 hover:text-white transition-colors duration-200"
                 >
                   Forgot password?
                 </button>
@@ -251,37 +264,56 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-1.5 bg-[#1b1f2a] hover:bg-[#252a3a] text-white text-xs rounded-md"
+              className="w-full py-2.5 mt-1 bg-white hover:bg-neutral-100 text-black text-sm font-semibold rounded-lg shadow-lg shadow-white/10 hover:shadow-white/20 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
             >
               {isLogin ? "Sign In" : "Create Account"}
             </button>
+
+            <p className="text-center text-[11px] text-neutral-600 pt-2">
+              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-white hover:underline"
+              >
+                {isLogin ? "Sign up" : "Sign in"}
+              </button>
+            </p>
           </form>
         </div>
       </div>
 
       {/* Forgot Password Modal */}
       {showForgot && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-[#0d0f14] border border-gray-800 rounded-lg w-[280px] p-4 relative">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="relative bg-neutral-950 border border-neutral-800 rounded-xl w-[300px] p-5 shadow-2xl shadow-black">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent"></div>
+            
             <button
               onClick={() => setShowForgot(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-white"
+              className="absolute top-4 right-4 text-neutral-600 hover:text-white transition-colors duration-200"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
 
-            <h2 className="text-xs font-semibold text-white mb-1">
-              Reset Password
-            </h2>
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white mb-3 shadow-lg shadow-white/10">
+                <Mail size={18} className="text-black" />
+              </div>
+              <h2 className="text-base font-bold text-white mb-1">
+                Reset Password
+              </h2>
+              <p className="text-xs text-neutral-500">We'll send you a reset link</p>
+            </div>
 
             <input
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
-              className="w-full bg-[#111318] border border-gray-800 rounded-md py-1.5 px-3 text-white text-xs mb-3"
+              className="w-full bg-black/60 border border-neutral-800 rounded-lg py-2 px-3 text-white text-sm mb-4 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 transition-all duration-200"
               placeholder="you@example.com"
             />
 
-            <button className="w-full bg-[#1b1f2a] hover:bg-[#252a3a] py-1.5 text-white text-xs rounded-md">
+            <button className="w-full py-2.5 bg-white hover:bg-neutral-100 text-black text-sm font-semibold rounded-lg shadow-lg shadow-white/10 hover:shadow-white/20 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200">
               Send Reset Link
             </button>
           </div>

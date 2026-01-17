@@ -28,6 +28,7 @@ export default function ExpenseTrackerHome() {
   const [hasNext, setHasNext] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmActionId, setConfirmActionId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [hiddenCount, setHiddenCount] = useState(0);
@@ -238,13 +239,31 @@ export default function ExpenseTrackerHome() {
         className="group relative overflow-hidden rounded-lg border border-gray-800 bg-[#0f1117] cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg/30"
         style={{ animation: `floatIn 0.5s ease-out ${index * 0.06}s both` }}
       >
-        <button
-          onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
-          disabled={isPending}
-          className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50"
-        >
-          {isPending ? "Saving…" : actionLabel}
-        </button>
+        {confirmActionId === e._id ? (
+          <div className="absolute top-2 right-2 z-20 flex gap-1">
+            <button
+              onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
+              disabled={isPending}
+              className="px-2 py-1 text-[10px] rounded-md bg-blue-700 hover:bg-blue-800 border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
+            >
+              Confirm {actionLabel}
+            </button>
+            <button
+              onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
+              className="px-2 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 whitespace-nowrap text-right"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
+            disabled={isPending}
+            className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50"
+          >
+            {isPending ? "Saving…" : actionLabel}
+          </button>
+        )}
         {/* Pattern + tint */}
         {/* Content */}
         <div className="relative z-10 p-2.5 sm:p-3 space-y-1.5 pr-2">
@@ -400,20 +419,39 @@ export default function ExpenseTrackerHome() {
                 </div>
 
                 <div className="flex flex-col gap-1 shrink-0">
-                  <button
-                    onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
-                    disabled={isPending}
-                    className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
-                  >
-                    {isPending ? "Saving…" : actionLabel}
-                  </button>
-
-                  <button
-                    onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                    className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
-                  >
-                    Edit
-                  </button>
+                  {confirmActionId === e._id ? (
+                    <>
+                      <button
+                        onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
+                        disabled={isPending}
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-blue-700 hover:bg-blue-800 border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
+                      >
+                        Confirm {actionLabel}
+                      </button>
+                      <button
+                        onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
+                        className="px-2 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 whitespace-nowrap text-right ml-1"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
+                        disabled={isPending}
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
+                      >
+                        {isPending ? "Saving…" : actionLabel}
+                      </button>
+                      <button
+                        onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
+                      >
+                        Edit
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
