@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Loader2,
   Key,
+  Monitor,
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
@@ -20,7 +21,7 @@ interface UserSettings {
   soundEnabled: boolean;
   notifications: boolean;
   currency: "INR" | "USD" | "EUR";
-  darkMode: boolean;
+  theme: "light" | "dark" | "system";
   startWeekOnMonday: boolean;
 }
 
@@ -35,7 +36,7 @@ export default function Settings() {
     soundEnabled: true,
     notifications: true,
     currency: "INR",
-    darkMode: true,
+    theme: "dark",
     startWeekOnMonday: false,
   });
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,7 @@ export default function Settings() {
         setSettings((prev) => ({
           ...prev,
           currency: data.currency || "INR",
-          darkMode: data.preferences?.darkMode ?? true,
+          theme: data.preferences?.theme || "dark",
           startWeekOnMonday: data.preferences?.startWeekOnMonday ?? false,
         }));
       })
@@ -84,7 +85,7 @@ export default function Settings() {
       const payload: Record<string, unknown> = {};
       if (key === "currency") {
         payload.currency = value;
-      } else if (key === "darkMode" || key === "startWeekOnMonday") {
+      } else if (key === "theme" || key === "startWeekOnMonday") {
         payload.preferences = {
           ...settings,
           [key]: value,
@@ -161,13 +162,41 @@ export default function Settings() {
           Appearance
         </h2>
         <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
-          <SettingToggle
-            icon={settings.darkMode ? Moon : Sun}
-            label="Dark Mode"
-            description="Use dark theme"
-            enabled={settings.darkMode}
-            onChange={(v) => updateSetting("darkMode", v)}
-          />
+          {/* Theme Selector */}
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                {settings.theme === "dark" ? (
+                  <Moon className="w-4 h-4 text-gray-400" />
+                ) : settings.theme === "light" ? (
+                  <Sun className="w-4 h-4 text-yellow-400" />
+                ) : (
+                  <Monitor className="w-4 h-4 text-gray-400" />
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-white">Theme</p>
+                <p className="text-[10px] text-gray-500">Choose your preferred theme</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {(["light", "dark", "system"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => updateSetting("theme", t)}
+                  className={`flex-1 py-2 px-3 rounded-lg text-[11px] font-medium transition-colors ${
+                    settings.theme === t
+                      ? "bg-blue-500 text-white"
+                      : "bg-white/5 text-gray-400 hover:bg-white/10"
+                  }`}
+                >
+                  {t === "light" && "☀️ Light"}
+                  {t === "dark" && "🌙 Dark"}
+                  {t === "system" && "💻 System"}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
