@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
+import EditExpenseModal from "./EditExpenseModal";
 
 type Expense = {
   _id: string;
@@ -31,8 +32,6 @@ export default function ExpenseTrackerHome() {
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [hiddenCount, setHiddenCount] = useState(0);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [editAmount, setEditAmount] = useState<string>("");
-  const [editNotes, setEditNotes] = useState<string>("");
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -173,33 +172,16 @@ export default function ExpenseTrackerHome() {
 
   const openEdit = (exp: Expense) => {
     setEditingExpense(exp);
-    setEditAmount(String(exp.amount));
-    setEditNotes(exp.notes || "");
   };
 
-  const submitEdit = async () => {
-    if (!editingExpense) return;
-    const amountNum = Number(editAmount);
-    if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      showTopToast("Enter a valid amount", { tone: "error" });
-      return;
-    }
-    setPendingId(editingExpense._id);
-    try {
-      const payload: any = { amount: amountNum, notes: editNotes };
-      await api.patch(`/api/expense/${editingExpense._id}`, payload, {
-        params: { tzOffsetMinutes: new Date().getTimezoneOffset() }
-      });
+  const handleEditUpdate = () => {
+    fetchExpenses(showHidden);
+    setEditingExpense(null);
+  };
 
-      setExpenses(prev => prev.map(e => e._id === editingExpense._id ? { ...e, amount: amountNum, notes: editNotes } : e));
-      showTopToast("Expense updated", { tone: "success" });
-      setEditingExpense(null);
-    } catch (err) {
-      console.error("Failed to update expense", err);
-      showTopToast("Failed to update", { tone: "error" });
-    } finally {
-      setPendingId(null);
-    }
+  const handleEditDelete = () => {
+    fetchExpenses(showHidden);
+    setEditingExpense(null);
   };
 
   useEffect(() => {
@@ -728,57 +710,13 @@ export default function ExpenseTrackerHome() {
         maxDate={today}
       />
 
-      {editingExpense && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-gray-800 bg-gray-900 p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-lg font-semibold">Edit Expense</h4>
-              <button
-                onClick={() => setEditingExpense(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            <label className="text-sm text-gray-300 flex flex-col gap-1">
-              Amount
-              <input
-                type="number"
-                value={editAmount}
-                onChange={(e) => setEditAmount(e.target.value)}
-                className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </label>
-
-            <label className="text-sm text-gray-300 flex flex-col gap-1">
-              Notes (optional)
-              <textarea
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-                rows={3}
-                className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-              />
-            </label>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                onClick={() => setEditingExpense(null)}
-                className="px-3 py-2 rounded-md border border-gray-700 text-sm text-gray-200 hover:bg-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitEdit}
-                disabled={pendingId === editingExpense._id}
-                className="px-3 py-2 rounded-md text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
-              >
-                {pendingId === editingExpense._id ? "Saving…" : "Save"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditExpenseModal
+        open={!!editingExpense}
+        onClose={() => setEditingExpense(null)}
+        expense={editingExpense}
+        onUpdate={handleEditUpdate}
+        onDelete={handleEditDelete}
+      />
     </div>
   );
 }

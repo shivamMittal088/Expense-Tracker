@@ -1,4 +1,4 @@
-import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock } from "lucide-react";
+import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
@@ -12,20 +12,37 @@ type Tile = {
   emoji?: string;
 };
 
+type Expense = {
+  _id: string;
+  amount: number;
+  category: {
+    name: string;
+    color: string;
+    emoji?: string;
+  };
+  payment_mode: string;
+  notes?: string;
+  occurredAt: string;
+  currency?: string;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
+  expense: Expense | null;
+  onUpdate?: () => void;
+  onDelete?: () => void;
 };
 
 const paymentModes = [
-  { id: "cash", label: "Cash", icon: Banknote, color: "#10b981" },
-  { id: "card", label: "Card", icon: CreditCard, color: "#8b5cf6" },
-  { id: "wallet", label: "Wallet", icon: Wallet, color: "#f59e0b" },
-  { id: "bank_transfer", label: "Bank", icon: Building2, color: "#06b6d4" },
-  { id: "UPI", label: "UPI", icon: Smartphone, color: "#ec4899" },
+  { id: "cash", label: "Cash", icon: Banknote },
+  { id: "card", label: "Card", icon: CreditCard },
+  { id: "wallet", label: "Wallet", icon: Wallet },
+  { id: "bank_transfer", label: "Bank", icon: Building2 },
+  { id: "UPI", label: "UPI", icon: Smartphone },
 ];
 
-export default function AddExpenseModal({ open, onClose }: Props) {
+export default function EditExpenseModal({ open, onClose, expense, onUpdate, onDelete }: Props) {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [loadingTiles, setLoadingTiles] = useState(true);
 
@@ -35,30 +52,36 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [notes, setNotes] = useState("");
   const [occurredAt, setOccurredAt] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedTime, setSelectedTime] = useState({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
+  const [selectedTime, setSelectedTime] = useState({ hours: 0, minutes: 0 });
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const getLocalISOString = () => {
-    const now = new Date();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return [
-      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
-      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
-    ].join("T");
-  };
-
+  // Load tiles and populate form when modal opens
   useEffect(() => {
-    if (!open) return;
+    if (!open || !expense) return;
 
     let cancelled = false;
     setLoadingTiles(true);
-    setSelectedDate(new Date());
-    setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
-    setOccurredAt(getLocalISOString());
+
+    // Populate form with expense data
+    setAmount(String(expense.amount));
+    setCategory(expense.category.name);
+    setPaymentMode(expense.payment_mode);
+    setNotes(expense.notes || "");
+    
+    const expenseDate = new Date(expense.occurredAt);
+    setSelectedDate(expenseDate);
+    setSelectedTime({ hours: expenseDate.getHours(), minutes: expenseDate.getMinutes() });
+    
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setOccurredAt(
+      `${expenseDate.getFullYear()}-${pad(expenseDate.getMonth() + 1)}-${pad(expenseDate.getDate())}T${pad(expenseDate.getHours())}:${pad(expenseDate.getMinutes())}:${pad(expenseDate.getSeconds())}`
+    );
 
     Api.get<Tile[]>("/api/tiles")
       .then(({ data }) => {
@@ -67,7 +90,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       })
       .catch(() => {
         if (cancelled) return;
-        showToast("Unable to load categories right now. Try again.");
+        showToast("Unable to load categories right now.");
       })
       .finally(() => {
         if (cancelled) return;
@@ -77,9 +100,18 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     return () => {
       cancelled = true;
     };
+  }, [open, expense]);
+
+  // Reset delete confirm when modal closes
+  useEffect(() => {
+    if (!open) {
+      setShowDeleteConfirm(false);
+    }
   }, [open]);
 
-  const handleSave = async () => {
+  const handleUpdate = async () => {
+    if (!expense) return;
+    
     if (!amount || !category || !paymentMode) {
       showTopToast("Please fill amount, category and payment mode", { tone: "error", duration: 2200 });
       return;
@@ -97,34 +129,48 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       payment_mode: paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
       notes,
       currency: "INR",
-      ...(occurredAt ? { occurredAt } : {}),
+      occurredAt,
     };
 
     setLoading(true);
     try {
-      const { data } = await Api.post("/api/expense/add", payload, {
+      const { data } = await Api.patch(`/api/expense/${expense._id}`, payload, {
         params: {
           tzOffsetMinutes: new Date().getTimezoneOffset(),
         },
       });
-      showTopToast(data?.message || "Expense added successfully", { duration: 2000 });
-
-      setAmount("");
-      setCategory("");
-      setPaymentMode("");
-      setNotes("");
-      setSelectedDate(new Date());
-      setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
-      setOccurredAt(getLocalISOString());
-      window.dispatchEvent(new CustomEvent("expense:added"));
+      showTopToast(data?.message || "Expense updated", { duration: 2000 });
+      window.dispatchEvent(new CustomEvent("expense:updated"));
+      onUpdate?.();
       onClose();
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to save expense. Please try again.";
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to update expense.";
       showTopToast(message, { tone: "error", duration: 2500 });
     } finally {
       setLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    if (!expense) return;
+
+    setDeleting(true);
+    try {
+      await Api.delete(`/api/expense/${expense._id}`);
+      showTopToast("Expense deleted", { duration: 2000 });
+      window.dispatchEvent(new CustomEvent("expense:deleted"));
+      onDelete?.();
+      onClose();
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to delete expense.";
+      showTopToast(message, { tone: "error", duration: 2500 });
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  if (!expense) return null;
 
   return (
     <>
@@ -151,7 +197,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           padding: "0 12px",
         }}
       >
-        {/* Main Card - Pure Black */}
+        {/* Main Card */}
         <div 
           className="relative overflow-hidden"
           style={{
@@ -161,14 +207,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
           }}
         >
-          {/* Header - Compact */}
+          {/* Header */}
           <div 
             className="relative px-4 py-3 flex items-center justify-between"
             style={{ 
               borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
             }}
           >
-            <h2 className="text-sm font-semibold text-white">Add Expense</h2>
+            <h2 className="text-sm font-semibold text-white">Edit Expense</h2>
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
@@ -177,7 +223,9 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             </button>
           </div>
 
-          {/* Content - Compact */}
+
+
+          {/* Content */}
           <div 
             className="px-4 pb-4 space-y-3 max-h-[60vh] overflow-y-auto" 
             style={{ 
@@ -210,7 +258,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               </div>
             </div>
 
-            {/* Category Grid - Compact */}
+            {/* Category Grid */}
             <div>
               <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Category</label>
               {loadingTiles ? (
@@ -238,18 +286,11 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                       </button>
                     );
                   })}
-                  <button
-                    onClick={() => alert("Add new category feature coming soon!")}
-                    className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-gray-700 hover:border-gray-500 transition-colors"
-                  >
-                    <span className="text-gray-600 text-sm">+</span>
-                    <span className="text-[8px] text-gray-600">Add</span>
-                  </button>
                 </div>
               )}
             </div>
 
-            {/* Payment Mode - Compact */}
+            {/* Payment Mode */}
             <div>
               <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Payment</label>
               <div className="grid grid-cols-5 gap-1">
@@ -274,7 +315,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               </div>
             </div>
 
-            {/* Date & Time - Compact */}
+            {/* Date & Time */}
             <div>
               <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">When</label>
               <div className="flex gap-2">
@@ -285,7 +326,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
                 >
                   <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                  {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                  {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </button>
                 <button
                   type="button"
@@ -330,7 +371,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               closeOnClickOutside={true}
             />
 
-            {/* Notes - Compact */}
+            {/* Notes */}
             <div>
               <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Notes</label>
               <textarea
@@ -348,7 +389,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               />
             </div>
 
-            {/* Buttons - Compact */}
+            {/* Buttons */}
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
@@ -358,12 +399,12 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 Cancel
               </button>
               <button
-                onClick={handleSave}
+                onClick={handleUpdate}
                 disabled={loading}
                 className="flex-1 py-2 text-[11px] font-semibold text-black rounded-lg disabled:opacity-50 transition-colors"
                 style={{ background: "#fff" }}
               >
-                {loading ? "..." : "Save"}
+                {loading ? "..." : "Update"}
               </button>
             </div>
           </div>

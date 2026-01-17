@@ -441,3 +441,381 @@
 .calendar-today-btn:active {
     transform: scale(0.97);
 }
+
+/* ====================================== */
+/* TIME PICKER - Premium Glassmorphism Design */
+/* ====================================== */
+
+/* Time Picker Modal */
+.time-picker-modal {
+    background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(20, 20, 25, 0.98));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 
+        0 32px 64px rgba(0, 0, 0, 0.4),
+        0 16px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    padding: 0;
+    width: 100%;
+    max-width: 300px;
+    overflow: hidden;
+    animation: timePickerSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes timePickerSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.time-picker-modal.closing {
+    animation: timePickerSlideOut 0.2s ease-out forwards;
+}
+
+@keyframes timePickerSlideOut {
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+    }
+}
+
+/* Header with gradient accent */
+.time-picker-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-picker-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+}
+
+.time-picker-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+/* Big Time Display */
+.time-picker-display {
+    padding: 16px 24px 24px;
+    text-align: center;
+    position: relative;
+}
+
+.time-picker-display-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 12px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-picker-display-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent);
+    pointer-events: none;
+}
+
+.time-picker-digit {
+    font-size: 48px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: white;
+    letter-spacing: -2px;
+    text-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s ease;
+}
+
+.time-picker-digit.active {
+    color: #a78bfa;
+    text-shadow: 0 0 24px rgba(167, 139, 250, 0.5);
+}
+
+.time-picker-separator {
+    font-size: 40px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.3);
+    margin: 0 2px;
+    animation: separatorPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes separatorPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Time Columns Container */
+.time-picker-columns {
+    display: flex;
+    gap: 12px;
+    padding: 0 20px 20px;
+}
+
+.time-picker-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-picker-column-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Scrollable Time List */
+.time-picker-scroll {
+    height: 180px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    scroll-behavior: smooth;
+}
+
+/* Gradient fade effect at top/bottom */
+.time-picker-scroll::before,
+.time-picker-scroll::after {
+    content: '';
+    position: sticky;
+    display: block;
+    height: 40px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.time-picker-scroll::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(20, 20, 25, 0.95), transparent);
+}
+
+.time-picker-scroll::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(20, 20, 25, 0.95), transparent);
+}
+
+/* Time Option Buttons */
+.time-picker-option {
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 15px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    outline: none;
+}
+
+.time-picker-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.time-picker-option.selected {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.2));
+    color: white;
+    font-weight: 600;
+    transform: scale(1.02);
+}
+
+.time-picker-option.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: linear-gradient(180deg, #6366f1, #a855f7);
+    border-radius: 0 4px 4px 0;
+}
+
+/* Quick Select Buttons */
+.time-picker-quick {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+}
+
+.time-picker-quick-btn {
+    flex: 1;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.time-picker-quick-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.time-picker-quick-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Action Buttons */
+.time-picker-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.time-picker-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.time-picker-btn-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.time-picker-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.time-picker-btn-confirm {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    border: none;
+    color: white;
+    box-shadow: 
+        0 4px 16px rgba(99, 102, 241, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.time-picker-btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 24px rgba(99, 102, 241, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.time-picker-btn-confirm:active {
+    transform: translateY(0);
+}
+
+.time-picker-btn-confirm::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+}
+
+/* Scrollbar Styling */
+.time-picker-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.time-picker-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+}
+
+.time-picker-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.4));
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.time-picker-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.6), rgba(168, 85, 247, 0.6));
+    background-clip: padding-box;
+}
+
+/* Firefox scrollbar */
+.time-picker-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.4) transparent;
+}
+
+/* Legacy time-scroll class for backwards compatibility */
+.time-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.time-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.time-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.time-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.time-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

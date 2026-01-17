@@ -9,6 +9,7 @@ interface CalendarPickerProps {
     selectedDate: Date;
     onDateSelect: (date: Date) => void;
     maxDate?: Date;
+    closeOnClickOutside?: boolean;
 }
 
 const MONTHS = [
@@ -30,6 +31,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
     selectedDate,
     onDateSelect,
     maxDate = new Date(),
+    closeOnClickOutside = true,
 }) => {
     const [isClosing, setIsClosing] = useState(false);
     const [viewDate, setViewDate] = useState(selectedDate);
@@ -57,7 +59,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
 
     // Handle click outside
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen || !closeOnClickOutside) return;
 
         const handleClickOutside = (e: MouseEvent | TouchEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
@@ -75,7 +77,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('touchstart', handleClickOutside);
         };
-    }, [isOpen]);
+    }, [isOpen, closeOnClickOutside]);
 
     // Handle escape key
     useEffect(() => {
@@ -187,7 +189,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
     const calendarContent = (
         <div
             className={`calendar-overlay ${isClosing ? 'closing' : ''}`}
-            onClick={handleClose}
+            onClick={closeOnClickOutside ? handleClose : undefined}
         >
             <div
                 ref={calendarRef}
