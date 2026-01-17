@@ -158,7 +158,7 @@ const Login: React.FC = () => {
     <div>
       <NavBar />
     </div>
-    <div className="min-h-[80vh] bg-black flex items-center justify-center px-4 lg:pt-16 xl:pt-20">
+    <div className="min-h-[80vh] bg-black flex items-center lg:items-start justify-center px-4 lg:pt-12 xl:pt-16">
       
       {/* Subtle background texture */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -166,34 +166,34 @@ const Login: React.FC = () => {
         <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-neutral-800/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative w-full max-w-[320px] lg:max-w-[300px] bg-neutral-950 border border-neutral-800/80 rounded-2xl shadow-2xl shadow-black overflow-hidden">
+      <div className="relative w-full max-w-[320px] lg:max-w-[280px] bg-neutral-950 border border-neutral-800/80 rounded-2xl lg:rounded-xl shadow-2xl shadow-black overflow-hidden">
         
         {/* Decorative top line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent"></div>
 
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 lg:px-5 lg:pt-5 lg:pb-3 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10 rounded-xl bg-white mb-3 lg:mb-2 shadow-lg shadow-white/10">
+        <div className="px-6 pt-6 pb-4 lg:px-4 lg:pt-4 lg:pb-2 text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 lg:w-9 lg:h-9 rounded-xl lg:rounded-lg bg-white mb-3 lg:mb-2 shadow-lg shadow-white/10">
             <User size={22} className="text-black lg:hidden" />
-            <User size={18} className="text-black hidden lg:block" />
+            <User size={16} className="text-black hidden lg:block" />
           </div>
-          <h1 className="text-lg lg:text-base font-bold text-white mb-1 tracking-tight">
+          <h1 className="text-lg lg:text-sm font-bold text-white mb-1 lg:mb-0.5 tracking-tight">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs lg:text-[10px] text-neutral-500">
             {isLogin
               ? "Sign in to continue tracking"
               : "Start your expense journey"}
           </p>
         </div>
 
-        <div className="px-6 pb-6 lg:px-5 lg:pb-5">
+        <div className="px-6 pb-6 lg:px-4 lg:pb-4">
 
           {/* Toggle */}
-          <div className="flex mb-5 lg:mb-4 bg-black rounded-lg p-0.5 border border-neutral-800">
+          <div className="flex mb-5 lg:mb-3 bg-black rounded-lg p-0.5 border border-neutral-800">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all duration-300 ${
+              className={`flex-1 py-2 lg:py-1.5 text-xs lg:text-[11px] font-medium rounded-md transition-all duration-300 ${
                 isLogin
                   ? "bg-white text-black shadow-lg"
                   : "text-neutral-500 hover:text-neutral-300"
@@ -203,7 +203,7 @@ const Login: React.FC = () => {
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 text-xs font-medium rounded-md transition-all duration-300 ${
+              className={`flex-1 py-2 lg:py-1.5 text-xs lg:text-[11px] font-medium rounded-md transition-all duration-300 ${
                 !isLogin
                   ? "bg-white text-black shadow-lg"
                   : "text-neutral-500 hover:text-neutral-300"
@@ -213,7 +213,7 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3 lg:space-y-2.5">
+          <form onSubmit={handleSubmit} className="space-y-3 lg:space-y-2">
 
             {!isLogin && (
               <Input
