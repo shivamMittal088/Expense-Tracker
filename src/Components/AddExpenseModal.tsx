@@ -5,6 +5,11 @@ import { showToast, showTopToast } from "../utils/Redirecttoast";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import { TimePicker } from "../utils/UI/TimePicker";
 import AddTileModal from "./AddTileModal";
+import { AxiosError } from "axios";
+
+interface ApiErrorResponse {
+  message?: string;
+}
 
 type Tile = {
   _id: string;
@@ -73,8 +78,9 @@ export default function AddExpenseModal({ open, onClose }: Props) {
         setCategory("");
       }
       showTopToast("Tile deleted", { duration: 1500 });
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to delete tile";
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      const message = axiosError?.response?.data?.message || "Failed to delete tile";
       showTopToast(message, { tone: "error", duration: 2000 });
     } finally {
       setDeletingTileId(null);
@@ -149,8 +155,9 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       setOccurredAt(getLocalISOString());
       window.dispatchEvent(new CustomEvent("expense:added"));
       onClose();
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to save expense. Please try again.";
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      const message = axiosError?.response?.data?.message || "Failed to save expense. Please try again.";
       showTopToast(message, { tone: "error", duration: 2500 });
     } finally {
       setLoading(false);
@@ -265,11 +272,11 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                         }}
                         disabled={isDeleting}
                       >
-                        {/* Delete button for user tiles */}
+                        {/* Delete button for user tiles - always visible on mobile, hover on desktop */}
                         {!tile.isBuiltIn && (
                           <button
                             onClick={(e) => handleDeleteTile(tile, e)}
-                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/90 flex items-center justify-center transition-opacity hover:bg-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                             title="Delete tile"
                           >
                             <Trash2 className="w-2.5 h-2.5 text-white" />

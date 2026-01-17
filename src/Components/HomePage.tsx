@@ -15,9 +15,29 @@ type Expense = {
   emoji?: string; // Emoji may also be stored on category
   notes?: string;
   occurredAt: string;
-  payment_mode?: string;
+  payment_mode: string;
   deleted?: boolean;
+  currency?: string;
 };
+
+interface RawExpense {
+  _id: string;
+  amount: number;
+  category: {
+    name: string;
+    color: string;
+    emoji?: string;
+  };
+  emoji?: string;
+  notes?: string;
+  occurredAt?: string;
+  occuredAt?: string;  // Handle typo from API
+  createdAt?: string;
+  updatedAt?: string;
+  payment_mode: string;
+  deleted?: boolean;
+  currency?: string;
+}
 
 export default function ExpenseTrackerHome() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -67,8 +87,8 @@ export default function ExpenseTrackerHome() {
 
   /* ---------------- Fetch expenses when date changes ---------------- */
 
-  const normalizeExpenses = (items: any[]) => {
-    const normalized = (items || []).map((e: any) => ({
+  const normalizeExpenses = (items: RawExpense[]): Expense[] => {
+    const normalized = (items || []).map((e: RawExpense) => ({
       ...e,
       occurredAt: e.occurredAt || e.occuredAt || e.createdAt || e.updatedAt || new Date().toISOString(),
     }));
