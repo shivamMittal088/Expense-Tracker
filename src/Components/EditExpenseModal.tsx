@@ -31,7 +31,6 @@ type Props = {
   onClose: () => void;
   expense: Expense | null;
   onUpdate?: () => void;
-  onDelete?: () => void;
 };
 
 const paymentModes = [
@@ -42,7 +41,7 @@ const paymentModes = [
   { id: "UPI", label: "UPI", icon: Smartphone },
 ];
 
-export default function EditExpenseModal({ open, onClose, expense, onUpdate, onDelete }: Props) {
+export default function EditExpenseModal({ open, onClose, expense, onUpdate }: Props) {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [loadingTiles, setLoadingTiles] = useState(true);
 

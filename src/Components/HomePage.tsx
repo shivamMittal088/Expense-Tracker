@@ -224,11 +224,6 @@ export default function ExpenseTrackerHome() {
     setEditingExpense(null);
   };
 
-  const handleEditDelete = () => {
-    fetchExpenses(showHidden);
-    setEditingExpense(null);
-  };
-
   useEffect(() => {
     fetchExpenses(showHidden);
   }, [fetchExpenses, showHidden]);
@@ -881,7 +876,6 @@ export default function ExpenseTrackerHome() {
         onClose={() => setEditingExpense(null)}
         expense={editingExpense}
         onUpdate={handleEditUpdate}
-        onDelete={handleEditDelete}
       />
     </div>
   );
