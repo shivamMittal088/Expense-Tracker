@@ -13,9 +13,12 @@ import {
   Loader2,
   Key,
   Monitor,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
+import { useAmountVisibility } from "../store/amountStore";
 
 interface UserSettings {
   soundEnabled: boolean;
@@ -32,6 +35,7 @@ const currencies = [
 ];
 
 export default function Settings() {
+  const { hideAmounts, setHideAmounts } = useAmountVisibility();
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: true,
     notifications: true,
@@ -238,6 +242,25 @@ export default function Settings() {
             description="Calendar week begins on Monday"
             enabled={settings.startWeekOnMonday}
             onChange={(v) => updateSetting("startWeekOnMonday", v)}
+          />
+        </div>
+      </section>
+
+      {/* Privacy */}
+      <section className="mb-6">
+        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+          Privacy
+        </h2>
+        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+          <SettingToggle
+            icon={hideAmounts ? EyeOff : Eye}
+            label="Hide Amounts"
+            description="Blur amounts until tapped (for privacy)"
+            enabled={hideAmounts}
+            onChange={(v) => {
+              setHideAmounts(v);
+              showTopToast(v ? "Amounts hidden" : "Amounts visible", { duration: 1500 });
+            }}
           />
         </div>
       </section>

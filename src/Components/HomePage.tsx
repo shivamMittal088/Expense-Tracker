@@ -3,6 +3,8 @@ import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
 import EditExpenseModal from "./EditExpenseModal";
+import { AmountText } from "./Amount";
+import { useAmountVisibility } from "../store/amountStore";
 
 type Expense = {
   _id: string;
@@ -40,6 +42,7 @@ interface RawExpense {
 }
 
 export default function ExpenseTrackerHome() {
+  const { hideAmounts } = useAmountVisibility();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -308,7 +311,7 @@ export default function ExpenseTrackerHome() {
               <div className="text-right shrink-0 pr-1">
                 <p className="text-[10px] text-gray-500">Amount</p>
                 <p className="text-sm sm:text-base font-bold" style={{ color: e.category.color }}>
-                  ₹{amountLabel}
+                  <AmountText value={e.amount} className="" />
                 </p>
               </div>
               <div className="flex flex-col gap-1 shrink-0 pt-0.5 sm:pt-0">
@@ -429,12 +432,11 @@ export default function ExpenseTrackerHome() {
               {/* Amount */}
               <div className="ml-auto flex items-start gap-2 sm:gap-3 w-full sm:w-auto justify-end">
                 <div className="flex items-baseline gap-0.5 shrink-0 pr-1 text-right">
-                  <span className="text-[10px] text-gray-600">₹</span>
                   <span
                     className="font-semibold text-base"
                     style={{ color: e.category.color }}
                   >
-                    {e.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    <AmountText value={e.amount} className="" />
                   </span>
                 </div>
 
@@ -549,7 +551,7 @@ export default function ExpenseTrackerHome() {
                     className="font-semibold text-sm"
                     style={{ color: e.category.color }}
                   >
-                    ₹{e. amount.toLocaleString('en-IN', { minimumFractionDigits:  2 })}
+                    <AmountText value={e.amount} className="" />
                   </span>
                 </div>
               </div>
@@ -628,7 +630,7 @@ export default function ExpenseTrackerHome() {
               <div className="text-right w-full sm:w-auto">
                 <p className="text-xs text-gray-400">Total Expenses</p>
                 <p className="text-2xl font-bold">
-                  ₹{totalForDay.toFixed(2)}
+                  {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(2)}`}
                 </p>
                 {showHidden && (
                   <p className="text-[10px] text-gray-500">Hidden items not counted</p>
