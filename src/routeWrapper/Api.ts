@@ -1,8 +1,11 @@
 import axios from "axios";
 import { showToast } from "../utils/Redirecttoast";
 
+// Production API URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://expense-tracker-backend-xi-one.vercel.app";
+
 const Api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+  baseURL: API_BASE_URL,
   withCredentials: true, // 🔥 required for JWT cookies
 });
 
