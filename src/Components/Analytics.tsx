@@ -50,6 +50,8 @@ const FilterButton = ({
   </button>
 );
 
+const ITEMS_PER_PAGE = 15;
+
 const Analytics = () => {
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("all");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -57,6 +59,7 @@ const Analytics = () => {
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
   const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
 
   // NEW: State for expenses
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
@@ -385,6 +388,38 @@ const Analytics = () => {
         )}
       </div>
 
+      {/* Recurring Payments Section */}
+      <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800 mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-medium text-white">Recurring Payments</h2>
+          <span className="text-[10px] text-zinc-500">Auto-detected</span>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {/* Dummy recurring items - replace with real data later */}
+          {[
+            { emoji: "🎬", name: "Netflix", amount: 649, count: 6 },
+            { emoji: "🏠", name: "Rent", amount: 15000, count: 4 },
+            { emoji: "💪", name: "Gym", amount: 1200, count: 3 },
+            { emoji: "📱", name: "Mobile", amount: 599, count: 5 },
+            { emoji: "🌐", name: "Internet", amount: 899, count: 4 },
+            { emoji: "🎵", name: "Spotify", amount: 119, count: 6 },
+          ].map((item) => (
+            <div
+              key={item.name}
+              className="flex items-center gap-2 bg-zinc-800/40 rounded px-2 py-1.5 hover:bg-zinc-800/70 transition-colors cursor-pointer"
+            >
+              <span className="text-sm">{item.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-xs truncate">{item.name}</p>
+                <p className="text-zinc-500 text-[10px]">{item.count}x</p>
+              </div>
+              <p className="text-emerald-400 text-xs font-medium">₹{item.amount.toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Analytics Content */}
       <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800">
         {loading ? (
@@ -417,9 +452,9 @@ const Analytics = () => {
             </div>
 
             {/* Expense List */}
-            <div className="space-y-1 max-h-[280px] overflow-y-auto">
+            <div className="max-h-[300px] overflow-y-auto">
               {filteredExpenses.length === 0 ? (
-                <div className="text-center py-6">
+                <div className="text-center py-4">
                   <p className="text-zinc-500 text-xs">No expenses match your filters</p>
                   <button 
                     onClick={clearAllFilters}
@@ -429,23 +464,32 @@ const Analytics = () => {
                   </button>
                 </div>
               ) : (
-                filteredExpenses.map((expense) => (
-                  <div
-                    key={expense._id}
-                    className="flex items-center justify-between bg-zinc-800/30 hover:bg-zinc-800/60 rounded px-2 py-1.5 transition-colors"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm">{expense.category.emoji || "💰"}</span>
-                      <div>
-                        <p className="text-white text-xs">{expense.category.name}</p>
-                        <p className="text-zinc-500 text-[10px]">
-                          {expense.payment_mode} • {new Date(expense.occurredAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-emerald-400 text-xs font-medium">₹{expense.amount.toLocaleString()}</p>
-                  </div>
-                ))
+                <>
+                  <table className="w-full text-xs">
+                    <tbody>
+                      {filteredExpenses.slice(0, displayCount).map((expense) => (
+                        <tr
+                          key={expense._id}
+                          className="border-b border-zinc-800/50 hover:bg-zinc-800/40"
+                        >
+                          <td className="py-1 pr-2 w-6">{expense.category.emoji || "💰"}</td>
+                          <td className="py-1 text-white">{expense.category.name}</td>
+                          <td className="py-1 text-zinc-500 hidden sm:table-cell">{expense.payment_mode}</td>
+                          <td className="py-1 text-zinc-500 text-right">{new Date(expense.occurredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</td>
+                          <td className="py-1 text-emerald-400 font-medium text-right pl-3">₹{expense.amount.toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {displayCount < filteredExpenses.length && (
+                    <button
+                      onClick={() => setDisplayCount((prev) => prev + ITEMS_PER_PAGE)}
+                      className="w-full mt-2 py-1.5 text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/50 rounded transition-colors"
+                    >
+                      Load more ({filteredExpenses.length - displayCount} remaining)
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

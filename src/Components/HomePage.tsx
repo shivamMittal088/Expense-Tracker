@@ -56,6 +56,26 @@ export default function ExpenseTrackerHome() {
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [hiddenCount, setHiddenCount] = useState(0);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  
+  // Income tracking
+  const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
+  const [isEditingIncome, setIsEditingIncome] = useState(false);
+  const [incomeInput, setIncomeInput] = useState("");
+
+  // Fetch monthly income from profile on mount
+  useEffect(() => {
+    const fetchIncome = async () => {
+      try {
+        const res = await api.get('/api/profile/view');
+        if (res.data?.monthlyIncome) {
+          setMonthlyIncome(res.data.monthlyIncome);
+        }
+      } catch (err) {
+        console.error('Failed to fetch income:', err);
+      }
+    };
+    fetchIncome();
+  }, []);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -603,29 +623,118 @@ export default function ExpenseTrackerHome() {
             </div>
 
             {/* Right – Calendar + Total */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 w-full sm:w-auto">
-              <button
-                onClick={() => setIsCalendarOpen(true)}
-                onTouchEnd={(e) => { e.preventDefault(); setIsCalendarOpen(true); }}
-                className={`px-3 py-1.5 sm:px-3 sm:py-1.5 rounded-md border text-xs sm:text-sm font-medium transition-all w-full sm:w-auto text-center
-                  ${
-                    isToday
-                      ?  "bg-blue-700 border-blue-600 text-white"
-                      :  "bg-black border-gray-800 hover:border-white"
-                  }
-                `}
-              >
-                Open Calendar
-              </button>
-
-              {(showHidden || hiddenCount > 0) && (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 w-full sm:w-auto">
+              <div className="flex gap-2">
                 <button
-                  onClick={() => setShowHidden(prev => !prev)}
-                  className="relative px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md border text-[11px] sm:text-xs font-semibold transition-all w-full sm:w-auto text-center bg-slate-900 border-slate-700 hover:border-white hover:bg-slate-800 text-slate-100"
+                  onClick={() => setIsCalendarOpen(true)}
+                  onTouchEnd={(e) => { e.preventDefault(); setIsCalendarOpen(true); }}
+                  className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+                    ${isToday
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
+                      : "bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600"
+                    }
+                  `}
                 >
-                  {showHidden ? "Back to visible" : `${hiddenCount} hidden`}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  Calendar
                 </button>
-              )}
+
+                {(showHidden || hiddenCount > 0) && (
+                  <button
+                    onClick={() => setShowHidden(prev => !prev)}
+                    className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all
+                      ${showHidden
+                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30"
+                        : "bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700"
+                      }
+                    `}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      {showHidden ? (
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                      ) : (
+                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24 M1 1l22 22" />
+                      )}
+                    </svg>
+                    {showHidden ? "Show visible" : `${hiddenCount} hidden`}
+                  </button>
+                )}
+              </div>
+
+              {/* Income & Percentage */}
+              <div className="flex items-center gap-3">
+                {isEditingIncome ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-zinc-500 text-xs">₹</span>
+                    <input
+                      type="number"
+                      value={incomeInput}
+                      onChange={(e) => setIncomeInput(e.target.value)}
+                      placeholder="Monthly income"
+                      className="w-24 bg-zinc-800 text-white text-xs px-2 py-1 rounded border border-zinc-700 focus:outline-none focus:border-emerald-500"
+                      autoFocus
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter') {
+                          const value = parseFloat(incomeInput) || 0;
+                          setMonthlyIncome(value);
+                          setIsEditingIncome(false);
+                          try {
+                            await api.patch('/api/profile/update', { monthlyIncome: value });
+                          } catch (err) {
+                            console.error('Failed to save income:', err);
+                          }
+                        } else if (e.key === 'Escape') {
+                          setIsEditingIncome(false);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={async () => {
+                        const value = parseFloat(incomeInput) || 0;
+                        setMonthlyIncome(value);
+                        setIsEditingIncome(false);
+                        try {
+                          await api.patch('/api/profile/update', { monthlyIncome: value });
+                        } catch (err) {
+                          console.error('Failed to save income:', err);
+                        }
+                      }}
+                      className="text-emerald-400 text-xs hover:text-emerald-300"
+                    >
+                      ✓
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setIncomeInput(monthlyIncome > 0 ? monthlyIncome.toString() : "");
+                      setIsEditingIncome(true);
+                    }}
+                    className="text-right hover:bg-zinc-800/50 rounded px-2 py-1 transition-colors"
+                  >
+                    {monthlyIncome > 0 ? (
+                      <>
+                        <p className="text-[10px] text-zinc-500">Monthly Income</p>
+                        <p className="text-sm font-medium text-white">
+                          {hideAmounts ? "₹•••••" : `₹${monthlyIncome.toLocaleString()}`}
+                        </p>
+                        <p className={`text-[10px] font-medium ${
+                          (totalForDay / monthlyIncome) * 100 > 5 ? 'text-red-400' : 'text-emerald-400'
+                        }`}>
+                          {hideAmounts ? "••%" : `${((totalForDay / monthlyIncome) * 100).toFixed(1)}% today`}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-zinc-500 hover:text-zinc-300">+ Set income</p>
+                    )}
+                  </button>
+                )}
+              </div>
 
               <div className="text-right w-full sm:w-auto">
                 <p className="text-xs text-gray-400">Total Expenses</p>
