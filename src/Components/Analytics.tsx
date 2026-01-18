@@ -51,6 +51,8 @@ const FilterButton = ({
 );
 
 const ITEMS_PER_PAGE = 15;
+const MIN_RECURRING_COUNT = 4; // Must occur at least 4 times
+const MIN_INCOME_PERCENTAGE = 0.5; // Must be at least 0.5% of income
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("all");
@@ -64,6 +66,7 @@ const Analytics = () => {
   // NEW: State for expenses
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -79,6 +82,13 @@ const Analytics = () => {
     const fetchExpenses = async () => {
       try {
         setLoading(true);
+        
+        // Fetch monthly income from profile
+        const profileRes = await api.get('/api/profile/view');
+        if (profileRes.data?.monthlyIncome) {
+          setMonthlyIncome(profileRes.data.monthlyIncome);
+        }
+        
         // Fetch last 30 days of expenses
         const today = new Date();
         const promises = [];
