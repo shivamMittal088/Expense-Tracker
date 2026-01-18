@@ -1,8 +1,24 @@
 import { useState, useRef, useEffect } from "react";
-import { Calendar, CreditCard, Tag, IndianRupee, X} from "lucide-react";
-import type{ LucideIcon } from "lucide-react";
+import { Calendar, CreditCard, Tag, IndianRupee, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import api from "../routeWrapper/Api";
 
 type DropdownType = "date" | "payment" | "category" | "amount" | null;
+
+type Expense = {
+  _id: string;
+  amount: number;
+  category: {
+    name: string;
+    color: string;
+    emoji?: string;
+  };
+  notes?: string;
+  occurredAt: string;
+  payment_mode: string;
+  deleted?: boolean;
+  currency?: string;
+};
 
 // Moved outside to prevent recreation on each render
 const FilterButton = ({
@@ -22,13 +38,13 @@ const FilterButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm whitespace-nowrap transition-all ${
+    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all ${
       isActive
         ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
         : "bg-zinc-800/60 text-zinc-300 border border-zinc-700/50 hover:bg-zinc-700/60"
-    } ${isOpen ? "ring-2 ring-emerald-500/50" : ""}`}
+    } ${isOpen ? "ring-1 ring-emerald-500/50" : ""}`}
   >
-    <Icon size={15} />
+    <Icon size={12} />
     <span className="text-zinc-500">{label}:</span>
     <span className="font-medium">{value}</span>
   </button>
@@ -37,15 +53,57 @@ const FilterButton = ({
 const Analytics = () => {
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("all");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [paymentMode, setPaymentMode] = useState<string>("all");
+  const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
   const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 
+  // NEW: State for expenses
+  const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const categories = ["Food", "Transport", "Shopping", "Entertainment", "Bills", "Health"];
-  const paymentModes = ["all", "cash", "card", "UPI", "bank_transfer", "wallet"];
+  // Dynamic categories extracted from user's expenses
+  const categories = [...new Map(
+    allExpenses.map((e) => [e.category.name, { name: e.category.name, emoji: e.category.emoji }])
+  ).values()];
+
+  const paymentModes = ["cash", "card", "UPI", "bank_transfer", "wallet"];
+
+  // NEW: Fetch expenses on mount
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        setLoading(true);
+        // Fetch last 30 days of expenses
+        const today = new Date();
+        const promises = [];
+        
+        for (let i = 0; i < 30; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+          promises.push(api.get(`/api/expense/${dateStr}`));
+        }
+        
+        const responses = await Promise.all(promises);
+        const allData = responses.flatMap((res) => res.data?.data || []);
+        
+        // Filter out deleted expenses
+        const activeExpenses = allData.filter((e: Expense) => !e.deleted);
+        setAllExpenses(activeExpenses);
+        
+        console.log("Fetched expenses:", activeExpenses.length);
+      } catch (error) {
+        console.error("Failed to fetch expenses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -58,6 +116,47 @@ const Analytics = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ============================================
+  // Filter expenses by all criteria
+  // ============================================
+  const filteredExpenses = allExpenses.filter((expense) => {
+    // 1. Payment mode filter (empty array = show all)
+    const paymentMatch = selectedPayments.length === 0 || selectedPayments.includes(expense.payment_mode);
+    
+    // 2. Category filter (if no categories selected, show all)
+    const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(expense.category.name);
+    
+    // 3. Date range filter
+    const expenseDate = new Date(expense.occurredAt);
+    const today = new Date();
+    let dateMatch = true;
+    
+    if (dateRange === "week") {
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      dateMatch = expenseDate >= weekAgo;
+    } else if (dateRange === "month") {
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(today.getMonth() - 1);
+      dateMatch = expenseDate >= monthAgo;
+    } else if (dateRange === "year") {
+      const yearAgo = new Date(today);
+      yearAgo.setFullYear(today.getFullYear() - 1);
+      dateMatch = expenseDate >= yearAgo;
+    }
+    // "all" = no date filter
+    
+    // 4. Amount range filter
+    let amountMatch = true;
+    const min = minAmount ? parseFloat(minAmount) : null;
+    const max = maxAmount ? parseFloat(maxAmount) : null;
+    
+    if (min !== null && expense.amount < min) amountMatch = false;
+    if (max !== null && expense.amount > max) amountMatch = false;
+    
+    return paymentMatch && categoryMatch && dateMatch && amountMatch;
+  });
+
   const getDateLabel = () => {
     if (dateRange === "all") return "All Time";
     if (dateRange === "week") return "This Week";
@@ -66,8 +165,12 @@ const Analytics = () => {
   };
 
   const getPaymentLabel = () => {
-    if (paymentMode === "all") return "All Modes";
-    return paymentMode === "bank_transfer" ? "Bank" : paymentMode.toUpperCase();
+    if (selectedPayments.length === 0) return "All Modes";
+    if (selectedPayments.length === 1) {
+      const mode = selectedPayments[0];
+      return mode === "bank_transfer" ? "Bank" : mode.toUpperCase();
+    }
+    return `${selectedPayments.length} selected`;
   };
 
   const getCategoryLabel = () => {
@@ -83,11 +186,11 @@ const Analytics = () => {
     return `Up to ₹${maxAmount}`;
   };
 
-  const hasActiveFilters = dateRange !== "all" || paymentMode !== "all" || selectedCategories.length > 0 || minAmount || maxAmount;
+  const hasActiveFilters = dateRange !== "all" || selectedPayments.length > 0 || selectedCategories.length > 0 || minAmount || maxAmount;
 
   const clearAllFilters = () => {
     setDateRange("all");
-    setPaymentMode("all");
+    setSelectedPayments([]);
     setSelectedCategories([]);
     setMinAmount("");
     setMaxAmount("");
@@ -98,12 +201,12 @@ const Analytics = () => {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-5">Analytics</h1>
+    <div className="p-3 pb-20 max-w-3xl mx-auto">
+      <h1 className="text-xl font-bold mb-3">Analytics</h1>
 
       {/* Filter Bar */}
-      <div className="relative mb-6" ref={dropdownRef}>
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="relative mb-4" ref={dropdownRef}>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
           <FilterButton
             icon={Calendar}
             label="Period"
@@ -116,7 +219,7 @@ const Analytics = () => {
             icon={CreditCard}
             label="Payment"
             value={getPaymentLabel()}
-            isActive={paymentMode !== "all"}
+            isActive={selectedPayments.length > 0}
             isOpen={openDropdown === "payment"}
             onClick={() => toggleDropdown("payment")}
           />
@@ -140,9 +243,9 @@ const Analytics = () => {
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-zinc-500 hover:text-red-400 transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-zinc-500 hover:text-red-400 transition-colors"
             >
-              <X size={14} />
+              <X size={12} />
               Clear
             </button>
           )}
@@ -171,54 +274,72 @@ const Analytics = () => {
         )}
 
         {openDropdown === "payment" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-2 shadow-xl z-50 min-w-[180px]">
-            {paymentModes.map((mode) => (
+          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-xl z-50 min-w-[200px]">
+            <div className="flex flex-wrap gap-2">
+              {paymentModes.map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setSelectedPayments((prev) =>
+                      prev.includes(mode) ? prev.filter((m) => m !== mode) : [...prev, mode]
+                    );
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                    selectedPayments.includes(mode)
+                      ? "bg-emerald-500 text-white"
+                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  }`}
+                >
+                  {mode === "bank_transfer" ? "Bank" : mode.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            {selectedPayments.length > 0 && (
               <button
-                key={mode}
-                onClick={() => {
-                  setPaymentMode(mode);
-                  setOpenDropdown(null);
-                }}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                  paymentMode === mode
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : "text-zinc-300 hover:bg-zinc-800"
-                }`}
+                onClick={() => setSelectedPayments([])}
+                className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
               >
-                {mode === "all" ? "All Modes" : mode === "bank_transfer" ? "Bank Transfer" : mode.toUpperCase()}
+                Clear selection
               </button>
-            ))}
+            )}
           </div>
         )}
 
         {openDropdown === "category" && (
           <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-xl z-50 min-w-[220px]">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategories((prev) =>
-                      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-                    );
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                    selectedCategories.includes(cat)
-                      ? "bg-emerald-500 text-white"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-            {selectedCategories.length > 0 && (
-              <button
-                onClick={() => setSelectedCategories([])}
-                className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
-              >
-                Clear selection
-              </button>
+            {categories.length === 0 ? (
+              <p className="text-zinc-500 text-sm">No categories found</p>
+            ) : (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.name}
+                      onClick={() => {
+                        setSelectedCategories((prev) =>
+                          prev.includes(cat.name) ? prev.filter((c) => c !== cat.name) : [...prev, cat.name]
+                        );
+                      }}
+                      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
+                        selectedCategories.includes(cat.name)
+                          ? "bg-emerald-500 text-white"
+                          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                      }`}
+                    >
+                      <span>{cat.emoji || "📁"}</span>
+                      <span>{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
+                {selectedCategories.length > 0 && (
+                  <button
+                    onClick={() => setSelectedCategories([])}
+                    className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
+                  >
+                    Clear selection
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}
@@ -264,9 +385,71 @@ const Analytics = () => {
         )}
       </div>
 
-      {/* Placeholder for Analytics Content */}
-      <div className="bg-zinc-900/50 rounded-2xl p-12 border border-zinc-800 text-center">
-        <p className="text-zinc-500">Analytics charts and data will appear here</p>
+      {/* Analytics Content */}
+      <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800">
+        {loading ? (
+          <div className="flex items-center justify-center py-6">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* Summary Row - Inline */}
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
+                <span className="text-zinc-500">Count:</span>
+                <span className="text-white font-medium">{filteredExpenses.length}</span>
+                <span className="text-zinc-600">/ {allExpenses.length}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
+                <span className="text-zinc-500">Total:</span>
+                <span className="text-emerald-400 font-medium">
+                  ₹{filteredExpenses.reduce((sum, e) => sum + e.amount, 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
+                <span className="text-zinc-500">Avg:</span>
+                <span className="text-white font-medium">
+                  ₹{filteredExpenses.length > 0 
+                    ? Math.round(filteredExpenses.reduce((sum, e) => sum + e.amount, 0) / filteredExpenses.length).toLocaleString()
+                    : 0}
+                </span>
+              </div>
+            </div>
+
+            {/* Expense List */}
+            <div className="space-y-1 max-h-[280px] overflow-y-auto">
+              {filteredExpenses.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-zinc-500 text-xs">No expenses match your filters</p>
+                  <button 
+                    onClick={clearAllFilters}
+                    className="text-emerald-400 text-xs mt-1 hover:underline"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              ) : (
+                filteredExpenses.map((expense) => (
+                  <div
+                    key={expense._id}
+                    className="flex items-center justify-between bg-zinc-800/30 hover:bg-zinc-800/60 rounded px-2 py-1.5 transition-colors"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">{expense.category.emoji || "💰"}</span>
+                      <div>
+                        <p className="text-white text-xs">{expense.category.name}</p>
+                        <p className="text-zinc-500 text-[10px]">
+                          {expense.payment_mode} • {new Date(expense.occurredAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-emerald-400 text-xs font-medium">₹{expense.amount.toLocaleString()}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
