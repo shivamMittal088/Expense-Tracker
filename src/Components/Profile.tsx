@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   User,
   Mail,
@@ -58,12 +58,31 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [loginHistory, setLoginHistory] = useState<LoginHistoryItem[]>([]);
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper to get full photo URL
+  const getFullPhotoURL = (photoURL?: string) => {
+    if (!photoURL) return undefined;
+    // If it's already a full URL, return as-is
+    if (photoURL.startsWith("http://") || photoURL.startsWith("https://")) {
+      return photoURL;
+    }
+    // Otherwise prepend the API base URL
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    return `${baseUrl}${photoURL}`;
+  };
 
   useEffect(() => {
     // Fetch profile first (required)
     Api.get<ProfileData>("/api/profile/view")
       .then(({ data }) => {
-        setProfile(data);
+        // Convert relative photoURL to full URL
+        const profileWithFullPhotoURL = {
+          ...data,
+          photoURL: getFullPhotoURL(data.photoURL),
+        };
+        setProfile(profileWithFullPhotoURL);
         setNameValue(data.name);
         setStatusValue(data.statusMessage || "");
       })
@@ -113,6 +132,52 @@ export default function Profile() {
       showTopToast(axiosError?.response?.data?.message || "Failed to update", { tone: "error" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      showTopToast("Image must be less than 5MB", { tone: "error" });
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      showTopToast("Only JPEG, PNG, GIF, or WebP images are allowed", { tone: "error" });
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await Api.post("/api/profile/upload-avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Build full URL for the photo
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const fullPhotoURL = `${baseUrl}${res.data.photoURL}`;
+      
+      setProfile((prev) => prev ? { ...prev, photoURL: fullPhotoURL } : null);
+      showTopToast("Photo updated!", { duration: 1500 });
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      showTopToast(axiosError?.response?.data?.message || "Failed to upload photo", { tone: "error" });
+    } finally {
+      setUploadingPhoto(false);
+      // Reset file input so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -197,11 +262,23 @@ export default function Profile() {
               {getInitials(profile.name)}
             </div>
           )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+            onChange={handlePhotoUpload}
+            className="hidden"
+          />
           <button
-            onClick={() => showTopToast("Photo upload coming soon", { tone: "info" })}
-            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center border-2 border-[#0a0a0a] hover:bg-blue-600 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingPhoto}
+            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center border-2 border-[#0a0a0a] hover:bg-blue-600 transition-colors disabled:opacity-50"
           >
-            <Camera className="w-4 h-4 text-white" />
+            {uploadingPhoto ? (
+              <Loader2 className="w-4 h-4 text-white animate-spin" />
+            ) : (
+              <Camera className="w-4 h-4 text-white" />
+            )}
           </button>
         </div>
 

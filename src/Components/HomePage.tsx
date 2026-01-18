@@ -67,7 +67,8 @@ export default function ExpenseTrackerHome() {
     const fetchIncome = async () => {
       try {
         const res = await api.get('/api/profile/view');
-        if (res.data?.monthlyIncome) {
+        // Use typeof check to handle 0 as a valid value (0 is falsy but valid)
+        if (typeof res.data?.monthlyIncome === 'number') {
           setMonthlyIncome(res.data.monthlyIncome);
         }
       } catch (err) {
@@ -272,10 +273,6 @@ export default function ExpenseTrackerHome() {
   const GlassCard = ({ e, index, onAction, isPending, actionLabel }: { e: Expense; index: number; onAction: (id: string) => void; isPending: boolean; actionLabel: string }) => {
     const emoji = e.emoji || e.category?.emoji || "✨";
     const timeLabel = formatLocalTime(e.occurredAt);
-    const amountLabel = e.amount.toLocaleString("en-IN", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
 
     return (
       <div
@@ -724,7 +721,7 @@ export default function ExpenseTrackerHome() {
                           {hideAmounts ? "₹•••••" : `₹${monthlyIncome.toLocaleString()}`}
                         </p>
                         <p className={`text-[10px] font-medium ${
-                          (totalForDay / monthlyIncome) * 100 > 5 ? 'text-red-400' : 'text-emerald-400'
+                          (totalForDay / monthlyIncome) * 100 > 2.5 ? 'text-red-400' : 'text-emerald-400'
                         }`}>
                           {hideAmounts ? "••%" : `${((totalForDay / monthlyIncome) * 100).toFixed(1)}% today`}
                         </p>
