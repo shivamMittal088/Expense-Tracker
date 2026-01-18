@@ -1,4 +1,4 @@
-import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock, Trash2 } from "lucide-react";
+import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
@@ -56,10 +56,8 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate, onD
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
   const [notesFocused, setNotesFocused] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Load tiles and populate form when modal opens
   useEffect(() => {
@@ -102,13 +100,6 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate, onD
     };
   }, [open, expense]);
 
-  // Reset delete confirm when modal closes
-  useEffect(() => {
-    if (!open) {
-      setShowDeleteConfirm(false);
-    }
-  }, [open]);
-
   const handleUpdate = async () => {
     if (!expense) return;
     
@@ -148,25 +139,6 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate, onD
       showTopToast(message, { tone: "error", duration: 2500 });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!expense) return;
-
-    setDeleting(true);
-    try {
-      await Api.delete(`/api/expense/${expense._id}`);
-      showTopToast("Expense deleted", { duration: 2000 });
-      window.dispatchEvent(new CustomEvent("expense:deleted"));
-      onDelete?.();
-      onClose();
-    } catch (err: unknown) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to delete expense.";
-      showTopToast(message, { tone: "error", duration: 2500 });
-    } finally {
-      setDeleting(false);
-      setShowDeleteConfirm(false);
     }
   };
 
