@@ -99,13 +99,14 @@ export function AmountText({
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const symbol = currencySymbols[currency] || "₹";
   
-  if (hideAmounts) {
-    return <span className={className}>{symbol}•••••</span>;
-  }
+  // Handle undefined/null/NaN values
+  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
 
-  return (
-    <span className={className}>
-      {symbol}{value.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-    </span>
-  );
+  const formatted = safeValue.toLocaleString("en-IN", { minimumFractionDigits: 2 });
+  
+  if (hideAmounts) {
+    return <>{symbol}•••••</>;
+  }
+  
+  return <>{symbol}{formatted}</>;
 }
