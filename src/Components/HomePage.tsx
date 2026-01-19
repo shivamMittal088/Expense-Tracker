@@ -264,93 +264,97 @@ export default function ExpenseTrackerHome() {
     setIsCalendarOpen(false);
   };
 
-  /* ---------------- Initial View - Compact Tile Style ---------------- */
+  /* ---------------- Initial View - Compact Card Style ---------------- */
   const GlassCard = ({ e, index, onAction, isPending, actionLabel }: { e: Expense; index: number; onAction: (id: string) => void; isPending: boolean; actionLabel: string }) => {
     const emoji = e.emoji || e.category?.emoji || "✨";
     const timeLabel = formatLocalTime(e.occurredAt);
 
     return (
       <div
-        className="group relative overflow-hidden rounded-lg border border-theme-border bg-theme-bg-card cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg/30"
-        style={{ animation: `floatIn 0.5s ease-out ${index * 0.06}s both` }}
+        className="group relative overflow-hidden rounded-xl bg-[#1a1a2e] border border-white/[0.08] hover:border-white/[0.12] transition-all duration-200 hover:bg-[#1e1e35]"
+        style={{ animation: `floatIn 0.4s ease-out ${index * 0.05}s both` }}
       >
-        {confirmActionId === e._id ? (
-          <div className="absolute top-2 right-2 z-20 flex gap-1">
-            <button
-              onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
-              disabled={isPending}
-              className="px-2 py-1 text-[10px] rounded-md bg-theme-accent hover:bg-theme-accent-hover border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
-            >
-              Confirm {actionLabel}
-            </button>
-            <button
-              onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
-              className="px-2 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
-            disabled={isPending}
-            className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-theme-bg-button/90 hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50"
-          >
-            {isPending ? "Saving…" : actionLabel}
-          </button>
-        )}
-        {/* Pattern + tint */}
+        {/* Left accent bar */}
+        <div 
+          className="absolute left-0 top-0 bottom-0 w-[3px]"
+          style={{ background: e.category.color }}
+        />
+
         {/* Content */}
-        <div className="relative z-10 p-2.5 sm:p-3 space-y-1.5 pr-2">
-          <div className="flex items-start gap-2 sm:gap-3">
+        <div className="relative z-10 p-3 pl-4">
+          {/* Row 1 - Category & Amount */}
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-base font-semibold"
-                style={{
-                  background: `${e.category.color}22`,
-                  color: e.category.color,
-                }}
-              >
-                {emoji}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] sm:text-xs text-theme-text-secondary leading-tight">{timeLabel}</p>
-                <p className="text-sm font-semibold text-theme-text-primary truncate">{e.category.name}</p>
-              </div>
+              <span className="text-base flex-shrink-0">{emoji}</span>
+              <span className="text-sm font-medium text-white/90 truncate">{e.category.name}</span>
             </div>
-
-            <div className="ml-auto flex items-start gap-2">
-              <div className="text-right shrink-0 pr-1">
-                <p className="text-[10px] text-theme-text-muted">Amount</p>
-                <p className="text-sm sm:text-base font-bold" style={{ color: e.category.color }}>
-                  <AmountText value={e.amount} className="" />
-                </p>
-              </div>
-              <div className="flex flex-col gap-1 shrink-0 pt-0.5 sm:pt-0">
-                <button
-                  onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
-                  disabled={isPending}
-                  className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-button/90 hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50 whitespace-nowrap text-right"
-                >
-                  {isPending ? "Saving…" : actionLabel}
-                </button>
-                <button
-                  onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                  className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-tertiary hover:bg-theme-bg-button border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
+            <span className="text-sm font-bold flex-shrink-0" style={{ color: e.category.color }}>
+              <AmountText value={e.amount} className="" />
+            </span>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-theme-text-secondary flex-wrap">
-            <span className="truncate leading-tight flex-1 min-w-0">
-              {e.notes || "No notes"}
-            </span>
-            <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap" style={{ background: `${e.category.color}1a`, color: e.category.color }}>
-              {e.payment_mode?.toUpperCase?.() || ""}
-            </span>
+          {/* Row 2 - Notes */}
+          <p className="text-[11px] text-white/40 truncate mb-2">
+            {e.notes || "No notes"}
+          </p>
+
+          {/* Row 3 - Time, Payment & Actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-white/30">{timeLabel}</span>
+              <span 
+                className="px-1.5 py-0.5 rounded text-[9px] font-medium uppercase"
+                style={{ background: `${e.category.color}20`, color: e.category.color }}
+              >
+                {e.payment_mode || "Cash"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {confirmActionId === e._id ? (
+                <>
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
+                    disabled={isPending}
+                    className="px-2 py-1 text-[10px] font-medium rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors disabled:opacity-50"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
+                    className="px-2 py-1 text-[10px] font-medium rounded bg-white/5 text-white/50 hover:bg-white/10 transition-colors"
+                  >
+                    No
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
+                    className="p-1.5 rounded bg-white/5 hover:bg-white/10 text-white/40 hover:text-white/70 transition-colors"
+                    title="Edit"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
+                    disabled={isPending}
+                    className="p-1.5 rounded bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-colors disabled:opacity-50"
+                    title={actionLabel}
+                  >
+                    {isPending ? (
+                      <div className="w-3 h-3 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                    )}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
