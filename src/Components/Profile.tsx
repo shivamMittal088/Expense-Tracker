@@ -231,22 +231,23 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-theme-text-secondary animate-spin" />
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-white/50 animate-spin" />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="text-center text-theme-text-secondary py-10">
-        Failed to load profile
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-white/50">Failed to load profile</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 pb-24">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-lg mx-auto px-4 py-6 pb-28">
       {/* Profile Header */}
       <div className="flex flex-col items-center mb-8">
         {/* Avatar */}
@@ -255,7 +256,7 @@ export default function Profile() {
             <img
               src={profile.photoURL}
               alt={profile.name}
-              className="w-24 h-24 rounded-full object-cover border-2 border-theme-border"
+              className="w-24 h-24 rounded-full object-cover border-2 border-white/10"
             />
           ) : (
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white">
@@ -272,12 +273,12 @@ export default function Profile() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
-            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-theme-accent flex items-center justify-center border-2 border-theme-bg-primary hover:bg-theme-accent-hover transition-colors disabled:opacity-50"
+            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white flex items-center justify-center border-2 border-black hover:bg-white/90 transition-colors disabled:opacity-50"
           >
             {uploadingPhoto ? (
-              <Loader2 className="w-4 h-4 text-white animate-spin" />
+              <Loader2 className="w-4 h-4 text-black animate-spin" />
             ) : (
-              <Camera className="w-4 h-4 text-white" />
+              <Camera className="w-4 h-4 text-black" />
             )}
           </button>
         </div>
@@ -289,14 +290,14 @@ export default function Profile() {
               type="text"
               value={nameValue}
               onChange={(e) => setNameValue(e.target.value)}
-              className="bg-theme-bg-tertiary border border-theme-border rounded-lg px-3 py-1.5 text-lg font-semibold text-theme-text-primary text-center focus:border-theme-accent focus:outline-none"
+              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-lg font-semibold text-white text-center focus:border-white/30 focus:outline-none"
               autoFocus
               maxLength={30}
             />
             <button
               onClick={handleSaveName}
               disabled={saving}
-              className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+              className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
             >
               <Check className="w-4 h-4" />
             </button>
@@ -305,17 +306,17 @@ export default function Profile() {
                 setEditingName(false);
                 setNameValue(profile.name);
               }}
-              className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-theme-text-primary">{profile.name}</h1>
+            <h1 className="text-xl font-bold text-white">{profile.name}</h1>
             <button
               onClick={() => setEditingName(true)}
-              className="p-1 rounded-lg hover:bg-theme-bg-hover text-theme-text-secondary hover:text-theme-text-primary transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors"
             >
               <Edit3 className="w-4 h-4" />
             </button>
@@ -324,20 +325,20 @@ export default function Profile() {
 
         {/* Status - Editable */}
         {editingStatus ? (
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-3">
             <input
               type="text"
               value={statusValue}
               onChange={(e) => setStatusValue(e.target.value)}
               placeholder="Set a status..."
-              className="bg-theme-bg-tertiary border border-theme-border rounded-lg px-3 py-1 text-sm text-theme-text-secondary text-center focus:border-theme-accent focus:outline-none"
+              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white/70 text-center focus:border-white/30 focus:outline-none"
               autoFocus
               maxLength={50}
             />
             <button
               onClick={handleSaveStatus}
               disabled={saving}
-              className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+              className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
             >
               <Check className="w-4 h-4" />
             </button>
@@ -346,7 +347,7 @@ export default function Profile() {
                 setEditingStatus(false);
                 setStatusValue(profile.statusMessage || "");
               }}
-              className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -354,7 +355,7 @@ export default function Profile() {
         ) : (
           <button
             onClick={() => setEditingStatus(true)}
-            className="flex items-center gap-1 mt-1 text-sm text-theme-text-secondary hover:text-theme-text-primary transition-colors"
+            className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
           >
             {profile.statusMessage || "Add a status..."}
             <Edit3 className="w-3 h-3" />
@@ -364,31 +365,31 @@ export default function Profile() {
 
       {/* Profile Details */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Account Info
         </h2>
-        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
           {/* Email */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
-              <Mail className="w-4 h-4 text-theme-text-secondary" />
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <Mail className="w-5 h-5 text-white/40" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-theme-text-muted uppercase">Email</p>
-              <p className="text-sm text-theme-text-primary">{profile.emailId}</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-wide">Email</p>
+              <p className="text-sm text-white">{profile.emailId}</p>
             </div>
           </div>
 
-          <div className="h-px bg-theme-border" />
+          <div className="h-px bg-white/5 mx-4" />
 
           {/* User ID */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
-              <User className="w-4 h-4 text-theme-text-secondary" />
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <User className="w-5 h-5 text-white/40" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-theme-text-muted uppercase">User ID</p>
-              <p className="text-sm text-theme-text-primary font-mono text-[11px]">{profile._id}</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-wide">User ID</p>
+              <p className="text-xs text-white/70 font-mono">{profile._id}</p>
             </div>
           </div>
         </div>
@@ -396,31 +397,31 @@ export default function Profile() {
 
       {/* Dates */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Activity
         </h2>
-        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
           {/* Member Since */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-theme-text-secondary" />
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-white/40" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-theme-text-muted uppercase">Member Since</p>
-              <p className="text-sm text-theme-text-primary">{formatDate(profile.createdAt)}</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-wide">Member Since</p>
+              <p className="text-sm text-white">{formatDate(profile.createdAt)}</p>
             </div>
           </div>
 
-          <div className="h-px bg-theme-border" />
+          <div className="h-px bg-white/5 mx-4" />
 
           {/* Last Updated */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-theme-text-secondary" />
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-white/40" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-theme-text-muted uppercase">Last Updated</p>
-              <p className="text-sm text-theme-text-primary">{formatDate(profile.updatedAt)}</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-wide">Last Updated</p>
+              <p className="text-sm text-white">{formatDate(profile.updatedAt)}</p>
             </div>
           </div>
         </div>
@@ -428,33 +429,33 @@ export default function Profile() {
 
       {/* Stats Preview */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Quick Stats
         </h2>
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
-            <p className="text-2xl font-bold text-theme-text-primary">-</p>
-            <p className="text-[10px] text-theme-text-muted uppercase mt-1">Total Expenses</p>
+          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+            <p className="text-2xl font-bold text-white">-</p>
+            <p className="text-[10px] text-white/30 uppercase mt-1">Total Expenses</p>
           </div>
-          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
-            <p className="text-2xl font-bold text-theme-text-primary">-</p>
-            <p className="text-[10px] text-theme-text-muted uppercase mt-1">This Month</p>
+          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+            <p className="text-2xl font-bold text-white">-</p>
+            <p className="text-[10px] text-white/30 uppercase mt-1">This Month</p>
           </div>
-          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
-            <p className="text-2xl font-bold text-theme-text-primary">{profile.currency}</p>
-            <p className="text-[10px] text-theme-text-muted uppercase mt-1">Currency</p>
+          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+            <p className="text-2xl font-bold text-emerald-400">{profile.currency}</p>
+            <p className="text-[10px] text-white/30 uppercase mt-1">Currency</p>
           </div>
         </div>
       </section>
 
       {/* Login History */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Login History
         </h2>
-        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
           {loginHistory.length === 0 ? (
-            <div className="px-4 py-6 text-center text-theme-text-muted text-sm">
+            <div className="px-4 py-8 text-center text-white/30 text-sm">
               No login history available
             </div>
           ) : (
@@ -462,28 +463,28 @@ export default function Profile() {
               {(showAllHistory ? loginHistory : loginHistory.slice(0, 3)).map(
                 (item, index) => (
                   <div key={item._id}>
-                    {index > 0 && <div className="h-px bg-theme-border" />}
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center text-theme-text-secondary">
+                    {index > 0 && <div className="h-px bg-white/5 mx-4" />}
+                    <div className="flex items-center gap-3 px-4 py-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40">
                         {getDeviceIcon(item.device)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm text-theme-text-primary truncate">
+                          <p className="text-sm text-white truncate">
                             {item.browser}
                           </p>
                           {index === 0 && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">
+                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-medium">
                               Current
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-theme-text-muted truncate">
+                        <p className="text-[11px] text-white/30 truncate">
                           {item.os} • {item.ipAddress}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-theme-text-secondary">
+                        <p className="text-xs text-white/40">
                           {formatLoginTime(item.loginAt)}
                         </p>
                       </div>
@@ -493,10 +494,10 @@ export default function Profile() {
               )}
               {loginHistory.length > 3 && (
                 <>
-                  <div className="h-px bg-theme-border" />
+                  <div className="h-px bg-white/5" />
                   <button
                     onClick={() => setShowAllHistory(!showAllHistory)}
-                    className="w-full px-4 py-2.5 text-xs text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-hover transition-colors flex items-center justify-center gap-1"
+                    className="w-full px-4 py-3 text-xs text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors flex items-center justify-center gap-1"
                   >
                     {showAllHistory ? (
                       <>
@@ -514,6 +515,7 @@ export default function Profile() {
           )}
         </div>
       </section>
+      </div>
     </div>
   );
 }

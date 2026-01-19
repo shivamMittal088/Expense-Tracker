@@ -1,116 +1,65 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Search, Bell, Menu, X, Home, TrendingUp, PieChart, Settings, CreditCard, FileText, User } from "lucide-react";
+import { Search, Bell } from "lucide-react";
+import Sidebar from "./Sidebar";
 
 const NavBar: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const menuItems = [
-    { icon: Home, label: "Dashboard", href: "/" },
-    { icon: CreditCard, label: "Expenses", href: "/" },
-    { icon: TrendingUp, label: "Analytics", href: "/analytics" },
-    { icon: PieChart, label: "Budget", href: "/" },
-    { icon: FileText, label: "Reports", href: "/" },
-    { icon: User, label: "Profile", href: "/profile" },
-    { icon: Settings, label: "Settings", href: "/settings" },
-  ];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
-      <nav className="border-b transition-colors" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between" style={{ color: 'var(--text-primary)' }}>
-          {/* Left side - Menu + App Name */}
-          <div className="flex items-center gap-3">
+      <nav className="border-b border-white/5 bg-black sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          {/* Left side - Animated Menu Button + App Name */}
+          <div className="flex items-center gap-3 relative">
+            {/* Animated Hamburger Button */}
             <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 rounded transition-colors hover:opacity-80"
-              style={{ backgroundColor: 'var(--bg-tertiary)' }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="relative w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 flex items-center justify-center"
               aria-label="Toggle menu"
             >
-              <Menu size={20} />
+              <div className="w-5 h-4 flex flex-col justify-between items-center">
+                <span 
+                  className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 origin-center ${
+                    isMenuOpen ? 'w-5 rotate-45 translate-y-[7px]' : 'w-5'
+                  }`} 
+                />
+                <span 
+                  className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 ${
+                    isMenuOpen ? 'w-0 opacity-0' : 'w-3.5'
+                  }`} 
+                />
+                <span 
+                  className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 origin-center ${
+                    isMenuOpen ? 'w-5 -rotate-45 -translate-y-[7px]' : 'w-4'
+                  }`} 
+                />
+              </div>
             </button>
+
+            {/* Sidebar Component */}
+            <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
             
             <a
               href="/"
-              className="font-brand text-lg font-semibold tracking-wide transition-colors"
-              style={{ color: 'var(--accent)' }}
+              className="font-brand text-lg font-bold tracking-wide bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
             >
               Track-Expense
             </a>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
-            <button className="p-2 rounded transition-colors hover:opacity-80" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+          <div className="flex items-center gap-2">
+            <button className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white/70">
               <Search size={18} />
             </button>
 
-            <button className="p-2 rounded relative transition-colors hover:opacity-80" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+            <button className="p-2 rounded-xl bg-white/5 hover:bg-white/10 relative transition-colors text-white/70">
               <Bell size={18} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-black" />
             </button>
           </div>
         </div>
       </nav>
-
-      {/* Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full w-72 border-r z-50 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-      >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
-          <h2 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Menu</h2>
-          <button 
-            onClick={() => setIsSidebarOpen(false)}
-            className="p-2 rounded transition-colors hover:opacity-80"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Menu Items */}
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {menuItems.map((item, index) => (
-              <li key={index}>
-                <Link
-                  to={item.href}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group hover:opacity-80"
-                  style={{ color: 'var(--text-secondary)' }}
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <item.icon 
-                    size={20} 
-                    className="transition-colors" 
-                    style={{ color: 'var(--text-muted)' }}
-                  />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Sidebar Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-          <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
-            <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Total Balance</p>
-            <p className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>₹12,345.00</p>
-          </div>
-        </div>
-      </aside>
     </>
   );
 };

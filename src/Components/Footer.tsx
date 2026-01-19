@@ -7,50 +7,68 @@ import AddExpenseModal from "./AddExpenseModal";
 const Footer: FC = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
 
-  const linkBase =
-    "flex flex-col items-center gap-1 text-xs transition-colors";
-
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t transition-colors" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
-        <div className="relative max-w-md mx-auto h-16 flex items-center justify-center">
-          <div className="flex items-center gap-6">
-
-            <NavLink to="/" end className={({ isActive }) =>
-              `${linkBase} ${isActive ? "" : ""}`
-            } style={({ isActive }) => ({ color: isActive ? 'var(--text-primary)' : 'var(--text-muted)' })}>
-              <Home size={18} />
-              <span>Home</span>
+      {/* Floating Pill Navigation */}
+      <nav className="fixed bottom-4 left-4 right-4 z-50">
+        <div className="max-w-md mx-auto">
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl px-2 py-2 flex items-center justify-between shadow-2xl shadow-black/80 backdrop-blur-xl">
+            
+            <NavLink 
+              to="/" 
+              end 
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${
+                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                }`
+              }
+            >
+              <Home size={20} />
+              <span className="text-[10px] font-medium">Home</span>
             </NavLink>
 
-            <NavLink to="/analytics" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "" : ""}`
-            } style={({ isActive }) => ({ color: isActive ? 'var(--text-primary)' : 'var(--text-muted)' })}>
-              <BarChart3 size={18} />
-              <span>Analytics</span>
+            <NavLink 
+              to="/analytics" 
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${
+                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                }`
+              }
+            >
+              <BarChart3 size={20} />
+              <span className="text-[10px] font-medium">Analytics</span>
             </NavLink>
 
-            {/* + Button */}
+            {/* Floating Add Button */}
             <button
               onClick={() => setShowAddExpense(true)}
-              className="-mt-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg border-4"
-              style={{ borderColor: 'var(--bg-secondary)' }}
+              className="bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95"
             >
-              <Plus size={28} />
+              <Plus size={24} strokeWidth={2.5} />
             </button>
 
-            <NavLink to="/profile" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "" : ""}`
-            } style={({ isActive }) => ({ color: isActive ? 'var(--text-primary)' : 'var(--text-muted)' })}>
-              <User size={18} />
-              <span>Profile</span>
+            <NavLink 
+              to="/profile" 
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${
+                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                }`
+              }
+            >
+              <User size={20} />
+              <span className="text-[10px] font-medium">Profile</span>
             </NavLink>
 
-            <NavLink to="/settings" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "" : ""}`
-            } style={({ isActive }) => ({ color: isActive ? 'var(--text-primary)' : 'var(--text-muted)' })}>
-              <Settings size={18} />
-              <span>Settings</span>
+            <NavLink 
+              to="/settings" 
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all ${
+                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                }`
+              }
+            >
+              <Settings size={20} />
+              <span className="text-[10px] font-medium">Settings</span>
             </NavLink>
 
           </div>
