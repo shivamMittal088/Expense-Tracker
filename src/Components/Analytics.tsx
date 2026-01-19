@@ -769,19 +769,21 @@ const Analytics = () => {
           <button
             onClick={() => setActiveView("chart")}
             className={`p-1.5 rounded-md transition-all ${activeView === "chart" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-white"}`}
+            title="Grid View"
           >
             <PieChart size={14} />
           </button>
           <button
             onClick={() => setActiveView("list")}
             className={`p-1.5 rounded-md transition-all ${activeView === "list" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-white"}`}
+            title="List View"
           >
             <BarChart3 size={14} />
           </button>
         </div>
       </div>
 
-      {/* Expense List */}
+      {/* Expense Views */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl border border-zinc-800/50 backdrop-blur-xl overflow-hidden">
         {filteredExpenses.length === 0 ? (
           <div className="text-center py-12">
@@ -797,7 +799,51 @@ const Analytics = () => {
               Clear all filters
             </button>
           </div>
+        ) : activeView === "chart" ? (
+          /* Grid/Card View */
+          <>
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto">
+              {filteredExpenses.slice(0, displayCount).map((expense, index) => (
+                <div
+                  key={expense._id}
+                  className="bg-zinc-800/50 hover:bg-zinc-800/80 rounded-xl p-3 transition-all cursor-pointer border border-zinc-700/30 hover:border-zinc-600/50 group"
+                  style={{ animationDelay: `${index * 20}ms` }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div 
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
+                      style={{ backgroundColor: `${expense.category.color || '#10b981'}20` }}
+                    >
+                      {expense.category.emoji || "💰"}
+                    </div>
+                    <span className="text-[10px] text-zinc-500">
+                      {new Date(expense.occurredAt).toLocaleDateString('en-IN', { 
+                        day: '2-digit', 
+                        month: 'short' 
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-white text-xs font-medium truncate mb-1">{expense.category.name}</p>
+                  <p className="text-emerald-400 font-bold text-sm">₹{expense.amount.toLocaleString()}</p>
+                  <div className="flex items-center gap-1 mt-1.5">
+                    <span className="text-[10px] text-zinc-500 bg-zinc-700/50 px-1.5 py-0.5 rounded">
+                      {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {displayCount < filteredExpenses.length && (
+              <button
+                onClick={() => setDisplayCount((prev) => prev + ITEMS_PER_PAGE)}
+                className="w-full py-3 text-sm text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/30 transition-all font-medium border-t border-zinc-800/50"
+              >
+                Load more ({filteredExpenses.length - displayCount} remaining)
+              </button>
+            )}
+          </>
         ) : (
+          /* List View */
           <>
             <div className="divide-y divide-zinc-800/50 max-h-[400px] overflow-y-auto">
               {filteredExpenses.slice(0, displayCount).map((expense, index) => (

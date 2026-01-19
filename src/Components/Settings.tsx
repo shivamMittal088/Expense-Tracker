@@ -3,8 +3,6 @@ import {
   Bell,
   Volume2,
   VolumeX,
-  Moon,
-  Sun,
   Globe,
   Shield,
   Trash2,
@@ -12,7 +10,6 @@ import {
   ChevronRight,
   Loader2,
   Key,
-  Monitor,
   EyeOff,
   Eye,
 } from "lucide-react";
@@ -24,7 +21,6 @@ interface UserSettings {
   soundEnabled: boolean;
   notifications: boolean;
   currency: "INR" | "USD" | "EUR";
-  theme: "light" | "dark" | "system";
   startWeekOnMonday: boolean;
 }
 
@@ -40,7 +36,6 @@ export default function Settings() {
     soundEnabled: true,
     notifications: true,
     currency: "INR",
-    theme: "dark",
     startWeekOnMonday: false,
   });
   const [loading, setLoading] = useState(true);
@@ -61,7 +56,6 @@ export default function Settings() {
         setSettings((prev) => ({
           ...prev,
           currency: data.currency || "INR",
-          theme: data.preferences?.theme || "dark",
           startWeekOnMonday: data.preferences?.startWeekOnMonday ?? false,
         }));
       })
@@ -89,7 +83,7 @@ export default function Settings() {
       const payload: Record<string, unknown> = {};
       if (key === "currency") {
         payload.currency = value;
-      } else if (key === "theme" || key === "startWeekOnMonday") {
+      } else if (key === "startWeekOnMonday") {
         payload.preferences = {
           ...settings,
           [key]: value,
@@ -157,50 +151,6 @@ export default function Settings() {
             enabled={settings.notifications}
             onChange={(v) => updateSetting("notifications", v)}
           />
-        </div>
-      </section>
-
-      {/* Appearance */}
-      <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
-          Appearance
-        </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
-          {/* Theme Selector */}
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                {settings.theme === "dark" ? (
-                  <Moon className="w-4 h-4 text-gray-400" />
-                ) : settings.theme === "light" ? (
-                  <Sun className="w-4 h-4 text-yellow-400" />
-                ) : (
-                  <Monitor className="w-4 h-4 text-gray-400" />
-                )}
-              </div>
-              <div>
-                <p className="text-sm text-white">Theme</p>
-                <p className="text-[10px] text-gray-500">Choose your preferred theme</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              {(["light", "dark", "system"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => updateSetting("theme", t)}
-                  className={`flex-1 py-2 px-3 rounded-lg text-[11px] font-medium transition-colors ${
-                    settings.theme === t
-                      ? "bg-blue-500 text-white"
-                      : "bg-white/5 text-gray-400 hover:bg-white/10"
-                  }`}
-                >
-                  {t === "light" && "☀️ Light"}
-                  {t === "dark" && "🌙 Dark"}
-                  {t === "system" && "💻 System"}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
