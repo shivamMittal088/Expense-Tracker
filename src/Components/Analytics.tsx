@@ -388,7 +388,7 @@ const Analytics = () => {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="p-4 pb-24 max-w-3xl mx-auto">
+      <div className="p-4 pb-28 max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="h-8 w-32 bg-zinc-800 rounded-lg animate-pulse" />
           <div className="h-8 w-8 bg-zinc-800 rounded-lg animate-pulse" />
@@ -404,7 +404,7 @@ const Analytics = () => {
   }
 
   return (
-    <div className="p-4 pb-24 max-w-3xl mx-auto">
+    <div className="p-4 pb-28 max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

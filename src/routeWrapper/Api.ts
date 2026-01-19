@@ -32,6 +32,7 @@ Api.interceptors.response.use(
 
       // ⏳ Give the toast time to render
       setTimeout(() => {
+        localStorage.removeItem("isLoggedIn");
         window.location.href = "/login";
       }, 1500);
     }

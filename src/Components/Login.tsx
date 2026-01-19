@@ -48,7 +48,7 @@ const Input = ({ label, icon, ...props }: InputProps) => (
     <label className="text-[11px] font-medium text-white/50 mb-1 block">{label}</label>
     <div className="relative">
       {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10">
           {icon}
         </span>
       )}
@@ -56,7 +56,7 @@ const Input = ({ label, icon, ...props }: InputProps) => (
         {...props}
         className={`w-full ${
           icon ? "pl-9" : "pl-3"
-        } pr-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors`}
+        } pr-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[box-shadow:0_0_0_1000px_black_inset] [&:-webkit-autofill]:[-webkit-background-clip:text]`}
       />
     </div>
   </div>
@@ -127,6 +127,7 @@ const Login: React.FC = () => {
           password: formData.password,
         });
 
+        localStorage.setItem("isLoggedIn", "true");
         navigate("/");
         console.log(res.data);
       } else {
@@ -141,6 +142,7 @@ const Login: React.FC = () => {
           emailId: formData.emailId,
           password: formData.password,
         });
+        localStorage.setItem("isLoggedIn", "true");
         navigate("/");
       }
     } catch (error) {

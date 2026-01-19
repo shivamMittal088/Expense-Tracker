@@ -282,12 +282,12 @@ export default function ExpenseTrackerHome() {
           style={{ background: `linear-gradient(90deg, ${e.category.color}, transparent)` }}
         />
         
-        <div className="p-4 lg:p-5">
+        <div className="p-4">
           {/* Main content row */}
-          <div className="flex items-center gap-3 lg:gap-4">
+          <div className="flex items-center gap-3">
             {/* Emoji avatar */}
             <div 
-              className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl flex items-center justify-center text-xl lg:text-2xl shrink-0"
+              className="w-11 h-11 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center text-xl shrink-0"
               style={{ background: `${e.category.color}15` }}
             >
               {emoji}
@@ -295,25 +295,25 @@ export default function ExpenseTrackerHome() {
             
             {/* Category & Notes */}
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] lg:text-base font-semibold text-white truncate">{e.category.name}</p>
-              <p className="text-[13px] lg:text-sm text-white/40 truncate">
+              <p className="text-[15px] font-semibold text-white truncate">{e.category.name}</p>
+              <p className="text-[13px] text-white/40 truncate">
                 {e.notes || "No notes"}
               </p>
             </div>
             
             {/* Amount */}
             <div className="text-right shrink-0">
-              <p className="text-lg lg:text-xl font-bold" style={{ color: e.category.color }}>
+              <p className="text-lg font-bold" style={{ color: e.category.color }}>
                 <AmountText value={e.amount} className="" />
               </p>
-              <p className="text-[11px] lg:text-xs text-white/30">{timeLabel}</p>
+              <p className="text-[11px] text-white/30">{timeLabel}</p>
             </div>
           </div>
           
           {/* Payment mode tag */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
             <span 
-              className="px-2 py-0.5 rounded-md text-[10px] lg:text-[11px] font-medium uppercase tracking-wide"
+              className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wide"
               style={{ background: `${e.category.color}12`, color: e.category.color }}
             >
               {e.payment_mode || "Cash"}
@@ -324,14 +324,14 @@ export default function ExpenseTrackerHome() {
             <div className="hidden lg:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-colors"
               >
                 ✏️ Edit
               </button>
               <button
                 onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
                 disabled={isPending}
-                className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors disabled:opacity-50"
+                className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {isPending ? "..." : "🗑️ Hide"}
               </button>
@@ -412,17 +412,19 @@ export default function ExpenseTrackerHome() {
 
     return (
       <>
-        {/* Desktop Grid Layout - 2 columns */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-4">
-          {displayedExpenses.map((e, idx) => (
-            <MobileExpenseCard
-              key={e._id}
-              e={e}
-              index={idx}
-              onAction={action}
-              isPending={pendingId === e._id}
-            />
-          ))}
+        {/* Desktop Grid Layout - 3 columns */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-3 gap-4">
+            {displayedExpenses.map((e, idx) => (
+              <MobileExpenseCard
+                key={e._id}
+                e={e}
+                index={idx}
+                onAction={action}
+                isPending={pendingId === e._id}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Mobile Layout */}
@@ -685,7 +687,7 @@ export default function ExpenseTrackerHome() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
+    <div className="min-h-screen bg-black text-white pb-28">
       <main className="max-w-6xl mx-auto px-4 lg:px-8 py-4 lg:py-6 space-y-4 lg:space-y-6">
 
         {/* Top Bar - Responsive */}

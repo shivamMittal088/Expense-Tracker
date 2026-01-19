@@ -1,16 +1,38 @@
 import type { FC } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, BarChart3, User, Settings, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 
 const Footer: FC = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show footer when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY || currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setIsVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   return (
     <>
       {/* Floating Pill Navigation */}
-      <nav className="fixed bottom-4 left-4 right-4 z-50">
+      <nav className={`fixed bottom-4 left-4 right-4 z-50 transition-all duration-300 ${
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'
+      }`}>
         <div className="max-w-md mx-auto">
           <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl px-2 py-2 flex items-center justify-between shadow-2xl shadow-black/80 backdrop-blur-xl">
             

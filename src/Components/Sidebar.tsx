@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Calculator, FileDown, TrendingUp, Settings, User, PlusCircle, X } from "lucide-react";
-import BlackPremiumCalculator from "../utils/UI/Calculator";
+import { Calculator as CalculatorIcon, FileDown, TrendingUp, Settings, User, PlusCircle } from "lucide-react";
+import { Calculator } from "../utils/UI/Calculator";
 import AddExpenseModal from "./AddExpenseModal";
 
 interface SidebarProps {
@@ -16,7 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { icon: PlusCircle, label: "Add Expense", color: "bg-emerald-500/20", iconColor: "text-emerald-400", action: "addExpense" },
-    { icon: Calculator, label: "Calculator", color: "bg-orange-500/20", iconColor: "text-orange-400", action: "calculator" },
+    { icon: CalculatorIcon, label: "Calculator", color: "bg-orange-500/20", iconColor: "text-orange-400", action: "calculator" },
     { icon: FileDown, label: "Download PDF", color: "bg-blue-500/20", iconColor: "text-blue-400", action: "pdf" },
     { icon: TrendingUp, label: "Analytics", color: "bg-purple-500/20", iconColor: "text-purple-400", href: "/analytics" },
     { icon: User, label: "Profile", color: "bg-pink-500/20", iconColor: "text-pink-400", href: "/profile" },
@@ -43,7 +43,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     } else if (item.action === "addExpense") {
       setIsAddExpenseOpen(true);
     } else if (item.action === "pdf") {
-      // TODO: Implement PDF download
       alert("PDF download coming soon!");
     }
   };
@@ -93,37 +92,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
       </div>
 
-      {/* Backdrop overlay when menu is open */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/40 z-40"
-          onClick={onClose}
-        />
-      )}
-
       {/* Calculator Modal */}
-      {isCalculatorOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setIsCalculatorOpen(false)}
-          />
-          
-          {/* Calculator Container */}
-          <div className="relative z-10 w-full max-w-sm">
-            {/* Close Button */}
-            <button 
-              onClick={() => setIsCalculatorOpen(false)}
-              className="absolute -top-12 right-0 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors"
-            >
-              <X size={20} />
-            </button>
-            
-            <BlackPremiumCalculator />
-          </div>
-        </div>
-      )}
+      <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
 
       {/* Add Expense Modal */}
       <AddExpenseModal open={isAddExpenseOpen} onClose={() => setIsAddExpenseOpen(false)} />

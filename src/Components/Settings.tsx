@@ -106,6 +106,7 @@ export default function Settings() {
   const handleLogout = async () => {
     try {
       await Api.post("/api/auth/logout");
+      localStorage.removeItem("isLoggedIn");
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to logout", { tone: "error" });
@@ -115,6 +116,7 @@ export default function Settings() {
   const handleDeleteAccount = async () => {
     try {
       await Api.delete("/api/profile/delete");
+      localStorage.removeItem("isLoggedIn");
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to delete account", { tone: "error" });
@@ -130,7 +132,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6">
+    <div className="max-w-md mx-auto px-4 py-6 pb-28">
       <h1 className="text-xl font-bold text-white mb-6">Settings</h1>
 
       {/* Sound & Notifications */}
