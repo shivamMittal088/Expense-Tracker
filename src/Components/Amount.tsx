@@ -90,11 +90,9 @@ export default function Amount({
 export function AmountText({
   value,
   currency = "INR",
-  className = "",
 }: {
   value: number;
   currency?: "INR" | "USD" | "EUR";
-  className?: string;
 }) {
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const symbol = currencySymbols[currency] || "₹";

@@ -161,13 +161,6 @@ export default function ExpenseTrackerHome() {
     }
   }, [apiDate]);
 
-  const loadMore = async () => {
-    if (loadingMore || !hasNext) return;
-    setLoadingMore(true);
-    // No pagination for daily view now
-    setLoadingMore(false);
-  };
-
   const handleHide = async (id: string) => {
     if (pendingId === id) return;
     setPendingId(id);
