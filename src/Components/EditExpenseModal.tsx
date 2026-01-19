@@ -151,7 +151,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{
-          background: "rgba(0, 0, 0, 0.9)",
+          background: "var(--bg-overlay)",
           backdropFilter: "blur(8px)",
         }}
       />
@@ -170,27 +170,22 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
       >
         {/* Main Card */}
         <div 
-          className="relative overflow-hidden"
+          className="relative overflow-hidden bg-theme-bg-secondary border border-theme-border"
           style={{
-            background: "#000000",
             borderRadius: "1.25rem",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
           }}
         >
           {/* Header */}
           <div 
-            className="relative px-4 py-3 flex items-center justify-between"
-            style={{ 
-              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-            }}
+            className="relative px-4 py-3 flex items-center justify-between border-b border-theme-border-subtle"
           >
-            <h2 className="text-sm font-semibold text-white">Edit Expense</h2>
+            <h2 className="text-sm font-semibold text-theme-text-primary">Edit Expense</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+              className="p-1.5 rounded-lg transition-colors hover:bg-theme-bg-hover"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-theme-text-muted" />
             </button>
           </div>
 
@@ -207,16 +202,11 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
           >
             {/* Amount */}
             <div 
-              className="p-3 transition-all duration-200"
-              style={{
-                background: amountFocused ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.02)",
-                borderRadius: "0.75rem",
-                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(255, 255, 255, 0.05)",
-              }}
+              className={`p-3 transition-all duration-200 rounded-xl bg-theme-bg-hover ${amountFocused ? 'border border-theme-border' : 'border border-theme-border-subtle'}`}
             >
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Amount</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-1">Amount</label>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-gray-400">₹</span>
+                <span className="text-lg font-bold text-theme-text-muted">₹</span>
                 <input
                   type="number"
                   placeholder="0.00"
@@ -224,17 +214,17 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                   onChange={(e) => setAmount(e.target.value)}
                   onFocus={() => setAmountFocused(true)}
                   onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-white placeholder-gray-700"
+                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-theme-text-primary placeholder-theme-text-dim"
                 />
               </div>
             </div>
 
             {/* Category Grid */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Category</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Category</label>
               {loadingTiles ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-700 border-t-white animate-spin" />
+                  <div className="w-6 h-6 rounded-full border-2 border-theme-border border-t-theme-accent animate-spin" />
                 </div>
               ) : (
                 <div className="grid grid-cols-4 gap-1.5">
@@ -244,14 +234,10 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                       <button
                         key={tile._id}
                         onClick={() => setCategory(tile.name)}
-                        className="p-2 flex flex-col items-center gap-1 rounded-lg transition-all"
-                        style={{
-                          background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.02)",
-                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
-                        }}
+                        className={`p-2 flex flex-col items-center gap-1 rounded-lg transition-all border ${isSelected ? 'bg-theme-bg-active border-theme-border' : 'bg-theme-bg-hover border-theme-border-subtle'}`}
                       >
                         <span className="text-sm">{tile.emoji || "✨"}</span>
-                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-gray-500'}`}>
+                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>
                           {tile.name}
                         </span>
                       </button>
@@ -263,7 +249,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Payment Mode */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Payment</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Payment</label>
               <div className="grid grid-cols-5 gap-1">
                 {paymentModes.map((mode) => {
                   const Icon = mode.icon;
@@ -272,14 +258,10 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                     <button
                       key={mode.id}
                       onClick={() => setPaymentMode(mode.id)}
-                      className="flex flex-col items-center gap-1 py-2 rounded-lg transition-all"
-                      style={{
-                        background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.02)",
-                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
-                      }}
+                      className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all border ${isSelected ? 'bg-theme-bg-active border-theme-border' : 'bg-theme-bg-hover border-theme-border-subtle'}`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-gray-500'}`} />
-                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-gray-500'}`}>{mode.label}</span>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`} />
+                      <span className={`text-[8px] font-medium ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -288,24 +270,22 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Date & Time */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">When</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">When</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-gray-300 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary transition-colors bg-theme-bg-hover border border-theme-border-subtle"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                  <Calendar className="w-3.5 h-3.5 text-theme-text-muted" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-gray-300 font-mono transition-colors"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary font-mono transition-colors bg-theme-bg-hover border border-theme-border-subtle"
                 >
-                  <Clock className="w-3.5 h-3.5 text-gray-500" />
+                  <Clock className="w-3.5 h-3.5 text-theme-text-muted" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
                 </button>
               </div>
@@ -344,7 +324,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Notes */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Notes</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Notes</label>
               <textarea
                 placeholder="Optional note..."
                 value={notes}
@@ -352,11 +332,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={1}
-                className="w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-gray-600"
-                style={{
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: notesFocused ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.05)",
-                }}
+                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-theme-text-primary placeholder-theme-text-dim bg-theme-bg-hover border ${notesFocused ? 'border-theme-border' : 'border-theme-border-subtle'}`}
               />
             </div>
 
@@ -364,16 +340,14 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-gray-400 rounded-lg transition-colors hover:bg-white/5"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg transition-colors hover:bg-theme-bg-hover bg-theme-bg-hover border border-theme-border-subtle"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="flex-1 py-2 text-[11px] font-semibold text-black rounded-lg disabled:opacity-50 transition-colors"
-                style={{ background: "#fff" }}
+                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-theme-bg-button text-theme-text-button hover:bg-theme-bg-button-hover"
               >
                 {loading ? "..." : "Update"}
               </button>

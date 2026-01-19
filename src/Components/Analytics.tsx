@@ -41,11 +41,11 @@ const FilterButton = ({
     className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all ${
       isActive
         ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-        : "bg-zinc-800/60 text-zinc-300 border border-zinc-700/50 hover:bg-zinc-700/60"
+        : "bg-theme-bg-button/60 text-theme-text-secondary border border-theme-border-subtle/50 hover:bg-theme-bg-button-hover/60"
     } ${isOpen ? "ring-1 ring-emerald-500/50" : ""}`}
   >
     <Icon size={12} />
-    <span className="text-zinc-500">{label}:</span>
+    <span className="text-theme-text-muted">{label}:</span>
     <span className="font-medium">{value}</span>
   </button>
 );
@@ -259,7 +259,7 @@ const Analytics = () => {
 
         {/* Dropdown Panels */}
         {openDropdown === "date" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-2 shadow-xl z-50 min-w-[160px]">
+          <div className="absolute top-full left-0 mt-2 bg-theme-bg-secondary border border-theme-border-subtle rounded-xl p-2 shadow-xl z-50 min-w-[160px]">
             {(["all", "week", "month", "year"] as const).map((range) => (
               <button
                 key={range}
@@ -270,7 +270,7 @@ const Analytics = () => {
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                   dateRange === range
                     ? "bg-emerald-500/20 text-emerald-400"
-                    : "text-zinc-300 hover:bg-zinc-800"
+                    : "text-theme-text-secondary hover:bg-theme-bg-hover"
                 }`}
               >
                 {range === "all" ? "All Time" : range === "week" ? "This Week" : range === "month" ? "This Month" : "This Year"}
@@ -280,7 +280,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "payment" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-xl z-50 min-w-[200px]">
+          <div className="absolute top-full left-0 mt-2 bg-theme-bg-secondary border border-theme-border-subtle rounded-xl p-3 shadow-xl z-50 min-w-[200px]">
             <div className="flex flex-wrap gap-2">
               {paymentModes.map((mode) => (
                 <button
@@ -293,7 +293,7 @@ const Analytics = () => {
                   className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                     selectedPayments.includes(mode)
                       ? "bg-emerald-500 text-white"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                      : "bg-theme-bg-button text-theme-text-secondary hover:bg-theme-bg-button-hover"
                   }`}
                 >
                   {mode === "bank_transfer" ? "Bank" : mode.toUpperCase()}
@@ -303,7 +303,7 @@ const Analytics = () => {
             {selectedPayments.length > 0 && (
               <button
                 onClick={() => setSelectedPayments([])}
-                className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
+                className="mt-3 text-xs text-theme-text-muted hover:text-theme-text-secondary"
               >
                 Clear selection
               </button>
@@ -312,9 +312,9 @@ const Analytics = () => {
         )}
 
         {openDropdown === "category" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-3 shadow-xl z-50 min-w-[220px]">
+          <div className="absolute top-full left-0 mt-2 bg-theme-bg-secondary border border-theme-border-subtle rounded-xl p-3 shadow-xl z-50 min-w-[220px]">
             {categories.length === 0 ? (
-              <p className="text-zinc-500 text-sm">No categories found</p>
+              <p className="text-theme-text-muted text-sm">No categories found</p>
             ) : (
               <>
                 <div className="flex flex-wrap gap-2">
@@ -329,7 +329,7 @@ const Analytics = () => {
                       className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
                         selectedCategories.includes(cat.name)
                           ? "bg-emerald-500 text-white"
-                          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                          : "bg-theme-bg-button text-theme-text-secondary hover:bg-theme-bg-button-hover"
                       }`}
                     >
                       <span>{cat.emoji || "📁"}</span>
@@ -340,7 +340,7 @@ const Analytics = () => {
                 {selectedCategories.length > 0 && (
                   <button
                     onClick={() => setSelectedCategories([])}
-                    className="mt-3 text-xs text-zinc-500 hover:text-zinc-300"
+                    className="mt-3 text-xs text-theme-text-muted hover:text-theme-text-secondary"
                   >
                     Clear selection
                   </button>
@@ -351,32 +351,32 @@ const Analytics = () => {
         )}
 
         {openDropdown === "amount" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl p-4 shadow-xl z-50 min-w-[240px]">
+          <div className="absolute top-full left-0 mt-2 bg-theme-bg-secondary border border-theme-border-subtle rounded-xl p-4 shadow-xl z-50 min-w-[240px]">
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="text-xs text-zinc-500 mb-1 block">Min</label>
+                <label className="text-xs text-theme-text-muted mb-1 block">Min</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-muted text-sm">₹</span>
                   <input
                     type="number"
                     placeholder="0"
                     value={minAmount}
                     onChange={(e) => setMinAmount(e.target.value)}
-                    className="w-full bg-zinc-800 text-white rounded-lg pl-7 pr-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-theme-bg-button text-theme-text-primary rounded-lg pl-7 pr-3 py-2 text-sm border border-theme-border-subtle focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
-              <span className="text-zinc-600 mt-5">–</span>
+              <span className="text-theme-text-dim mt-5">–</span>
               <div className="flex-1">
-                <label className="text-xs text-zinc-500 mb-1 block">Max</label>
+                <label className="text-xs text-theme-text-muted mb-1 block">Max</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-muted text-sm">₹</span>
                   <input
                     type="number"
                     placeholder="Any"
                     value={maxAmount}
                     onChange={(e) => setMaxAmount(e.target.value)}
-                    className="w-full bg-zinc-800 text-white rounded-lg pl-7 pr-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-theme-bg-button text-theme-text-primary rounded-lg pl-7 pr-3 py-2 text-sm border border-theme-border-subtle focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
@@ -392,10 +392,10 @@ const Analytics = () => {
       </div>
 
       {/* Recurring Payments Section */}
-      <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800 mb-4">
+      <div className="bg-theme-bg-secondary/50 rounded-lg p-3 border border-theme-border mb-4">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-medium text-white">Recurring Payments</h2>
-          <span className="text-[10px] text-zinc-500">Auto-detected</span>
+          <h2 className="text-sm font-medium text-theme-text-primary">Recurring Payments</h2>
+          <span className="text-[10px] text-theme-text-muted">Auto-detected</span>
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -410,12 +410,12 @@ const Analytics = () => {
           ].map((item) => (
             <div
               key={item.name}
-              className="flex items-center gap-2 bg-zinc-800/40 rounded px-2 py-1.5 hover:bg-zinc-800/70 transition-colors cursor-pointer"
+              className="flex items-center gap-2 bg-theme-bg-button/40 rounded px-2 py-1.5 hover:bg-theme-bg-button/70 transition-colors cursor-pointer"
             >
               <span className="text-sm">{item.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-xs truncate">{item.name}</p>
-                <p className="text-zinc-500 text-[10px]">{item.count}x</p>
+                <p className="text-theme-text-primary text-xs truncate">{item.name}</p>
+                <p className="text-theme-text-muted text-[10px]">{item.count}x</p>
               </div>
               <p className="text-emerald-400 text-xs font-medium">₹{item.amount.toLocaleString()}</p>
             </div>
@@ -424,7 +424,7 @@ const Analytics = () => {
       </div>
 
       {/* Analytics Content */}
-      <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800">
+      <div className="bg-theme-bg-secondary/50 rounded-lg p-3 border border-theme-border">
         {loading ? (
           <div className="flex items-center justify-center py-6">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
@@ -433,20 +433,20 @@ const Analytics = () => {
           <div className="space-y-3">
             {/* Summary Row - Inline */}
             <div className="flex items-center gap-2 flex-wrap text-xs">
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
-                <span className="text-zinc-500">Count:</span>
-                <span className="text-white font-medium">{filteredExpenses.length}</span>
-                <span className="text-zinc-600">/ {allExpenses.length}</span>
+              <div className="flex items-center gap-1.5 bg-theme-bg-button/50 rounded px-2 py-1">
+                <span className="text-theme-text-muted">Count:</span>
+                <span className="text-theme-text-primary font-medium">{filteredExpenses.length}</span>
+                <span className="text-theme-text-dim">/ {allExpenses.length}</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
-                <span className="text-zinc-500">Total:</span>
+              <div className="flex items-center gap-1.5 bg-theme-bg-button/50 rounded px-2 py-1">
+                <span className="text-theme-text-muted">Total:</span>
                 <span className="text-emerald-400 font-medium">
                   ₹{filteredExpenses.reduce((sum, e) => sum + e.amount, 0).toLocaleString()}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 rounded px-2 py-1">
-                <span className="text-zinc-500">Avg:</span>
-                <span className="text-white font-medium">
+              <div className="flex items-center gap-1.5 bg-theme-bg-button/50 rounded px-2 py-1">
+                <span className="text-theme-text-muted">Avg:</span>
+                <span className="text-theme-text-primary font-medium">
                   ₹{filteredExpenses.length > 0 
                     ? Math.round(filteredExpenses.reduce((sum, e) => sum + e.amount, 0) / filteredExpenses.length).toLocaleString()
                     : 0}
@@ -458,7 +458,7 @@ const Analytics = () => {
             <div className="max-h-[300px] overflow-y-auto">
               {filteredExpenses.length === 0 ? (
                 <div className="text-center py-4">
-                  <p className="text-zinc-500 text-xs">No expenses match your filters</p>
+                  <p className="text-theme-text-muted text-xs">No expenses match your filters</p>
                   <button 
                     onClick={clearAllFilters}
                     className="text-emerald-400 text-xs mt-1 hover:underline"
@@ -473,12 +473,12 @@ const Analytics = () => {
                       {filteredExpenses.slice(0, displayCount).map((expense) => (
                         <tr
                           key={expense._id}
-                          className="border-b border-zinc-800/50 hover:bg-zinc-800/40"
+                          className="border-b border-theme-border/50 hover:bg-theme-bg-hover/40"
                         >
                           <td className="py-1 pr-2 w-6">{expense.category.emoji || "💰"}</td>
-                          <td className="py-1 text-white">{expense.category.name}</td>
-                          <td className="py-1 text-zinc-500 hidden sm:table-cell">{expense.payment_mode}</td>
-                          <td className="py-1 text-zinc-500 text-right">{new Date(expense.occurredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</td>
+                          <td className="py-1 text-theme-text-primary">{expense.category.name}</td>
+                          <td className="py-1 text-theme-text-muted hidden sm:table-cell">{expense.payment_mode}</td>
+                          <td className="py-1 text-theme-text-muted text-right">{new Date(expense.occurredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</td>
                           <td className="py-1 text-emerald-400 font-medium text-right pl-3">₹{expense.amount.toLocaleString()}</td>
                         </tr>
                       ))}
@@ -487,7 +487,7 @@ const Analytics = () => {
                   {displayCount < filteredExpenses.length && (
                     <button
                       onClick={() => setDisplayCount((prev) => prev + ITEMS_PER_PAGE)}
-                      className="w-full mt-2 py-1.5 text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/50 rounded transition-colors"
+                      className="w-full mt-2 py-1.5 text-xs text-theme-text-secondary hover:text-emerald-400 hover:bg-theme-bg-hover/50 rounded transition-colors"
                     >
                       Load more ({filteredExpenses.length - displayCount} remaining)
                     </button>

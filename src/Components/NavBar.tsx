@@ -17,13 +17,14 @@ const NavBar: React.FC = () => {
 
   return (
     <>
-      <nav className="bg-gray-900 border-b border-gray-700 relative z-50">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between text-white">
+      <nav className="border-b transition-colors" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between" style={{ color: 'var(--text-primary)' }}>
           {/* Left side - Menu + App Name */}
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 rounded hover:bg-gray-800 transition-colors"
+              className="p-2 rounded transition-colors hover:opacity-80"
+              style={{ backgroundColor: 'var(--bg-tertiary)' }}
               aria-label="Toggle menu"
             >
               <Menu size={20} />
@@ -31,7 +32,8 @@ const NavBar: React.FC = () => {
             
             <a
               href="/"
-              className="font-brand text-lg font-semibold tracking-wide hover:text-blue-400 transition-colors"
+              className="font-brand text-lg font-semibold tracking-wide transition-colors"
+              style={{ color: 'var(--accent)' }}
             >
               Track-Expense
             </a>
@@ -39,11 +41,11 @@ const NavBar: React.FC = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <button className="p-2 rounded hover:bg-gray-800 transition-colors">
+            <button className="p-2 rounded transition-colors hover:opacity-80" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
               <Search size={18} />
             </button>
 
-            <button className="p-2 rounded hover:bg-gray-800 relative transition-colors">
+            <button className="p-2 rounded relative transition-colors hover:opacity-80" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
               <Bell size={18} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
             </button>
@@ -61,16 +63,18 @@ const NavBar: React.FC = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-gray-900 to-black border-r border-gray-800 z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-72 border-r z-50 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800">
-          <h2 className="text-white font-bold text-lg">Menu</h2>
+        <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
+          <h2 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Menu</h2>
           <button 
             onClick={() => setIsSidebarOpen(false)}
-            className="p-2 rounded hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded transition-colors hover:opacity-80"
+            style={{ color: 'var(--text-secondary)' }}
           >
             <X size={20} />
           </button>
@@ -83,12 +87,14 @@ const NavBar: React.FC = () => {
               <li key={index}>
                 <Link
                   to={item.href}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-all duration-200 group"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group hover:opacity-80"
+                  style={{ color: 'var(--text-secondary)' }}
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <item.icon 
                     size={20} 
-                    className="text-gray-500 group-hover:text-blue-500 transition-colors" 
+                    className="transition-colors" 
+                    style={{ color: 'var(--text-muted)' }}
                   />
                   <span className="font-medium">{item.label}</span>
                 </Link>
@@ -98,10 +104,10 @@ const NavBar: React.FC = () => {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-          <div className="bg-gray-800/50 rounded-lg p-3">
-            <p className="text-xs text-gray-400 mb-1">Total Balance</p>
-            <p className="text-xl font-bold text-white">₹12,345.00</p>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+            <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Total Balance</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>₹12,345.00</p>
           </div>
         </div>
       </aside>

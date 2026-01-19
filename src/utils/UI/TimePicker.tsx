@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import './CalendarPicker.css';
+import './TimePicker.css';
 
 interface TimePickerProps {
     isOpen: boolean;
@@ -130,81 +131,31 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         >
             <div
                 ref={pickerRef}
-                className={`calendar-modal ${isClosing ? 'closing' : ''}`}
+                className={`calendar-modal time-picker-modal ${isClosing ? 'closing' : ''}`}
                 onClick={(e) => e.stopPropagation()}
-                style={{ 
-                    maxWidth: '260px',
-                    background: '#000000',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9)',
-                }}
             >
                 {/* Header */}
-                <div className="calendar-header" style={{ justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '10px' }}>
-                    <span className="calendar-title" style={{ color: 'white', fontSize: '12px', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Select Time</span>
+                <div className="calendar-header time-picker-header">
+                    <span className="time-picker-title">Select Time</span>
                 </div>
 
                 {/* Time Display */}
-                <div 
-                    style={{ 
-                        textAlign: 'center', 
-                        padding: '14px 12px',
-                        fontSize: '32px',
-                        fontWeight: '800',
-                        color: 'white',
-                        letterSpacing: '2px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)',
-                    }}
-                >
-                    <span style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>{String(display12Hour).padStart(2, '0')}:{String(minutes).padStart(2, '0')}</span>
-                    <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', fontWeight: '600', background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '6px' }}>{period}</span>
+                <div className="time-picker-display">
+                    <span className="time-picker-display-value">{String(display12Hour).padStart(2, '0')}:{String(minutes).padStart(2, '0')}</span>
+                    <span className="time-picker-period-badge">{period}</span>
                 </div>
 
                 {/* Time Selectors */}
-                <div style={{ display: 'flex', gap: '6px', padding: '0 12px 12px' }}>
+                <div className="time-picker-selectors">
                     {/* Hours (12-hour) */}
-                    <div style={{ flex: 1 }}>
-                        <div style={{ 
-                            fontSize: '9px', 
-                            color: 'rgba(255,255,255,0.4)', 
-                            marginBottom: '6px',
-                            textAlign: 'center',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            fontWeight: '700'
-                        }}>
-                            Hour
-                        </div>
-                        <div 
-                            style={{ 
-                                height: '120px', 
-                                overflowY: 'auto',
-                                background: '#0a0a0a',
-                                borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                            }}
-                            className="time-scroll"
-                        >
+                    <div className="time-picker-column">
+                        <div className="time-picker-column-label">Hour</div>
+                        <div className="time-picker-scroll-container time-scroll">
                             {hoursArray.map((h) => (
                                 <button
                                     key={h}
                                     onClick={() => handleHourChange(h)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '8px',
-                                        background: display12Hour === h ? 'rgba(255,255,255,0.12)' : 'transparent',
-                                        border: 'none',
-                                        color: display12Hour === h ? 'white' : 'rgba(255,255,255,0.4)',
-                                        fontSize: '13px',
-                                        fontWeight: display12Hour === h ? '700' : '500',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.15s ease',
-                                        borderLeft: display12Hour === h ? '2px solid white' : '2px solid transparent',
-                                    }}
+                                    className={`time-picker-option ${display12Hour === h ? 'selected' : ''}`}
                                 >
                                     {String(h).padStart(2, '0')}
                                 </button>
@@ -213,44 +164,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     </div>
 
                     {/* Minutes */}
-                    <div style={{ flex: 1 }}>
-                        <div style={{ 
-                            fontSize: '9px', 
-                            color: 'rgba(255,255,255,0.4)', 
-                            marginBottom: '6px',
-                            textAlign: 'center',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            fontWeight: '700'
-                        }}>
-                            Min
-                        </div>
-                        <div 
-                            style={{ 
-                                height: '120px', 
-                                overflowY: 'auto',
-                                background: '#0a0a0a',
-                                borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                            }}
-                            className="time-scroll"
-                        >
+                    <div className="time-picker-column">
+                        <div className="time-picker-column-label">Min</div>
+                        <div className="time-picker-scroll-container time-scroll">
                             {minutesArray.map((m) => (
                                 <button
                                     key={m}
                                     onClick={() => setMinutes(m)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '8px',
-                                        background: minutes === m ? 'rgba(255,255,255,0.12)' : 'transparent',
-                                        border: 'none',
-                                        color: minutes === m ? 'white' : 'rgba(255,255,255,0.4)',
-                                        fontSize: '13px',
-                                        fontWeight: minutes === m ? '700' : '500',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.15s ease',
-                                        borderLeft: minutes === m ? '2px solid white' : '2px solid transparent',
-                                    }}
+                                    className={`time-picker-option ${minutes === m ? 'selected' : ''}`}
                                 >
                                     {String(m).padStart(2, '0')}
                                 </button>
@@ -259,50 +180,18 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     </div>
 
                     {/* AM/PM */}
-                    <div style={{ width: '50px' }}>
-                        <div style={{ 
-                            fontSize: '9px', 
-                            color: 'rgba(255,255,255,0.4)', 
-                            marginBottom: '6px',
-                            textAlign: 'center',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            fontWeight: '700'
-                        }}>
-                            &nbsp;
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="time-picker-period-column">
+                        <div className="time-picker-column-label">&nbsp;</div>
+                        <div className="time-picker-period-buttons">
                             <button
                                 onClick={() => handlePeriodChange('AM')}
-                                style={{
-                                    padding: '10px 6px',
-                                    background: period === 'AM' ? 'white' : '#0a0a0a',
-                                    border: period === 'AM' ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '8px',
-                                    color: period === 'AM' ? 'black' : 'rgba(255,255,255,0.4)',
-                                    fontSize: '11px',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s ease',
-                                    boxShadow: period === 'AM' ? '0 2px 8px rgba(255,255,255,0.15)' : 'none',
-                                }}
+                                className={`time-picker-period-btn ${period === 'AM' ? 'selected' : ''}`}
                             >
                                 AM
                             </button>
                             <button
                                 onClick={() => handlePeriodChange('PM')}
-                                style={{
-                                    padding: '10px 6px',
-                                    background: period === 'PM' ? 'white' : '#0a0a0a',
-                                    border: period === 'PM' ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '8px',
-                                    color: period === 'PM' ? 'black' : 'rgba(255,255,255,0.4)',
-                                    fontSize: '11px',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s ease',
-                                    boxShadow: period === 'PM' ? '0 2px 8px rgba(255,255,255,0.15)' : 'none',
-                                }}
+                                className={`time-picker-period-btn ${period === 'PM' ? 'selected' : ''}`}
                             >
                                 PM
                             </button>
@@ -311,46 +200,11 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{ 
-                    display: 'flex', 
-                    gap: '8px', 
-                    padding: '10px 12px',
-                    borderTop: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(255,255,255,0.02)',
-                }}>
-                    <button
-                        onClick={handleNow}
-                        style={{
-                            flex: 1,
-                            padding: '10px',
-                            background: '#0a0a0a',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                            borderRadius: '8px',
-                            color: 'rgba(255,255,255,0.7)',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                        }}
-                    >
+                <div className="time-picker-actions">
+                    <button onClick={handleNow} className="time-picker-btn-secondary">
                         Now
                     </button>
-                    <button
-                        onClick={handleConfirm}
-                        style={{
-                            flex: 1,
-                            padding: '10px',
-                            background: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            color: 'black',
-                            fontSize: '12px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                            boxShadow: '0 2px 8px rgba(255,255,255,0.15)',
-                        }}
-                    >
+                    <button onClick={handleConfirm} className="time-picker-btn-primary">
                         Confirm
                     </button>
                 </div>

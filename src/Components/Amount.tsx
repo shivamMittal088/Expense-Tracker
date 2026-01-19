@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useAmountVisibility } from "../store/amountStore";
+import { useAppSelector } from "../store/hooks";
 
 interface AmountProps {
   value: number;
@@ -23,7 +23,7 @@ export default function Amount({
   showCurrency = true,
   size = "md",
 }: AmountProps) {
-  const { hideAmounts } = useAmountVisibility();
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const [revealed, setRevealed] = useState(false);
   const prevHideAmounts = useRef(hideAmounts);
 
@@ -96,7 +96,7 @@ export function AmountText({
   currency?: "INR" | "USD" | "EUR";
   className?: string;
 }) {
-  const { hideAmounts } = useAmountVisibility();
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const symbol = currencySymbols[currency] || "₹";
   
   if (hideAmounts) {

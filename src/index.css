@@ -1,6 +1,75 @@
 @import "tailwindcss";
 
+/* Theme CSS Variables */
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --bg-card: #0f1117;
+  --bg-hover: #1f2937;
+  --bg-button: #1f2937;
+  --bg-button-hover: #374151;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #6b7280;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-subtle: #374151;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #10b981;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-hover: #e5e7eb;
+  --bg-active: #dbeafe;
+  --bg-button: #1f2937;
+  --bg-button-hover: #374151;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-dim: #9ca3af;
+  --text-button: #ffffff;
+  --border-color: #e5e7eb;
+  --border-subtle: #d1d5db;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --success: #059669;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --bg-card: #0f1117;
+  --bg-hover: #1f2937;
+  --bg-button: #1f2937;
+  --bg-button-hover: #374151;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #6b7280;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-subtle: #374151;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #10b981;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+}
+
 html, body, #root {
   height: 100%;
-  background-color: #000;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

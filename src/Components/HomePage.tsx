@@ -4,7 +4,7 @@ import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
 import EditExpenseModal from "./EditExpenseModal";
 import { AmountText } from "./Amount";
-import { useAmountVisibility } from "../store/amountStore";
+import { useAppSelector } from "../store/hooks";
 
 type Expense = {
   _id: string;
@@ -42,7 +42,7 @@ interface RawExpense {
 }
 
 export default function ExpenseTrackerHome() {
-  const { hideAmounts } = useAmountVisibility();
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -271,7 +271,7 @@ export default function ExpenseTrackerHome() {
 
     return (
       <div
-        className="group relative overflow-hidden rounded-lg border border-gray-800 bg-[#0f1117] cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg/30"
+        className="group relative overflow-hidden rounded-lg border border-theme-border bg-theme-bg-card cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg/30"
         style={{ animation: `floatIn 0.5s ease-out ${index * 0.06}s both` }}
       >
         {confirmActionId === e._id ? (
@@ -279,13 +279,13 @@ export default function ExpenseTrackerHome() {
             <button
               onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
               disabled={isPending}
-              className="px-2 py-1 text-[10px] rounded-md bg-blue-700 hover:bg-blue-800 border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
+              className="px-2 py-1 text-[10px] rounded-md bg-theme-accent hover:bg-theme-accent-hover border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
             >
               Confirm {actionLabel}
             </button>
             <button
               onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
-              className="px-2 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 whitespace-nowrap text-right"
+              className="px-2 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
             >
               Cancel
             </button>
@@ -294,7 +294,7 @@ export default function ExpenseTrackerHome() {
           <button
             onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
             disabled={isPending}
-            className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50"
+            className="absolute top-2 right-2 z-20 px-2 py-1 text-[10px] rounded-md bg-theme-bg-button/90 hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50"
           >
             {isPending ? "Saving…" : actionLabel}
           </button>
@@ -314,14 +314,14 @@ export default function ExpenseTrackerHome() {
                 {emoji}
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] sm:text-xs text-gray-400 leading-tight">{timeLabel}</p>
-                <p className="text-sm font-semibold text-white truncate">{e.category.name}</p>
+                <p className="text-[10px] sm:text-xs text-theme-text-secondary leading-tight">{timeLabel}</p>
+                <p className="text-sm font-semibold text-theme-text-primary truncate">{e.category.name}</p>
               </div>
             </div>
 
             <div className="ml-auto flex items-start gap-2">
               <div className="text-right shrink-0 pr-1">
-                <p className="text-[10px] text-gray-500">Amount</p>
+                <p className="text-[10px] text-theme-text-muted">Amount</p>
                 <p className="text-sm sm:text-base font-bold" style={{ color: e.category.color }}>
                   <AmountText value={e.amount} className="" />
                 </p>
@@ -330,13 +330,13 @@ export default function ExpenseTrackerHome() {
                 <button
                   onClick={(ev) => { ev.stopPropagation(); onAction(e._id); }}
                   disabled={isPending}
-                  className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
+                  className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-button/90 hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50 whitespace-nowrap text-right"
                 >
                   {isPending ? "Saving…" : actionLabel}
                 </button>
                 <button
                   onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                  className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
+                  className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-tertiary hover:bg-theme-bg-button border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
                 >
                   Edit
                 </button>
@@ -344,7 +344,7 @@ export default function ExpenseTrackerHome() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-gray-400 flex-wrap">
+          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-theme-text-secondary flex-wrap">
             <span className="truncate leading-tight flex-1 min-w-0">
               {e.notes || "No notes"}
             </span>
@@ -392,7 +392,7 @@ export default function ExpenseTrackerHome() {
             />
 
             {/* Dark glass background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 to-black/95 backdrop-blur-md" />
+            <div className="absolute inset-0 bg-gradient-to-r from-theme-bg-secondary/95 to-theme-bg-primary/95 backdrop-blur-md" />
 
             {/* Left color accent bar */}
             <div
@@ -416,27 +416,27 @@ export default function ExpenseTrackerHome() {
                     style={{ backgroundColor: e.category.color }}
                   />
                 )}
-                <span className="text-sm font-medium text-white truncate">
+                <span className="text-sm font-medium text-theme-text-primary truncate">
                   {e.category. name}
                 </span>
               </div>
 
               {/* Time */}
-              <span className="text-[11px] text-gray-500 flex-shrink-0">
+              <span className="text-[11px] text-theme-text-muted flex-shrink-0">
                 {formatLocalTime(e.occurredAt)}
               </span>
 
               {/* Notes + Payment */}
               <div className="flex-1 min-w-0 flex items-center gap-2">
-                <p className="text-[11px] text-gray-500 truncate">
+                <p className="text-[11px] text-theme-text-muted truncate">
                   {e.notes || '—'}
                 </p>
                 {hasLongNotes && (
-                  <span className="text-[9px] text-gray-600 bg-gray-800 px-1.5 py-0.5 rounded shrink-0">
+                  <span className="text-[9px] text-theme-text-dim bg-theme-bg-button px-1.5 py-0.5 rounded shrink-0">
                     hover to read
                   </span>
                 )}
-                <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] bg-gray-800/60" style={{ color: e.category.color }}>
+                <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] bg-theme-bg-button/60" style={{ color: e.category.color }}>
                   {e.payment_mode?.toUpperCase?.() || ''}
                 </span>
               </div>
@@ -458,13 +458,13 @@ export default function ExpenseTrackerHome() {
                       <button
                         onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
                         disabled={isPending}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-blue-700 hover:bg-blue-800 border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-accent hover:bg-theme-accent-hover border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
                       >
                         Confirm {actionLabel}
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
-                        className="px-2 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 whitespace-nowrap text-right ml-1"
+                        className="px-2 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right ml-1"
                       >
                         Cancel
                       </button>
@@ -474,13 +474,13 @@ export default function ExpenseTrackerHome() {
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
                         disabled={isPending}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 disabled:opacity-50 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50 whitespace-nowrap text-right"
                       >
                         {isPending ? "Saving…" : actionLabel}
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-tertiary hover:bg-theme-bg-button border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
                       >
                         Edit
                       </button>
@@ -514,7 +514,7 @@ export default function ExpenseTrackerHome() {
                   background: `linear-gradient(135deg, ${e. category.color} 0%, transparent 60%)`
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
+              <div className="absolute inset-0 bg-gradient-to-br from-theme-bg-secondary to-theme-bg-primary" />
 
               {/* Left color accent bar */}
               <div
@@ -548,8 +548,8 @@ export default function ExpenseTrackerHome() {
 
                 {/* Full notes text */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-gray-400 mb-0.5">Notes</p>
-                  <p className="text-xs text-gray-300 line-clamp-2">
+                  <p className="text-[10px] text-theme-text-secondary mb-0.5">Notes</p>
+                  <p className="text-xs text-theme-text-secondary line-clamp-2">
                     {e.notes}
                   </p>
                 </div>
@@ -583,18 +583,18 @@ export default function ExpenseTrackerHome() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-12">
+    <div className="min-h-screen bg-theme-bg-primary text-theme-text-primary pb-12">
       <main className="max-w-7xl mx-auto px-6 py-6 space-y-8">
 
         {/* Top Bar */}
         <section className="mb-6">
-          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4">
+          <div className="bg-theme-bg-secondary border border-theme-border rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4">
 
             {/* Left – Date */}
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => changeDateBy(-1)}
-                className="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors flex items-center justify-center"
+                className="w-9 h-9 bg-theme-bg-button hover:bg-theme-bg-button-hover rounded-md transition-colors flex items-center justify-center"
               >
                 &lt;
               </button>
@@ -606,8 +606,8 @@ export default function ExpenseTrackerHome() {
                 disabled={isToday}
                 className={`w-9 h-9 rounded-md transition-colors flex items-center justify-center ${
                   isToday
-                    ? "bg-gray-900 text-gray-600 cursor-not-allowed"
-                    : "bg-gray-800 hover:bg-gray-700"
+                    ? "bg-theme-bg-tertiary text-theme-text-muted cursor-not-allowed"
+                    : "bg-theme-bg-button hover:bg-theme-bg-button-hover"
                 }`}
               >
                 &gt;
@@ -662,13 +662,13 @@ export default function ExpenseTrackerHome() {
               <div className="flex items-center gap-3">
                 {isEditingIncome ? (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-zinc-500 text-xs">₹</span>
+                    <span className="text-theme-text-muted text-xs">₹</span>
                     <input
                       type="number"
                       value={incomeInput}
                       onChange={(e) => setIncomeInput(e.target.value)}
                       placeholder="Monthly income"
-                      className="w-24 bg-zinc-800 text-white text-xs px-2 py-1 rounded border border-zinc-700 focus:outline-none focus:border-emerald-500"
+                      className="w-24 bg-theme-bg-button text-theme-text-primary text-xs px-2 py-1 rounded border border-theme-border-subtle focus:outline-none focus:border-emerald-500"
                       autoFocus
                       onKeyDown={async (e) => {
                         if (e.key === 'Enter') {
@@ -707,12 +707,12 @@ export default function ExpenseTrackerHome() {
                       setIncomeInput(monthlyIncome > 0 ? monthlyIncome.toString() : "");
                       setIsEditingIncome(true);
                     }}
-                    className="text-right hover:bg-zinc-800/50 rounded px-2 py-1 transition-colors"
+                    className="text-right hover:bg-theme-bg-button/50 rounded px-2 py-1 transition-colors"
                   >
                     {monthlyIncome > 0 ? (
                       <>
-                        <p className="text-[10px] text-zinc-500">Monthly Income</p>
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-[10px] text-theme-text-muted">Monthly Income</p>
+                        <p className="text-sm font-medium text-theme-text-primary">
                           {hideAmounts ? "₹•••••" : `₹${monthlyIncome.toLocaleString()}`}
                         </p>
                         <p className={`text-[10px] font-medium ${
@@ -722,19 +722,19 @@ export default function ExpenseTrackerHome() {
                         </p>
                       </>
                     ) : (
-                      <p className="text-xs text-zinc-500 hover:text-zinc-300">+ Set income</p>
+                      <p className="text-xs text-theme-text-muted hover:text-theme-text-secondary">+ Set income</p>
                     )}
                   </button>
                 )}
               </div>
 
               <div className="text-right w-full sm:w-auto">
-                <p className="text-xs text-gray-400">Total Expenses</p>
+                <p className="text-xs text-theme-text-secondary">Total Expenses</p>
                 <p className="text-2xl font-bold">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(2)}`}
                 </p>
                 {showHidden && (
-                  <p className="text-[10px] text-gray-500">Hidden items not counted</p>
+                  <p className="text-[10px] text-theme-text-muted">Hidden items not counted</p>
                 )}
               </div>
             </div>
@@ -743,12 +743,12 @@ export default function ExpenseTrackerHome() {
 
         {/* Expenses */}
         <section>
-          <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-6">
+          <div className="bg-theme-bg-secondary border border-theme-border rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <div>
                 <h3 className="text-xl font-bold">Expenses</h3>
                 {expenses.length > 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-theme-text-muted mt-1">
                     {showAll
                       ? `All ${expenses.length} transactions`
                       : `Showing ${Math.min(INITIAL_LIMIT, expenses.length)} of ${expenses.length}`
@@ -765,7 +765,7 @@ export default function ExpenseTrackerHome() {
                       onClick={() => setShowAll(! showAll)}
                       className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 hover:scale-105 ${
                         showAll
-                          ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                          ? 'bg-theme-bg-button hover:bg-theme-bg-button-hover text-theme-text-primary'
                           : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
                       }`}
                     >
@@ -777,7 +777,7 @@ export default function ExpenseTrackerHome() {
                     <button
                       onClick={loadMore}
                       disabled={loadingMore}
-                      className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 bg-gray-800 hover:bg-gray-700 text-white disabled:opacity-50"
+                      className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 bg-theme-bg-button hover:bg-theme-bg-button-hover text-theme-text-primary disabled:opacity-50"
                     >
                       {loadingMore ? 'Loading…' : 'Load more'}
                     </button>
@@ -788,17 +788,17 @@ export default function ExpenseTrackerHome() {
 
             {loading && (
               <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme-text-primary"></div>
               </div>
             )}
 
             {!loading && expenses.length === 0 && (
               <div className="text-center py-20">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-900 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-theme-bg-tertiary flex items-center justify-center">
                   <span className="text-2xl">💸</span>
                 </div>
-                <p className="text-gray-500">No expenses for {displayLabel}</p>
-                <p className="text-xs text-gray-600 mt-1">Add your first expense to get started</p>
+                <p className="text-theme-text-muted">No expenses for {displayLabel}</p>
+                <p className="text-xs text-theme-text-dim mt-1">Add your first expense to get started</p>
               </div>
             )}
 

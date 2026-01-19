@@ -232,14 +232,14 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+        <Loader2 className="w-6 h-6 text-theme-text-secondary animate-spin" />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="text-center text-gray-400 py-10">
+      <div className="text-center text-theme-text-secondary py-10">
         Failed to load profile
       </div>
     );
@@ -255,7 +255,7 @@ export default function Profile() {
             <img
               src={profile.photoURL}
               alt={profile.name}
-              className="w-24 h-24 rounded-full object-cover border-2 border-white/10"
+              className="w-24 h-24 rounded-full object-cover border-2 border-theme-border"
             />
           ) : (
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white">
@@ -272,7 +272,7 @@ export default function Profile() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
-            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center border-2 border-[#0a0a0a] hover:bg-blue-600 transition-colors disabled:opacity-50"
+            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-theme-accent flex items-center justify-center border-2 border-theme-bg-primary hover:bg-theme-accent-hover transition-colors disabled:opacity-50"
           >
             {uploadingPhoto ? (
               <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -289,7 +289,7 @@ export default function Profile() {
               type="text"
               value={nameValue}
               onChange={(e) => setNameValue(e.target.value)}
-              className="bg-[#1a1a1a] border border-white/20 rounded-lg px-3 py-1.5 text-lg font-semibold text-white text-center focus:border-blue-500 focus:outline-none"
+              className="bg-theme-bg-tertiary border border-theme-border rounded-lg px-3 py-1.5 text-lg font-semibold text-theme-text-primary text-center focus:border-theme-accent focus:outline-none"
               autoFocus
               maxLength={30}
             />
@@ -312,10 +312,10 @@ export default function Profile() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">{profile.name}</h1>
+            <h1 className="text-xl font-bold text-theme-text-primary">{profile.name}</h1>
             <button
               onClick={() => setEditingName(true)}
-              className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+              className="p-1 rounded-lg hover:bg-theme-bg-hover text-theme-text-secondary hover:text-theme-text-primary transition-colors"
             >
               <Edit3 className="w-4 h-4" />
             </button>
@@ -330,7 +330,7 @@ export default function Profile() {
               value={statusValue}
               onChange={(e) => setStatusValue(e.target.value)}
               placeholder="Set a status..."
-              className="bg-[#1a1a1a] border border-white/20 rounded-lg px-3 py-1 text-sm text-gray-300 text-center focus:border-blue-500 focus:outline-none"
+              className="bg-theme-bg-tertiary border border-theme-border rounded-lg px-3 py-1 text-sm text-theme-text-secondary text-center focus:border-theme-accent focus:outline-none"
               autoFocus
               maxLength={50}
             />
@@ -354,7 +354,7 @@ export default function Profile() {
         ) : (
           <button
             onClick={() => setEditingStatus(true)}
-            className="flex items-center gap-1 mt-1 text-sm text-gray-400 hover:text-gray-300 transition-colors"
+            className="flex items-center gap-1 mt-1 text-sm text-theme-text-secondary hover:text-theme-text-primary transition-colors"
           >
             {profile.statusMessage || "Add a status..."}
             <Edit3 className="w-3 h-3" />
@@ -364,31 +364,31 @@ export default function Profile() {
 
       {/* Profile Details */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
           Account Info
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
           {/* Email */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-              <Mail className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
+              <Mail className="w-4 h-4 text-theme-text-secondary" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-gray-500 uppercase">Email</p>
-              <p className="text-sm text-white">{profile.emailId}</p>
+              <p className="text-[10px] text-theme-text-muted uppercase">Email</p>
+              <p className="text-sm text-theme-text-primary">{profile.emailId}</p>
             </div>
           </div>
 
-          <div className="h-px bg-white/5" />
+          <div className="h-px bg-theme-border" />
 
           {/* User ID */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-              <User className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
+              <User className="w-4 h-4 text-theme-text-secondary" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-gray-500 uppercase">User ID</p>
-              <p className="text-sm text-white font-mono text-[11px]">{profile._id}</p>
+              <p className="text-[10px] text-theme-text-muted uppercase">User ID</p>
+              <p className="text-sm text-theme-text-primary font-mono text-[11px]">{profile._id}</p>
             </div>
           </div>
         </div>
@@ -396,31 +396,31 @@ export default function Profile() {
 
       {/* Dates */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
           Activity
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
           {/* Member Since */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-theme-text-secondary" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-gray-500 uppercase">Member Since</p>
-              <p className="text-sm text-white">{formatDate(profile.createdAt)}</p>
+              <p className="text-[10px] text-theme-text-muted uppercase">Member Since</p>
+              <p className="text-sm text-theme-text-primary">{formatDate(profile.createdAt)}</p>
             </div>
           </div>
 
-          <div className="h-px bg-white/5" />
+          <div className="h-px bg-theme-border" />
 
           {/* Last Updated */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-theme-text-secondary" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-gray-500 uppercase">Last Updated</p>
-              <p className="text-sm text-white">{formatDate(profile.updatedAt)}</p>
+              <p className="text-[10px] text-theme-text-muted uppercase">Last Updated</p>
+              <p className="text-sm text-theme-text-primary">{formatDate(profile.updatedAt)}</p>
             </div>
           </div>
         </div>
@@ -428,33 +428,33 @@ export default function Profile() {
 
       {/* Stats Preview */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
           Quick Stats
         </h2>
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-white/10 bg-[#111] p-4 text-center">
-            <p className="text-2xl font-bold text-white">-</p>
-            <p className="text-[10px] text-gray-500 uppercase mt-1">Total Expenses</p>
+          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
+            <p className="text-2xl font-bold text-theme-text-primary">-</p>
+            <p className="text-[10px] text-theme-text-muted uppercase mt-1">Total Expenses</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-[#111] p-4 text-center">
-            <p className="text-2xl font-bold text-white">-</p>
-            <p className="text-[10px] text-gray-500 uppercase mt-1">This Month</p>
+          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
+            <p className="text-2xl font-bold text-theme-text-primary">-</p>
+            <p className="text-[10px] text-theme-text-muted uppercase mt-1">This Month</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-[#111] p-4 text-center">
-            <p className="text-2xl font-bold text-white">{profile.currency}</p>
-            <p className="text-[10px] text-gray-500 uppercase mt-1">Currency</p>
+          <div className="rounded-xl border border-theme-border bg-theme-bg-secondary p-4 text-center">
+            <p className="text-2xl font-bold text-theme-text-primary">{profile.currency}</p>
+            <p className="text-[10px] text-theme-text-muted uppercase mt-1">Currency</p>
           </div>
         </div>
       </section>
 
       {/* Login History */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[10px] font-semibold text-theme-text-muted uppercase tracking-wider mb-2 px-1">
           Login History
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-theme-border bg-theme-bg-secondary overflow-hidden">
           {loginHistory.length === 0 ? (
-            <div className="px-4 py-6 text-center text-gray-500 text-sm">
+            <div className="px-4 py-6 text-center text-theme-text-muted text-sm">
               No login history available
             </div>
           ) : (
@@ -462,14 +462,14 @@ export default function Profile() {
               {(showAllHistory ? loginHistory : loginHistory.slice(0, 3)).map(
                 (item, index) => (
                   <div key={item._id}>
-                    {index > 0 && <div className="h-px bg-white/5" />}
+                    {index > 0 && <div className="h-px bg-theme-border" />}
                     <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400">
+                      <div className="w-8 h-8 rounded-lg bg-theme-bg-tertiary flex items-center justify-center text-theme-text-secondary">
                         {getDeviceIcon(item.device)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm text-white truncate">
+                          <p className="text-sm text-theme-text-primary truncate">
                             {item.browser}
                           </p>
                           {index === 0 && (
@@ -478,12 +478,12 @@ export default function Profile() {
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-gray-500 truncate">
+                        <p className="text-[11px] text-theme-text-muted truncate">
                           {item.os} • {item.ipAddress}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-theme-text-secondary">
                           {formatLoginTime(item.loginAt)}
                         </p>
                       </div>
@@ -493,10 +493,10 @@ export default function Profile() {
               )}
               {loginHistory.length > 3 && (
                 <>
-                  <div className="h-px bg-white/5" />
+                  <div className="h-px bg-theme-border" />
                   <button
                     onClick={() => setShowAllHistory(!showAllHistory)}
-                    className="w-full px-4 py-2.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-1"
+                    className="w-full px-4 py-2.5 text-xs text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-hover transition-colors flex items-center justify-center gap-1"
                   >
                     {showAllHistory ? (
                       <>

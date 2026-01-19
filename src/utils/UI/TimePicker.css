@@ -1,0 +1,195 @@
+/* TimePicker - Theme-aware styling */
+
+.time-picker-modal {
+    max-width: 260px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.time-picker-header {
+    justify-content: center;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 10px;
+}
+
+.time-picker-title {
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.time-picker-display {
+    text-align: center;
+    padding: 14px 12px;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--bg-hover);
+}
+
+.time-picker-display-value {
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.time-picker-period-badge {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+    background: var(--bg-hover);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.time-picker-selectors {
+    display: flex;
+    gap: 6px;
+    padding: 0 12px 12px;
+}
+
+.time-picker-column {
+    flex: 1;
+}
+
+.time-picker-column-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.time-picker-scroll-container {
+    height: 120px;
+    overflow-y: auto;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+}
+
+.time-picker-option {
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+}
+
+.time-picker-option:hover {
+    background: var(--bg-hover);
+}
+
+.time-picker-option.selected {
+    background: var(--bg-active);
+    color: var(--text-primary);
+    font-weight: 700;
+    border-left-color: var(--accent);
+}
+
+.time-picker-period-column {
+    width: 50px;
+}
+
+.time-picker-period-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.time-picker-period-btn {
+    padding: 10px 6px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.time-picker-period-btn:hover {
+    background: var(--bg-hover);
+}
+
+.time-picker-period-btn.selected {
+    background: var(--bg-button);
+    border: none;
+    color: var(--text-button);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.time-picker-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-hover);
+}
+
+.time-picker-btn-secondary {
+    flex: 1;
+    padding: 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.time-picker-btn-secondary:hover {
+    background: var(--bg-hover);
+}
+
+.time-picker-btn-primary {
+    flex: 1;
+    padding: 10px;
+    background: var(--bg-button);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-button);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.time-picker-btn-primary:hover {
+    background: var(--bg-button-hover);
+}
+
+/* Scrollbar styling for time scroll */
+.time-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.time-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.time-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.time-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}

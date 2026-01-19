@@ -7,7 +7,7 @@ export default function Layout() {
   // const hideUI = location.pathname === "/login";
 
   return (
-    <div className="h-screen bg-black flex flex-col">
+    <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <NavBar />
 
       {/* This is the scrollable area */}

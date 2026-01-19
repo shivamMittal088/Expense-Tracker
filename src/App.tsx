@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AmountProvider } from "./store/amountStore";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
 import Analytics from "./Components/Analytics";
@@ -10,7 +11,7 @@ import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
 const App: React.FC = () => {
   return (
-    <AmountProvider>
+    <Provider store={store}>
       <BrowserRouter>
         <Routes>
           {/* Public */}
@@ -27,7 +28,7 @@ const App: React.FC = () => {
           </Route>
         </Routes>
       </BrowserRouter>
-    </AmountProvider>
+    </Provider>
   );
 };
 

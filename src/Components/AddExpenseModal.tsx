@@ -193,9 +193,9 @@ export default function AddExpenseModal({ open, onClose }: Props) {
         <div 
           className="relative overflow-hidden"
           style={{
-            background: "#000000",
+            background: "var(--bg-secondary)",
             borderRadius: "1.25rem",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
+            border: "1px solid var(--border-color)",
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
           }}
         >
@@ -203,15 +203,15 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           <div 
             className="relative px-4 py-3 flex items-center justify-between"
             style={{ 
-              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+              borderBottom: "1px solid var(--border-color)",
             }}
           >
-            <h2 className="text-sm font-semibold text-white">Add Expense</h2>
+            <h2 className="text-sm font-semibold text-theme-text-primary">Add Expense</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+              className="p-1.5 rounded-lg transition-colors hover:bg-theme-bg-hover"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-theme-text-muted" />
             </button>
           </div>
 
@@ -228,14 +228,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div 
               className="p-3 transition-all duration-200"
               style={{
-                background: amountFocused ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.02)",
+                background: amountFocused ? "var(--bg-tertiary)" : "var(--bg-card)",
                 borderRadius: "0.75rem",
-                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(255, 255, 255, 0.05)",
+                border: amountFocused ? "1px solid var(--border-subtle)" : "1px solid var(--border-color)",
               }}
             >
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Amount</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-1">Amount</label>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-gray-400">₹</span>
+                <span className="text-lg font-bold text-theme-text-secondary">₹</span>
                 <input
                   type="number"
                   placeholder="0.00"
@@ -243,17 +243,17 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   onChange={(e) => setAmount(e.target.value)}
                   onFocus={() => setAmountFocused(true)}
                   onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-white placeholder-gray-700"
+                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-theme-text-primary placeholder-theme-text-dim"
                 />
               </div>
             </div>
 
             {/* Category Grid - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Category</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Category</label>
               {loadingTiles ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-700 border-t-white animate-spin" />
+                  <div className="w-6 h-6 rounded-full border-2 border-theme-border-subtle border-t-theme-text-primary animate-spin" />
                 </div>
               ) : (
                 <div className="grid grid-cols-4 gap-1.5">
@@ -283,7 +283,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                           </button>
                         )}
                         <span className="text-sm">{tile.emoji || "✨"}</span>
-                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-gray-500'}`}>
+                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-theme-text-muted'}`}>
                           {tile.name}
                         </span>
                       </button>
@@ -293,8 +293,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                     onClick={() => setAddTileOpen(true)}
                     className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-gray-700 hover:border-gray-500 transition-colors"
                   >
-                    <span className="text-gray-600 text-sm">+</span>
-                    <span className="text-[8px] text-gray-600">Add</span>
+                    <span className="text-theme-text-dim text-sm">+</span>
+                    <span className="text-[8px] text-theme-text-dim">Add</span>
                   </button>
                 </div>
               )}
@@ -302,7 +302,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Payment Mode - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Payment</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Payment</label>
               <div className="grid grid-cols-5 gap-1">
                 {paymentModes.map((mode) => {
                   const Icon = mode.icon;
@@ -317,8 +317,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                         border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
                       }}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-gray-500'}`} />
-                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-gray-500'}`}>{mode.label}</span>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-theme-text-muted'}`} />
+                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-theme-text-muted'}`}>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -327,24 +327,22 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Date & Time - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">When</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">When</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-gray-300 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary transition-colors bg-theme-bg-hover border border-theme-border-subtle"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                  <Calendar className="w-3.5 h-3.5 text-theme-text-muted" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-gray-300 font-mono transition-colors"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary font-mono transition-colors bg-theme-bg-hover border border-theme-border-subtle"
                 >
-                  <Clock className="w-3.5 h-3.5 text-gray-500" />
+                  <Clock className="w-3.5 h-3.5 text-theme-text-muted" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
                 </button>
               </div>
@@ -383,7 +381,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Notes - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide block mb-2">Notes</label>
+              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Notes</label>
               <textarea
                 placeholder="Optional note..."
                 value={notes}
@@ -391,11 +389,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={1}
-                className="w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-gray-600"
-                style={{
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: notesFocused ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(255,255,255,0.05)",
-                }}
+                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-theme-text-primary placeholder-theme-text-dim bg-theme-bg-hover border ${notesFocused ? 'border-theme-border' : 'border-theme-border-subtle'}`}
               />
             </div>
 
@@ -403,16 +397,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-gray-400 rounded-lg transition-colors hover:bg-white/5"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg transition-colors hover:bg-theme-bg-hover bg-theme-bg-hover border border-theme-border-subtle"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-1 py-2 text-[11px] font-semibold text-black rounded-lg disabled:opacity-50 transition-colors"
-                style={{ background: "#fff" }}
+                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-theme-bg-button text-theme-text-button hover:bg-theme-bg-button-hover"
               >
                 {loading ? "..." : "Save"}
               </button>
@@ -436,28 +428,28 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       {/* Delete Confirmation Modal */}
       {tileToDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
-          <div className="w-full max-w-[240px] rounded-xl border border-white/10 bg-[#1a1a1a] p-4 text-center">
+          <div className="w-full max-w-[240px] rounded-xl border border-theme-border p-4 text-center bg-theme-bg-card">
             <div
               className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: tileToDelete.color }}
             >
               <span className="text-lg">{tileToDelete.emoji || "✨"}</span>
             </div>
-            <h3 className="text-sm font-semibold text-white mb-1">Delete Tile?</h3>
-            <p className="text-[11px] text-gray-400 mb-4">
-              Are you sure you want to delete <span className="text-white font-medium">"{tileToDelete.name}"</span>?
+            <h3 className="text-sm font-semibold text-theme-text-primary mb-1">Delete Tile?</h3>
+            <p className="text-[11px] text-theme-text-muted mb-4">
+              Are you sure you want to delete <span className="text-theme-text-primary font-medium">"{tileToDelete.name}"</span>?
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setTileToDelete(null)}
-                className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg border border-theme-border hover:bg-theme-bg-hover transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteTile}
                 disabled={deletingTileId !== null}
-                className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-red-500/90 hover:bg-red-600 disabled:opacity-50 transition-colors"
+                className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-theme-danger hover:bg-theme-danger-hover disabled:opacity-50 transition-colors"
               >
                 {deletingTileId ? "..." : "Delete"}
               </button>

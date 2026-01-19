@@ -45,10 +45,10 @@ interface PasswordInputProps {
 
 const Input = ({ label, icon, ...props }: InputProps) => (
   <div className="group">
-    <label className="text-[10px] font-medium text-neutral-500 mb-1 block tracking-wide uppercase">{label}</label>
+    <label className="text-[10px] font-medium text-theme-text-muted mb-1 block tracking-wide uppercase">{label}</label>
     <div className="relative">
       {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-white transition-colors duration-200">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-dim group-focus-within:text-theme-text-primary transition-colors duration-200">
           {icon}
         </span>
       )}
@@ -56,7 +56,7 @@ const Input = ({ label, icon, ...props }: InputProps) => (
         {...props}
         className={`w-full ${
           icon ? "pl-9" : "pl-3"
-        } py-2 bg-black/60 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 focus:bg-black transition-all duration-200`}
+        } py-2 bg-theme-bg-primary/60 border border-theme-border rounded-lg text-theme-text-primary text-sm placeholder-theme-text-dim focus:outline-none focus:border-theme-border-subtle focus:ring-1 focus:ring-theme-border-subtle focus:bg-theme-bg-primary transition-all duration-200`}
       />
     </div>
   </div>
@@ -69,23 +69,23 @@ const PasswordInput = ({
   toggle,
 }: PasswordInputProps) => (
   <div className="group">
-    <label className="text-[10px] font-medium text-neutral-500 mb-1 block tracking-wide uppercase">Password</label>
+    <label className="text-[10px] font-medium text-theme-text-muted mb-1 block tracking-wide uppercase">Password</label>
     <div className="relative">
       <Lock
         size={14}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-white transition-colors duration-200"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-dim group-focus-within:text-theme-text-primary transition-colors duration-200"
       />
       <input
         type={show ? "text" : "password"}
         name="password"
         value={value}
         onChange={onChange}
-        className="w-full pl-9 pr-9 py-2 bg-black/60 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 focus:bg-black transition-all duration-200"
+        className="w-full pl-9 pr-9 py-2 bg-theme-bg-primary/60 border border-theme-border rounded-lg text-theme-text-primary text-sm placeholder-theme-text-dim focus:outline-none focus:border-theme-border-subtle focus:ring-1 focus:ring-theme-border-subtle focus:bg-theme-bg-primary transition-all duration-200"
       />
       <button
         type="button"
         onClick={toggle}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-white transition-colors duration-200"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-text-dim hover:text-theme-text-primary transition-colors duration-200"
       >
         {show ? <EyeOff size={14} /> : <Eye size={14} />}
       </button>
@@ -158,29 +158,29 @@ const Login: React.FC = () => {
     <div>
       <NavBar />
     </div>
-    <div className="min-h-[80vh] bg-black flex items-center lg:items-start justify-center px-4 lg:pt-12 xl:pt-16">
+    <div className="min-h-[80vh] bg-theme-bg-primary flex items-center lg:items-start justify-center px-4 lg:pt-12 xl:pt-16">
       
       {/* Subtle background texture */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-neutral-900/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-neutral-800/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-theme-bg-tertiary/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-theme-bg-secondary/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative w-full max-w-[320px] lg:max-w-[280px] bg-neutral-950 border border-neutral-800/80 rounded-2xl lg:rounded-xl shadow-2xl shadow-black overflow-hidden">
+      <div className="relative w-full max-w-[320px] lg:max-w-[280px] bg-theme-bg-secondary border border-theme-border rounded-2xl lg:rounded-xl shadow-2xl overflow-hidden">
         
         {/* Decorative top line */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent"></div>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-border-subtle to-transparent"></div>
 
         {/* Header */}
         <div className="px-6 pt-6 pb-4 lg:px-4 lg:pt-4 lg:pb-2 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 lg:w-9 lg:h-9 rounded-xl lg:rounded-lg bg-white mb-3 lg:mb-2 shadow-lg shadow-white/10">
-            <User size={22} className="text-black lg:hidden" />
-            <User size={16} className="text-black hidden lg:block" />
+          <div className="inline-flex items-center justify-center w-12 h-12 lg:w-9 lg:h-9 rounded-xl lg:rounded-lg bg-theme-accent mb-3 lg:mb-2 shadow-lg">
+            <User size={22} className="text-white lg:hidden" />
+            <User size={16} className="text-white hidden lg:block" />
           </div>
-          <h1 className="text-lg lg:text-sm font-bold text-white mb-1 lg:mb-0.5 tracking-tight">
+          <h1 className="text-lg lg:text-sm font-bold text-theme-text-primary mb-1 lg:mb-0.5 tracking-tight">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-xs lg:text-[10px] text-neutral-500">
+          <p className="text-xs lg:text-[10px] text-theme-text-muted">
             {isLogin
               ? "Sign in to continue tracking"
               : "Start your expense journey"}
@@ -190,13 +190,13 @@ const Login: React.FC = () => {
         <div className="px-6 pb-6 lg:px-4 lg:pb-4">
 
           {/* Toggle */}
-          <div className="flex mb-5 lg:mb-3 bg-black rounded-lg p-0.5 border border-neutral-800">
+          <div className="flex mb-5 lg:mb-3 bg-theme-bg-primary rounded-lg p-0.5 border border-theme-border">
             <button
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-2 lg:py-1.5 text-xs lg:text-[11px] font-medium rounded-md transition-all duration-300 ${
                 isLogin
-                  ? "bg-white text-black shadow-lg"
-                  : "text-neutral-500 hover:text-neutral-300"
+                  ? "bg-theme-accent text-white shadow-lg"
+                  : "text-theme-text-muted hover:text-theme-text-secondary"
               }`}
             >
               Sign In
@@ -205,8 +205,8 @@ const Login: React.FC = () => {
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-2 lg:py-1.5 text-xs lg:text-[11px] font-medium rounded-md transition-all duration-300 ${
                 !isLogin
-                  ? "bg-white text-black shadow-lg"
-                  : "text-neutral-500 hover:text-neutral-300"
+                  ? "bg-theme-accent text-white shadow-lg"
+                  : "text-theme-text-muted hover:text-theme-text-secondary"
               }`}
             >
               Sign Up
@@ -255,7 +255,7 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowForgot(true)}
-                  className="text-[10px] text-neutral-500 hover:text-white transition-colors duration-200"
+                  className="text-[10px] text-theme-text-muted hover:text-theme-text-primary transition-colors duration-200"
                 >
                   Forgot password?
                 </button>
@@ -264,17 +264,17 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-2.5 mt-1 bg-white hover:bg-neutral-100 text-black text-sm font-semibold rounded-lg shadow-lg shadow-white/10 hover:shadow-white/20 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+              className="w-full py-2.5 mt-1 bg-theme-accent hover:bg-theme-accent-hover text-white text-sm font-semibold rounded-lg shadow-lg transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
             >
               {isLogin ? "Sign In" : "Create Account"}
             </button>
 
-            <p className="text-center text-[11px] text-neutral-600 pt-2">
+            <p className="text-center text-[11px] text-theme-text-dim pt-2">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-white hover:underline"
+                className="text-theme-text-primary hover:underline"
               >
                 {isLogin ? "Sign up" : "Sign in"}
               </button>
@@ -286,34 +286,34 @@ const Login: React.FC = () => {
       {/* Forgot Password Modal */}
       {showForgot && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="relative bg-neutral-950 border border-neutral-800 rounded-xl w-[300px] p-5 shadow-2xl shadow-black">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent"></div>
+          <div className="relative bg-theme-bg-secondary border border-theme-border rounded-xl w-[300px] p-5 shadow-2xl">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-border-subtle to-transparent"></div>
             
             <button
               onClick={() => setShowForgot(false)}
-              className="absolute top-4 right-4 text-neutral-600 hover:text-white transition-colors duration-200"
+              className="absolute top-4 right-4 text-theme-text-dim hover:text-theme-text-primary transition-colors duration-200"
             >
               <X size={16} />
             </button>
 
             <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white mb-3 shadow-lg shadow-white/10">
-                <Mail size={18} className="text-black" />
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-theme-accent mb-3 shadow-lg">
+                <Mail size={18} className="text-white" />
               </div>
-              <h2 className="text-base font-bold text-white mb-1">
+              <h2 className="text-base font-bold text-theme-text-primary mb-1">
                 Reset Password
               </h2>
-              <p className="text-xs text-neutral-500">We'll send you a reset link</p>
+              <p className="text-xs text-theme-text-muted">We'll send you a reset link</p>
             </div>
 
             <input
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
-              className="w-full bg-black/60 border border-neutral-800 rounded-lg py-2 px-3 text-white text-sm mb-4 focus:outline-none focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700 transition-all duration-200"
+              className="w-full bg-theme-bg-primary/60 border border-theme-border rounded-lg py-2 px-3 text-theme-text-primary text-sm mb-4 focus:outline-none focus:border-theme-border-subtle focus:ring-1 focus:ring-theme-border-subtle transition-all duration-200"
               placeholder="you@example.com"
             />
 
-            <button className="w-full py-2.5 bg-white hover:bg-neutral-100 text-black text-sm font-semibold rounded-lg shadow-lg shadow-white/10 hover:shadow-white/20 transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200">
+            <button className="w-full py-2.5 bg-theme-accent hover:bg-theme-accent-hover text-white text-sm font-semibold rounded-lg shadow-lg transform hover:scale-[1.01] active:scale-[0.99] transition-all duration-200">
               Send Reset Link
             </button>
           </div>
