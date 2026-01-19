@@ -79,7 +79,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
     padding: 14px;
     width: 100%;
-    max-width: 280px;
+    max-width: 320px;
     min-width: 0;
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -96,7 +96,7 @@
 
     .calendar-modal {
         padding: 8px;
-        max-width: 280px;
+        max-width: 300px;
     }
 
     .calendar-nav-btn {
