@@ -172,8 +172,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{
-          background: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(8px)",
+          background: "rgba(0, 0, 0, 0.95)",
+          backdropFilter: "blur(12px)",
         }}
       />
 
@@ -193,25 +193,26 @@ export default function AddExpenseModal({ open, onClose }: Props) {
         <div 
           className="relative overflow-hidden"
           style={{
-            background: "var(--bg-secondary)",
+            background: "#000000",
             borderRadius: "1.25rem",
-            border: "1px solid var(--border-color)",
-            boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.03)",
           }}
         >
           {/* Header - Compact */}
           <div 
             className="relative px-4 py-3 flex items-center justify-between"
             style={{ 
-              borderBottom: "1px solid var(--border-color)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+              background: "#000000",
             }}
           >
-            <h2 className="text-sm font-semibold text-theme-text-primary">Add Expense</h2>
+            <h2 className="text-sm font-semibold text-white">Add Expense</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-theme-bg-hover"
+              className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
             >
-              <X className="w-4 h-4 text-theme-text-muted" />
+              <X className="w-4 h-4 text-white/40" />
             </button>
           </div>
 
@@ -221,21 +222,22 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             style={{ 
               paddingTop: "0.75rem",
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(255, 255, 255, 0.15) transparent",
+              scrollbarColor: "rgba(255, 255, 255, 0.1) transparent",
+              background: "#000000",
             }}
           >
             {/* Amount */}
             <div 
               className="p-3 transition-all duration-200"
               style={{
-                background: amountFocused ? "var(--bg-tertiary)" : "var(--bg-card)",
+                background: amountFocused ? "rgba(255, 255, 255, 0.03)" : "rgba(255, 255, 255, 0.02)",
                 borderRadius: "0.75rem",
-                border: amountFocused ? "1px solid var(--border-subtle)" : "1px solid var(--border-color)",
+                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid rgba(255, 255, 255, 0.06)",
               }}
             >
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-1">Amount</label>
+              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-1">Amount</label>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-theme-text-secondary">₹</span>
+                <span className="text-lg font-bold text-white/50">₹</span>
                 <input
                   type="number"
                   placeholder="0.00"
@@ -243,17 +245,17 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   onChange={(e) => setAmount(e.target.value)}
                   onFocus={() => setAmountFocused(true)}
                   onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-theme-text-primary placeholder-theme-text-dim"
+                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-white placeholder-white/20"
                 />
               </div>
             </div>
 
             {/* Category Grid - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Category</label>
+              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Category</label>
               {loadingTiles ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="w-6 h-6 rounded-full border-2 border-theme-border-subtle border-t-theme-text-primary animate-spin" />
+                  <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
                 </div>
               ) : (
                 <div className="grid grid-cols-4 gap-1.5">
@@ -266,7 +268,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                         onClick={() => setCategory(tile.name)}
                         className="group relative p-2 flex flex-col items-center gap-1 rounded-lg transition-all"
                         style={{
-                          background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.02)",
+                          background: isSelected ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.02)",
                           border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
                           opacity: isDeleting ? 0.5 : 1,
                         }}
@@ -283,7 +285,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                           </button>
                         )}
                         <span className="text-sm">{tile.emoji || "✨"}</span>
-                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-theme-text-muted'}`}>
+                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-white/50'}`}>
                           {tile.name}
                         </span>
                       </button>
@@ -291,10 +293,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   })}
                   <button
                     onClick={() => setAddTileOpen(true)}
-                    className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-gray-700 hover:border-gray-500 transition-colors"
+                    className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/10 hover:border-white/20 transition-colors"
                   >
-                    <span className="text-theme-text-dim text-sm">+</span>
-                    <span className="text-[8px] text-theme-text-dim">Add</span>
+                    <span className="text-white/30 text-sm">+</span>
+                    <span className="text-[8px] text-white/30">Add</span>
                   </button>
                 </div>
               )}
@@ -302,7 +304,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Payment Mode - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Payment</label>
+              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Payment</label>
               <div className="grid grid-cols-5 gap-1">
                 {paymentModes.map((mode) => {
                   const Icon = mode.icon;
@@ -313,12 +315,12 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                       onClick={() => setPaymentMode(mode.id)}
                       className="flex flex-col items-center gap-1 py-2 rounded-lg transition-all"
                       style={{
-                        background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.02)",
+                        background: isSelected ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.02)",
                         border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
                       }}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-theme-text-muted'}`} />
-                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-theme-text-muted'}`}>{mode.label}</span>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/40'}`} />
+                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-white/40'}`}>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -327,22 +329,22 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Date & Time - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">When</label>
+              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">When</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary transition-colors bg-theme-bg-hover border border-theme-border-subtle"
+                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 transition-colors bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-theme-text-muted" />
+                  <Calendar className="w-3.5 h-3.5 text-white/40" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary font-mono transition-colors bg-theme-bg-hover border border-theme-border-subtle"
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 font-mono transition-colors bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
                 >
-                  <Clock className="w-3.5 h-3.5 text-theme-text-muted" />
+                  <Clock className="w-3.5 h-3.5 text-white/40" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
                 </button>
               </div>
@@ -381,7 +383,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Notes - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Notes</label>
+              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Notes</label>
               <textarea
                 placeholder="Optional note..."
                 value={notes}
@@ -389,7 +391,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={1}
-                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-theme-text-primary placeholder-theme-text-dim bg-theme-bg-hover border ${notesFocused ? 'border-theme-border' : 'border-theme-border-subtle'}`}
+                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/20 bg-white/[0.02] border ${notesFocused ? 'border-white/12' : 'border-white/[0.06]'}`}
               />
             </div>
 
@@ -397,14 +399,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg transition-colors hover:bg-theme-bg-hover bg-theme-bg-hover border border-theme-border-subtle"
+                className="flex-1 py-2 text-[11px] font-medium text-white/60 rounded-lg transition-colors hover:bg-white/5 bg-white/[0.02] border border-white/[0.06]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-theme-bg-button text-theme-text-button hover:bg-theme-bg-button-hover"
+                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
               >
                 {loading ? "..." : "Save"}
               </button>
@@ -427,29 +429,29 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
       {/* Delete Confirmation Modal */}
       {tileToDelete && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
-          <div className="w-full max-w-[240px] rounded-xl border border-theme-border p-4 text-center bg-theme-bg-card">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+          <div className="w-full max-w-[240px] rounded-xl border border-white/[0.08] p-4 text-center bg-black">
             <div
               className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: tileToDelete.color }}
             >
               <span className="text-lg">{tileToDelete.emoji || "✨"}</span>
             </div>
-            <h3 className="text-sm font-semibold text-theme-text-primary mb-1">Delete Tile?</h3>
-            <p className="text-[11px] text-theme-text-muted mb-4">
-              Are you sure you want to delete <span className="text-theme-text-primary font-medium">"{tileToDelete.name}"</span>?
+            <h3 className="text-sm font-semibold text-white mb-1">Delete Tile?</h3>
+            <p className="text-[11px] text-white/50 mb-4">
+              Are you sure you want to delete <span className="text-white font-medium">"{tileToDelete.name}"</span>?
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setTileToDelete(null)}
-                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg border border-theme-border hover:bg-theme-bg-hover transition-colors"
+                className="flex-1 py-2 text-[11px] font-medium text-white/60 rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteTile}
                 disabled={deletingTileId !== null}
-                className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-theme-danger hover:bg-theme-danger-hover disabled:opacity-50 transition-colors"
+                className="flex-1 py-2 text-[11px] font-semibold text-white rounded-lg bg-red-500/90 hover:bg-red-500 disabled:opacity-50 transition-colors"
               >
                 {deletingTileId ? "..." : "Delete"}
               </button>

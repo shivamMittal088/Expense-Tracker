@@ -249,20 +249,23 @@ export default function Profile() {
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-lg mx-auto px-4 py-6 pb-28">
       {/* Profile Header */}
-      <div className="flex flex-col items-center mb-8">
+      <div className="flex items-center justify-center sm:justify-start gap-4 mb-8">
         {/* Avatar */}
-        <div className="relative mb-4">
-          {profile.photoURL ? (
-            <img
-              src={profile.photoURL}
-              alt={profile.name}
-              className="w-24 h-24 rounded-full object-cover border-2 border-white/10"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white">
-              {getInitials(profile.name)}
-            </div>
-          )}
+        <div className="relative flex-shrink-0">
+          <div className="relative">
+            {profile.photoURL ? (
+              <img
+                src={profile.photoURL}
+                alt={profile.name}
+                className="w-20 h-20 rounded-full object-cover border border-white/10 shadow-xl shadow-black"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/10 shadow-xl shadow-black">
+                <User className="w-8 h-8 text-white/30" />
+              </div>
+            )}
+          </div>
+          
           <input
             ref={fileInputRef}
             type="file"
@@ -273,94 +276,103 @@ export default function Profile() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
-            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white flex items-center justify-center border-2 border-black hover:bg-white/90 transition-colors disabled:opacity-50"
+            className="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
           >
             {uploadingPhoto ? (
-              <Loader2 className="w-4 h-4 text-black animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
             ) : (
-              <Camera className="w-4 h-4 text-black" />
+              <Camera className="w-3.5 h-3.5 text-white" />
             )}
           </button>
         </div>
 
-        {/* Name - Editable */}
-        {editingName ? (
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={nameValue}
-              onChange={(e) => setNameValue(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-lg font-semibold text-white text-center focus:border-white/30 focus:outline-none"
-              autoFocus
-              maxLength={30}
-            />
-            <button
-              onClick={handleSaveName}
-              disabled={saving}
-              className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
-            >
-              <Check className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => {
-                setEditingName(false);
-                setNameValue(profile.name);
-              }}
-              className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">{profile.name}</h1>
-            <button
-              onClick={() => setEditingName(true)}
-              className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors"
-            >
-              <Edit3 className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {/* Name & Status */}
+        <div className="flex-1 min-w-0">
+          {/* Name - Editable */}
+          {editingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-base font-semibold text-white focus:border-white/30 focus:outline-none w-full"
+                autoFocus
+                maxLength={30}
+              />
+              <button
+                onClick={handleSaveName}
+                disabled={saving}
+                className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setEditingName(false);
+                  setNameValue(profile.name);
+                }}
+                className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold text-white truncate">{profile.name}</h1>
+              <button
+                onClick={() => setEditingName(true)}
+                className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors flex-shrink-0"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
 
-        {/* Status - Editable */}
-        {editingStatus ? (
-          <div className="flex items-center gap-2 mt-3">
-            <input
-              type="text"
-              value={statusValue}
-              onChange={(e) => setStatusValue(e.target.value)}
-              placeholder="Set a status..."
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white/70 text-center focus:border-white/30 focus:outline-none"
-              autoFocus
-              maxLength={50}
-            />
+          {/* Status - Editable (Visible to others) */}
+          {editingStatus ? (
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={statusValue}
+                  onChange={(e) => setStatusValue(e.target.value)}
+                  placeholder="What's on your mind?"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
+                  autoFocus
+                  maxLength={50}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-white/20">{statusValue.length}/50</span>
+              </div>
+              <button
+                onClick={handleSaveStatus}
+                disabled={saving}
+                className="p-2 rounded-xl bg-blue-500 text-white hover:bg-blue-400 transition-colors shadow-lg shadow-blue-500/20"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setEditingStatus(false);
+                  setStatusValue(profile.statusMessage || "");
+                }}
+                className="p-2 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={handleSaveStatus}
-              disabled={saving}
-              className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
+              onClick={() => setEditingStatus(true)}
+              className="group flex items-center gap-2 mt-2 px-3 py-1.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 hover:bg-white/[0.04] transition-all"
             >
-              <Check className="w-4 h-4" />
+              <span className="text-lg">💭</span>
+              <span className={`text-sm ${profile.statusMessage ? 'text-white/60' : 'text-white/30 italic'}`}>
+                {profile.statusMessage || "Share what's on your mind..."}
+              </span>
+              <Edit3 className="w-3 h-3 text-white/20 group-hover:text-white/40 transition-colors ml-auto" />
             </button>
-            <button
-              onClick={() => {
-                setEditingStatus(false);
-                setStatusValue(profile.statusMessage || "");
-              }}
-              className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setEditingStatus(true)}
-            className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg text-sm text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
-          >
-            {profile.statusMessage || "Add a status..."}
-            <Edit3 className="w-3 h-3" />
-          </button>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Profile Details */}
