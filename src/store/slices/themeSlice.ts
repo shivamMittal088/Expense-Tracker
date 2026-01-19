@@ -7,12 +7,10 @@ interface ThemeState {
   mode: ThemeMode;
 }
 
-// Get initial theme from localStorage or default to "dark"
+// Get initial theme - always use dark since theme toggle was removed
 const getInitialTheme = (): ThemeMode => {
-  const saved = localStorage.getItem("theme");
-  if (saved === "light" || saved === "dark" || saved === "system") {
-    return saved;
-  }
+  // Force dark theme
+  localStorage.setItem("theme", "dark");
   return "dark";
 };
 

@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
-import { useAmountVisibility } from "../store/amountStore";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 
 interface UserSettings {
   soundEnabled: boolean;
@@ -31,7 +32,9 @@ const currencies = [
 ];
 
 export default function Settings() {
-  const { hideAmounts, setHideAmounts } = useAmountVisibility();
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
+  const dispatch = useAppDispatch();
+  const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: true,
     notifications: true,
