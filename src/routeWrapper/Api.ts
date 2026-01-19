@@ -2,9 +2,7 @@ import axios from "axios";
 import { showToast } from "../utils/Redirecttoast";
 
 // Production API URL
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://expense-tracker-backend-ozq87igog.vercel.app";
-
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://expense-tracker-backend-ozq87igog.vercel.app";
 
 const Api = axios.create({
   baseURL: API_BASE_URL,

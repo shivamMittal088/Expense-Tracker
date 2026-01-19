@@ -139,9 +139,9 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
         const days: { date: Date; isCurrentMonth: boolean; isToday: boolean; isSelected: boolean; isDisabled: boolean }[] = [];
         
         // Previous month padding
-        const prevMonthLastDay = new Date(year, month, 0).getDate();
-        for (let i = 0; i < startPadding; i++) {
-            const date = new Date(year, month - 1, prevMonthLastDay - startPadding + 1 + i);
+        const prevMonth = new Date(year, month, 0);
+        for (let i = startPadding - 1; i >= 0; i--) {
+            const date = new Date(year, month - 1, prevMonth.getDate() - i);
             days.push({
                 date,
                 isCurrentMonth: false,
