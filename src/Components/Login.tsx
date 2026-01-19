@@ -44,19 +44,19 @@ interface PasswordInputProps {
 /* ---------------- Inputs ---------------- */
 
 const Input = ({ label, icon, ...props }: InputProps) => (
-  <div className="group">
-    <label className="text-xs font-medium text-white/60 mb-2 block">{label}</label>
+  <div>
+    <label className="text-[11px] font-medium text-white/50 mb-1 block">{label}</label>
     <div className="relative">
       {icon && (
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-white/60 transition-colors">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
           {icon}
         </span>
       )}
       <input
         {...props}
         className={`w-full ${
-          icon ? "pl-10" : "pl-4"
-        } pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all`}
+          icon ? "pl-9" : "pl-3"
+        } pr-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors`}
       />
     </div>
   </div>
@@ -68,26 +68,26 @@ const PasswordInput = ({
   show,
   toggle,
 }: PasswordInputProps) => (
-  <div className="group">
-    <label className="text-xs font-medium text-white/60 mb-2 block">Password</label>
+  <div>
+    <label className="text-[11px] font-medium text-white/50 mb-1 block">Password</label>
     <div className="relative">
       <Lock
-        size={16}
-        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-white/60 transition-colors"
+        size={14}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
       />
       <input
         type={show ? "text" : "password"}
         name="password"
         value={value}
         onChange={onChange}
-        className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
+        className="w-full pl-9 pr-9 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors"
       />
       <button
         type="button"
         onClick={toggle}
-        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/50"
       >
-        {show ? <EyeOff size={16} /> : <Eye size={16} />}
+        {show ? <EyeOff size={14} /> : <Eye size={14} />}
       </button>
     </div>
   </div>
@@ -156,56 +156,56 @@ const Login: React.FC = () => {
   return (
     <>
       <NavBar />
-      <div className="min-h-[calc(100vh-60px)] bg-[#0a0a0f] flex items-center justify-center px-4 py-8">
+      <div className="min-h-[calc(100vh-60px)] bg-black flex items-center justify-center px-4 py-6">
         {/* Card */}
-        <div className="relative w-full max-w-[340px] bg-[#12121a] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-[300px] bg-[#0a0a0a] border border-white/[0.08] rounded-xl overflow-hidden">
         
           {/* Header */}
-          <div className="px-6 pt-8 pb-4 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 mb-4 shadow-lg shadow-blue-500/20">
-              <User size={24} className="text-white" />
+          <div className="px-5 pt-5 pb-3 text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white mb-3">
+              <User size={18} className="text-black" />
             </div>
-            <h1 className="text-xl font-bold text-white mb-1">
+            <h1 className="text-base font-semibold text-white">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h1>
-            <p className="text-sm text-white/50">
+            <p className="text-xs text-white/40 mt-0.5">
               {isLogin
-                ? "Sign in to continue tracking"
-                : "Start your expense journey"}
+                ? "Sign in to continue"
+                : "Start tracking expenses"}
             </p>
           </div>
 
-          <div className="px-6 pb-6">
+          <div className="px-5 pb-5">
             {/* Toggle */}
-            <div className="flex mb-6 bg-white/5 rounded-xl p-1">
+            <div className="flex mb-4 bg-black rounded-lg p-0.5 border border-white/10">
               <button
                 onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   isLogin
-                    ? "bg-blue-500 text-white shadow-lg"
-                    : "text-white/50 hover:text-white/70"
+                    ? "bg-white text-black"
+                    : "text-white/40 hover:text-white/60"
                 }`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   !isLogin
-                    ? "bg-blue-500 text-white shadow-lg"
-                    : "text-white/50 hover:text-white/70"
+                    ? "bg-white text-black"
+                    : "text-white/40 hover:text-white/60"
                 }`}
               >
                 Sign Up
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
 
             {!isLogin && (
               <Input
                 label="Full Name"
-                icon={<User size={16} />}
+                icon={<User size={14} />}
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -214,7 +214,7 @@ const Login: React.FC = () => {
 
             <Input
               label="Email"
-              icon={<Mail size={16} />}
+              icon={<Mail size={14} />}
               name="emailId"
               value={formData.emailId}
               onChange={handleChange}
@@ -242,7 +242,7 @@ const Login: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowForgot(true)}
-                    className="text-xs text-white/40 hover:text-blue-400 transition-colors"
+                    className="text-[10px] text-white/40 hover:text-white/60"
                   >
                     Forgot password?
                   </button>
@@ -251,17 +251,17 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 mt-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-200"
+                className="w-full py-2 mt-1 bg-white hover:bg-white/90 text-black text-sm font-medium rounded-lg transition-colors"
               >
                 {isLogin ? "Sign In" : "Create Account"}
               </button>
 
-              <p className="text-center text-sm text-white/40 pt-3">
+              <p className="text-center text-[11px] text-white/40 pt-2">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-white hover:text-white/80"
                 >
                   {isLogin ? "Sign up" : "Sign in"}
                 </button>
@@ -272,31 +272,31 @@ const Login: React.FC = () => {
 
         {/* Forgot Password Modal */}
         {showForgot && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="relative bg-[#12121a] border border-white/[0.08] rounded-2xl w-full max-w-[320px] p-6 shadow-2xl">
+          <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+            <div className="relative bg-[#0a0a0a] border border-white/[0.08] rounded-xl w-full max-w-[280px] p-5">
               <button
                 onClick={() => setShowForgot(false)}
-                className="absolute top-4 right-4 text-white/40 hover:text-white/70 transition-colors"
+                className="absolute top-3 right-3 text-white/30 hover:text-white/60"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
 
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 mb-4 shadow-lg shadow-blue-500/20">
-                  <Mail size={20} className="text-white" />
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white mb-3">
+                  <Mail size={16} className="text-black" />
                 </div>
-                <h2 className="text-lg font-bold text-white mb-1">Reset Password</h2>
-                <p className="text-sm text-white/50">We'll send you a reset link</p>
+                <h2 className="text-sm font-semibold text-white">Reset Password</h2>
+                <p className="text-[11px] text-white/40 mt-0.5">We'll send you a reset link</p>
               </div>
 
               <input
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm mb-4 placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-black border border-white/10 rounded-lg py-2 px-3 text-white text-sm mb-3 placeholder-white/25 focus:outline-none focus:border-white/30"
                 placeholder="you@example.com"
               />
 
-              <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-200">
+              <button className="w-full py-2 bg-white hover:bg-white/90 text-black text-sm font-medium rounded-lg transition-colors">
                 Send Reset Link
               </button>
             </div>
