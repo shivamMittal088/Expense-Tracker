@@ -382,8 +382,8 @@ function SettingToggle({ icon: Icon, label, description, enabled, onChange }: Se
         }`}
       >
         <span
-          className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-            enabled ? "left-5" : "left-1"
+          className={`absolute top-1 w-4 h-4 rounded-full shadow-md transition-transform ${
+            enabled ? "left-5 bg-white" : "left-1 bg-white"
           }`}
         />
       </button>
