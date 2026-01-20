@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, Sparkles } from "lucide-react";
 import Sidebar from "./Sidebar";
 
 const NavBar: React.FC = () => {
@@ -20,7 +20,13 @@ const NavBar: React.FC = () => {
 
   return (
     <>
-      <nav className="border-b border-white/10 bg-[#111111] sticky top-0 z-50">
+      <nav className="sticky top-0 z-50 bg-black/95 backdrop-blur-xl">
+        {/* Subtle gradient line at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        
+        {/* Very subtle top glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Left side - Animated Menu Button + App Name */}
           <div className="flex items-center gap-3 relative">
@@ -28,23 +34,23 @@ const NavBar: React.FC = () => {
             {showIcons && (
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="relative w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 flex items-center justify-center"
+                className="group relative w-9 h-9 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 flex items-center justify-center"
                 aria-label="Toggle menu"
               >
-                <div className="w-5 h-4 flex flex-col justify-between items-center">
+                <div className="w-4 h-3.5 flex flex-col justify-between items-center">
                   <span 
-                    className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 origin-center ${
-                      isMenuOpen ? 'w-5 rotate-45 translate-y-[7px]' : 'w-5'
+                    className={`block h-[1.5px] bg-white/60 group-hover:bg-white/90 rounded-full transition-all duration-300 origin-center ${
+                      isMenuOpen ? 'w-4 rotate-45 translate-y-[5px]' : 'w-4'
                     }`} 
                   />
                   <span 
-                    className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 ${
-                      isMenuOpen ? 'w-0 opacity-0' : 'w-3.5'
+                    className={`block h-[1.5px] bg-white/60 group-hover:bg-white/90 rounded-full transition-all duration-300 ${
+                      isMenuOpen ? 'w-0 opacity-0' : 'w-3'
                     }`} 
                   />
                   <span 
-                    className={`block h-0.5 bg-white/70 rounded-full transition-all duration-300 origin-center ${
-                      isMenuOpen ? 'w-5 -rotate-45 -translate-y-[7px]' : 'w-4'
+                    className={`block h-[1.5px] bg-white/60 group-hover:bg-white/90 rounded-full transition-all duration-300 origin-center ${
+                      isMenuOpen ? 'w-4 -rotate-45 -translate-y-[5px]' : 'w-3.5'
                     }`} 
                   />
                 </div>
@@ -54,24 +60,39 @@ const NavBar: React.FC = () => {
             {/* Sidebar Component */}
             <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
             
+            {/* Premium Logo */}
             <a
               href="/"
-              className="font-brand text-lg font-bold tracking-wide bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+              className="group flex items-center gap-2"
             >
-              Track-Expense
+              {/* Logo Icon */}
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
+                <Sparkles size={14} className="text-white/80 relative z-10" />
+              </div>
+              
+              {/* Brand Name */}
+              <span className="font-brand text-[15px] font-semibold tracking-wide text-white/90">
+                Track<span className="text-white/50">Expense</span>
+              </span>
             </a>
           </div>
 
           {/* Actions - only show when logged in */}
           {showIcons && (
-            <div className="flex items-center gap-2">
-              <button className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white/70">
-                <Search size={18} />
+            <div className="flex items-center gap-1.5">
+              {/* Search Button */}
+              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
+                <Search size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
               </button>
 
-              <button className="p-2 rounded-xl bg-white/5 hover:bg-white/10 relative transition-colors text-white/70">
-                <Bell size={18} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-black" />
+              {/* Notification Button */}
+              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
+                <Bell size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
+                {/* Notification Dot */}
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-white rounded-full ring-1 ring-black/50">
+                  <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-50" />
+                </span>
               </button>
             </div>
           )}

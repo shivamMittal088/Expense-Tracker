@@ -675,11 +675,22 @@ export default function ExpenseTrackerHome() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-28">
-      <main className="max-w-6xl mx-auto px-4 lg:px-8 py-4 lg:py-6 space-y-4 lg:space-y-6">
+      <main className="max-w-6xl mx-auto px-4 lg:px-8 pt-6 lg:pt-8 pb-4 lg:pb-6 space-y-6 lg:space-y-8">
 
-        {/* Top Bar - Responsive */}
-        <section className="sticky top-0 z-10 -mx-4 lg:-mx-8 px-4 lg:px-8 pt-2 pb-3 lg:pb-4 bg-black/95 backdrop-blur-md">
-          <div className="max-w-6xl mx-auto">
+        {/* Top Bar - Premium Glass Card */}
+        <section className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.03)]">
+          {/* Solid dark background with subtle gradient */}
+          <div className="absolute inset-0 bg-[#0a0a0a]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+          {/* Visible border */}
+          <div className="absolute inset-0 border border-white/10 rounded-2xl lg:rounded-3xl" />
+          {/* Top accent line */}
+          <div className="absolute top-0 left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-white/[0.08] to-transparent" />
+          <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-white/[0.05] to-transparent" />
+          
+          <div className="relative px-4 lg:px-6 pt-4 pb-4 lg:pt-5 lg:pb-5">
             {/* Desktop Layout */}
             <div className="hidden lg:flex items-center justify-between gap-8">
               {/* Date Navigation */}
@@ -954,29 +965,39 @@ export default function ExpenseTrackerHome() {
           </div>
         </section>
 
-        {/* Expenses Section */}
-        <section>
-          {/* Section header */}
-          <div className="flex items-center justify-between mb-4 lg:mb-6">
-            <div>
-              <h3 className="text-lg lg:text-2xl font-bold">Expenses</h3>
-              {expenses.length > 0 && (
-                <p className="text-[11px] lg:text-sm text-white/40">
-                  {showAll
-                    ? `All ${expenses.length} transactions`
-                    : `${Math.min(INITIAL_LIMIT, expenses.length)} of ${expenses.length}`
-                  }
-                </p>
-              )}
+        {/* Expenses Section - Separate Card */}
+        <section className="relative">
+          {/* Section divider line - more visible */}
+          <div className="absolute -top-3 lg:-top-4 left-0 right-0 flex items-center gap-4">
+            <div className="flex-1 h-px bg-gradient-to-r from-white/5 via-white/20 to-white/5" />
+          </div>
+          {/* Section header - Premium style */}
+          <div className="flex items-center justify-between mb-4 lg:mb-6 pt-2">
+            <div className="flex items-center gap-3">
+              {/* Icon badge - more visible */}
+              <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-[#111] border border-white/15 flex items-center justify-center shadow-sm">
+                <span className="text-base lg:text-lg">📝</span>
+              </div>
+              <div>
+                <h3 className="text-base lg:text-xl font-semibold text-white">Expenses</h3>
+                {expenses.length > 0 && (
+                  <p className="text-[10px] lg:text-xs text-white/40">
+                    {showAll
+                      ? `All ${expenses.length} transactions`
+                      : `${Math.min(INITIAL_LIMIT, expenses.length)} of ${expenses.length}`
+                    }
+                  </p>
+                )}
+              </div>
             </div>
 
             {hasMoreThanLimit && (
               <button
                 onClick={() => setShowAll(!showAll)}
-                className={`px-4 py-2 lg:px-6 lg:py-2.5 rounded-xl text-sm font-semibold transition-all touch-manipulation lg:hover:scale-105 ${
+                className={`px-3 py-1.5 lg:px-5 lg:py-2 rounded-lg lg:rounded-xl text-xs lg:text-sm font-medium transition-all touch-manipulation ${
                   showAll
-                    ? 'bg-white/5 text-white/70 lg:hover:bg-white/10'
-                    : 'bg-white text-black lg:hover:bg-white/90'
+                    ? 'bg-white/[0.04] border border-white/[0.08] text-white/70 hover:bg-white/[0.08]'
+                    : 'bg-white/90 text-black hover:bg-white'
                 }`}
               >
                 {showAll ? '← Cards' : `View All ${expenses.length}`}

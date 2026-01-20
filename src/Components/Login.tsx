@@ -169,42 +169,51 @@ const Login: React.FC = () => {
       <NavBar />
       <div className="min-h-[calc(100vh-60px)] min-h-[calc(100dvh-60px)] bg-black flex items-center md:items-center justify-center px-4 py-8 pb-[20vh] md:pt-8">
         {/* Card */}
-        <div className="w-full max-w-[320px] bg-[#111111] border border-white/20 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.05)] overflow-hidden">
+        <div className="relative w-full max-w-[320px] overflow-hidden">
+          {/* Glow effect behind card */}
+          <div className="absolute -inset-1 bg-gradient-to-b from-white/10 via-white/5 to-transparent rounded-3xl blur-xl" />
+          
+          <div className="relative bg-[#0a0a0a] border border-white/15 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.08)] overflow-hidden">
+            {/* Top accent line */}
+            <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent" />
+            <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-white/5 to-transparent" />
         
-          {/* Header */}
-          <div className="px-5 pt-6 pb-3 text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white mb-3">
-              <User size={18} className="text-black" />
+            {/* Header */}
+            <div className="relative px-5 pt-6 pb-3 text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white mb-3 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                <User size={18} className="text-black" />
+              </div>
+              <h1 className="text-lg font-semibold text-white">
+                {isLogin ? "Welcome Back" : "Create Account"}
+              </h1>
+              <p className="text-xs text-white/60 mt-1">
+                {isLogin
+                  ? "Sign in to continue"
+                  : "Start tracking expenses"}
+              </p>
             </div>
-            <h1 className="text-lg font-semibold text-white">
-              {isLogin ? "Welcome Back" : "Create Account"}
-            </h1>
-            <p className="text-xs text-white/50 mt-1">
-              {isLogin
-                ? "Sign in to continue"
-                : "Start tracking expenses"}
-            </p>
-          </div>
 
-          <div className="px-5 pb-6">
+          <div className="relative px-5 pb-6">
             {/* Toggle */}
-            <div className="flex mb-5 bg-black/50 rounded-lg p-1 border border-white/15">
+            <div className="flex mb-5 bg-black/70 rounded-lg p-1 border border-white/20">
               <button
                 onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2 text-xs font-medium rounded-md transition-colors ${
+                className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
                   isLogin
-                    ? "bg-white text-black"
-                    : "text-white/40 hover:text-white/60"
+                    ? "bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                    : "text-white/50 hover:text-white/70"
                 }`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => setIsLogin(false)}
-                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
                   !isLogin
-                    ? "bg-white text-black"
-                    : "text-white/40 hover:text-white/60"
+                    ? "bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                    : "text-white/50 hover:text-white/70"
                 }`}
               >
                 Sign Up
@@ -262,54 +271,63 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-2 mt-1 bg-white hover:bg-white/90 text-black text-sm font-medium rounded-lg transition-colors"
+                className="w-full py-2.5 mt-2 bg-white hover:bg-white/95 text-black text-sm font-semibold rounded-lg transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
               >
                 {isLogin ? "Sign In" : "Create Account"}
               </button>
 
-              <p className="text-center text-[11px] text-white/40 pt-2">
+              <p className="text-center text-[11px] text-white/50 pt-3">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-white hover:text-white/80"
+                  className="text-white font-medium hover:text-white/80"
                 >
                   {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
             </form>
           </div>
+          </div>
         </div>
 
         {/* Forgot Password Modal */}
         {showForgot && (
-          <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-            <div className="relative bg-[#0a0a0a] border border-white/[0.08] rounded-xl w-full max-w-[280px] p-5">
-              <button
-                onClick={() => setShowForgot(false)}
-                className="absolute top-3 right-3 text-white/30 hover:text-white/60"
-              >
-                <X size={16} />
-              </button>
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="relative">
+              {/* Glow behind modal */}
+              <div className="absolute -inset-2 bg-gradient-to-b from-white/10 to-transparent rounded-2xl blur-xl" />
+              
+              <div className="relative bg-[#0a0a0a] border border-white/15 rounded-xl w-full max-w-[280px] p-5 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+                {/* Top accent */}
+                <div className="absolute top-0 left-[25%] right-[25%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                
+                <button
+                  onClick={() => setShowForgot(false)}
+                  className="absolute top-3 right-3 text-white/40 hover:text-white/70"
+                >
+                  <X size={16} />
+                </button>
 
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white mb-3">
-                  <Mail size={16} className="text-black" />
+                <div className="text-center mb-4">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white mb-3 shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                    <Mail size={16} className="text-black" />
+                  </div>
+                  <h2 className="text-sm font-semibold text-white">Reset Password</h2>
+                  <p className="text-[11px] text-white/50 mt-0.5">We'll send you a reset link</p>
                 </div>
-                <h2 className="text-sm font-semibold text-white">Reset Password</h2>
-                <p className="text-[11px] text-white/40 mt-0.5">We'll send you a reset link</p>
+
+                <input
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="w-full bg-black/80 border border-white/15 rounded-lg py-2.5 px-3 text-white text-sm mb-3 placeholder-white/30 focus:outline-none focus:border-white/30"
+                  placeholder="you@example.com"
+                />
+
+                <button className="w-full py-2.5 bg-white hover:bg-white/95 text-black text-sm font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                  Send Reset Link
+                </button>
               </div>
-
-              <input
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full bg-black border border-white/10 rounded-lg py-2 px-3 text-white text-sm mb-3 placeholder-white/25 focus:outline-none focus:border-white/30"
-                placeholder="you@example.com"
-              />
-
-              <button className="w-full py-2 bg-white hover:bg-white/90 text-black text-sm font-medium rounded-lg transition-colors">
-                Send Reset Link
-              </button>
             </div>
           </div>
         )}
