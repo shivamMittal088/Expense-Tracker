@@ -20,7 +20,7 @@ const NavBar: React.FC = () => {
 
   return (
     <>
-      <nav className="border-b border-white/5 bg-black sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#111111] sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Left side - Animated Menu Button + App Name */}
           <div className="flex items-center gap-3 relative">
