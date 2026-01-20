@@ -185,59 +185,59 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             : "-translate-y-[60%] opacity-0 scale-95 pointer-events-none"
         }`}
         style={{
-          maxWidth: "340px",
-          padding: "0 12px",
+          maxWidth: "380px",
+          padding: "0 16px",
         }}
       >
         {/* Main Card - Pure Black */}
         <div 
           className="relative overflow-hidden"
           style={{
-            background: "#000000",
-            borderRadius: "1.25rem",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.03)",
+            background: "#0a0a0a",
+            borderRadius: "1.5rem",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05)",
           }}
         >
           {/* Header - Compact */}
           <div 
-            className="relative px-4 py-3 flex items-center justify-between"
+            className="relative px-5 py-4 flex items-center justify-between"
             style={{ 
-              borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-              background: "#000000",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "#0a0a0a",
             }}
           >
-            <h2 className="text-sm font-semibold text-white">Add Expense</h2>
+            <h2 className="text-base font-semibold text-white">Add Expense</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
+              className="p-2 rounded-lg transition-colors hover:bg-white/10"
             >
-              <X className="w-4 h-4 text-white/40" />
+              <X className="w-5 h-5 text-white/50" />
             </button>
           </div>
 
           {/* Content - Compact */}
           <div 
-            className="px-4 pb-4 space-y-3 max-h-[60vh] overflow-y-auto" 
+            className="px-5 pb-5 space-y-4 max-h-[65vh] overflow-y-auto" 
             style={{ 
-              paddingTop: "0.75rem",
+              paddingTop: "1rem",
               scrollbarWidth: "thin",
               scrollbarColor: "rgba(255, 255, 255, 0.1) transparent",
-              background: "#000000",
+              background: "#0a0a0a",
             }}
           >
             {/* Amount */}
             <div 
-              className="p-3 transition-all duration-200"
+              className="p-4 transition-all duration-200"
               style={{
-                background: amountFocused ? "rgba(255, 255, 255, 0.03)" : "rgba(255, 255, 255, 0.02)",
-                borderRadius: "0.75rem",
-                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid rgba(255, 255, 255, 0.06)",
+                background: amountFocused ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.03)",
+                borderRadius: "1rem",
+                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.08)",
               }}
             >
-              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-1">Amount</label>
-              <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-white/50">₹</span>
+              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Amount</label>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-bold text-white/50">₹</span>
                 <input
                   type="number"
                   placeholder="0.00"
@@ -245,20 +245,20 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   onChange={(e) => setAmount(e.target.value)}
                   onFocus={() => setAmountFocused(true)}
                   onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-white placeholder-white/20"
+                  className="flex-1 text-2xl font-bold border-0 outline-none bg-transparent text-white placeholder-white/25"
                 />
               </div>
             </div>
 
             {/* Category Grid - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Category</label>
+              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Category</label>
               {loadingTiles ? (
                 <div className="flex items-center justify-center py-6">
                   <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
                 </div>
               ) : (
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className="grid grid-cols-4 gap-2">
                   {tiles.map((tile) => {
                     const isSelected = category === tile.name;
                     const isDeleting = deletingTileId === tile._id;
@@ -266,10 +266,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                       <button
                         key={tile._id}
                         onClick={() => setCategory(tile.name)}
-                        className="group relative p-2 flex flex-col items-center gap-1 rounded-lg transition-all"
+                        className="group relative p-3 flex flex-col items-center gap-1.5 rounded-xl transition-all"
                         style={{
-                          background: isSelected ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.02)",
-                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
+                          background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
+                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
                           opacity: isDeleting ? 0.5 : 1,
                         }}
                         disabled={isDeleting}
