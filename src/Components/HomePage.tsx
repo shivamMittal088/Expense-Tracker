@@ -677,55 +677,55 @@ export default function ExpenseTrackerHome() {
     <div className="min-h-screen bg-black text-white pb-28">
       <main className="max-w-6xl mx-auto px-4 lg:px-8 pt-6 lg:pt-8 pb-4 lg:pb-6 space-y-6 lg:space-y-8">
 
-        {/* Top Bar - Premium Glass Card */}
-        <section className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.03)]">
+        {/* Top Bar - Premium Glass Card - Compact & Centered */}
+        <section className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.04)]">
           {/* Solid dark background with subtle gradient */}
           <div className="absolute inset-0 bg-[#0a0a0a]" />
           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
           {/* Visible border */}
-          <div className="absolute inset-0 border border-white/10 rounded-2xl lg:rounded-3xl" />
+          <div className="absolute inset-0 border border-white/10 rounded-2xl" />
           {/* Top accent line */}
-          <div className="absolute top-0 left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
           {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-white/[0.08] to-transparent" />
-          <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-white/[0.05] to-transparent" />
+          <div className="absolute top-0 left-0 w-12 h-12 bg-gradient-to-br from-white/[0.08] to-transparent" />
+          <div className="absolute bottom-0 right-0 w-12 h-12 bg-gradient-to-tl from-white/[0.05] to-transparent" />
           
-          <div className="relative px-4 lg:px-6 pt-4 pb-4 lg:pt-5 lg:pb-5">
-            {/* Desktop Layout */}
-            <div className="hidden lg:flex items-center justify-between gap-8">
+          <div className="relative px-4 lg:px-5 py-3 lg:py-4">
+            {/* Desktop Layout - Compact */}
+            <div className="hidden lg:flex items-center justify-between gap-4">
               {/* Date Navigation */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => changeDateBy(-1)}
-                  className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center text-white/60 transition-colors"
+                  className="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center text-white/60 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
                 <button 
                   onClick={() => setIsCalendarOpen(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl transition-colors group"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg transition-colors group"
                 >
-                  <svg className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  <p className="text-xl font-bold">{displayLabel}</p>
-                  <svg className="w-4 h-4 text-white/30 group-hover:text-white/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <p className="text-base font-bold">{displayLabel}</p>
+                  <svg className="w-3 h-3 text-white/30 group-hover:text-white/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
                 <button
                   onClick={() => changeDateBy(1)}
                   disabled={isToday}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
                     isToday ? "bg-white/5 text-white/20 cursor-not-allowed" : "bg-white/5 hover:bg-white/10 text-white/60"
                   }`}
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -733,22 +733,22 @@ export default function ExpenseTrackerHome() {
 
               {/* Center - Total */}
               <div className="flex-1 text-center">
-                <p className="text-sm text-white/40">Today's Spending</p>
-                <p className="text-3xl font-bold">
+                <p className="text-xs text-white/40">Today's Spending</p>
+                <p className="text-2xl font-bold">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                 </p>
               </div>
 
               {/* Right Actions */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 {(showHidden || hiddenCount > 0) && (
                   <button
                     onClick={() => setShowHidden(prev => !prev)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       showHidden ? "bg-amber-500/20 text-amber-400" : "bg-white/5 hover:bg-white/10 text-white/50"
                     }`}
                   >
-                    {showHidden ? "👁 Show Visible" : `🙈 ${hiddenCount} Hidden`}
+                    {showHidden ? "👁 Visible" : `🙈 ${hiddenCount}`}
                   </button>
                 )}
                 
@@ -842,46 +842,46 @@ export default function ExpenseTrackerHome() {
 
             {/* Mobile Layout */}
             <div className="lg:hidden">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <button
                   onClick={() => changeDateBy(-1)}
-                  className="w-10 h-10 bg-white/5 active:bg-white/10 rounded-xl flex items-center justify-center text-white/60 transition-colors touch-manipulation"
+                  className="w-9 h-9 bg-white/5 active:bg-white/10 rounded-lg flex items-center justify-center text-white/60 transition-colors touch-manipulation"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
                 <button 
                   onClick={() => setIsCalendarOpen(true)}
-                  className="flex-1 mx-2 py-2.5 px-4 bg-white/5 active:bg-white/10 rounded-xl transition-colors touch-manipulation flex items-center justify-center gap-2"
+                  className="flex-1 mx-2 py-2 px-3 bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation flex items-center justify-center gap-1.5"
                 >
-                  <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  <p className="text-base font-bold">{displayLabel}</p>
-                  <svg className="w-3 h-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <p className="text-sm font-bold">{displayLabel}</p>
+                  <svg className="w-2.5 h-2.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
                 <button
                   onClick={() => changeDateBy(1)}
                   disabled={isToday}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors touch-manipulation ${
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors touch-manipulation ${
                     isToday ? "bg-white/5 text-white/20" : "bg-white/5 active:bg-white/10 text-white/60"
                   }`}
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex-1">
-                  <p className="text-[11px] text-white/40 uppercase tracking-wider">Today's Spending</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-[10px] text-white/40 uppercase tracking-wider">Today's Spending</p>
+                  <p className="text-xl font-bold">
                     {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                   </p>
                 </div>

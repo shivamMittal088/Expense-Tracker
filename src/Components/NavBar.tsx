@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Search, Bell, Sparkles } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import Sidebar from "./Sidebar";
 
 const NavBar: React.FC = () => {
@@ -65,11 +65,12 @@ const NavBar: React.FC = () => {
               href="/"
               className="group flex items-center gap-2"
             >
-              {/* Logo Icon */}
-              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-                <Sparkles size={14} className="text-white/80 relative z-10" />
-              </div>
+              {/* Favicon Logo */}
+              <img 
+                src="/favicon.svg" 
+                alt="TrackExpense" 
+                className="w-8 h-8"
+              />
               
               {/* Brand Name */}
               <span className="font-brand text-[15px] font-semibold tracking-wide text-white/90">
