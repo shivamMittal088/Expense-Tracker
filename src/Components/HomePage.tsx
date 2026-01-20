@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
@@ -211,8 +211,25 @@ export default function ExpenseTrackerHome() {
     setEditingExpense(null);
   };
 
+  // Debounce API calls when date changes rapidly
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   useEffect(() => {
-    fetchExpenses(showHidden);
+    // Cancel previous pending request
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    // Debounce by 150ms to avoid rapid API calls when navigating dates
+    debounceRef.current = setTimeout(() => {
+      fetchExpenses(showHidden);
+    }, 150);
+    
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, [fetchExpenses, showHidden]);
 
   useEffect(() => {

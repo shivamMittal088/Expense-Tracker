@@ -221,25 +221,26 @@ const Analytics = () => {
 
   const paymentModes = ["cash", "card", "UPI", "bank_transfer", "wallet"];
 
-  // Fetch expenses on mount
+  // Fetch expenses on mount - using date range endpoint (1 API call instead of 30)
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
         setLoading(true);
         
         const today = new Date();
-        const promises = [];
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - 365); // Fetch 1 year of data
         
-        for (let i = 0; i < 30; i++) {
-          const date = new Date(today);
-          date.setDate(date.getDate() - i);
-          const dateStr = date.toISOString().split("T")[0];
-          promises.push(api.get(`/api/expense/${dateStr}`));
-        }
+        const formatDate = (d: Date) => d.toISOString().split("T")[0];
         
-        const responses = await Promise.all(promises);
-        const allData = responses.flatMap((res) => res.data?.data || []);
+        const response = await api.get('/api/expenses/range', {
+          params: {
+            startDate: formatDate(startDate),
+            endDate: formatDate(today),
+          },
+        });
         
+        const allData = response.data?.data || [];
         const activeExpenses = allData.filter((e: Expense) => !e.deleted);
         setAllExpenses(activeExpenses);
       } catch (error) {
