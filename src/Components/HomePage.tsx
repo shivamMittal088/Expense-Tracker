@@ -47,8 +47,6 @@ export default function ExpenseTrackerHome() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [confirmActionId, setConfirmActionId] = useState<string | null>(null);
@@ -142,8 +140,6 @@ export default function ExpenseTrackerHome() {
       }
 
       setExpenses(filtered);
-      setHasNext(false);
-      setLoadingMore(false);
       setShowAll(false);
 
       if (!hidden) {
@@ -153,8 +149,6 @@ export default function ExpenseTrackerHome() {
     } catch (err) {
       console.error("Failed to load expenses", err);
       setExpenses([]);
-      setHasNext(false);
-      setLoadingMore(false);
       if (!hidden) setVisibleTotal(0);
     } finally {
       setLoading(false);
@@ -297,7 +291,7 @@ export default function ExpenseTrackerHome() {
             {/* Amount */}
             <div className="text-right shrink-0">
               <p className="text-lg font-bold" style={{ color: e.category.color }}>
-                <AmountText value={e.amount} className="" />
+                <AmountText value={e.amount} />
               </p>
               <p className="text-[11px] text-white/30">{timeLabel}</p>
             </div>
@@ -381,7 +375,7 @@ export default function ExpenseTrackerHome() {
         
         {/* Amount */}
         <p className="text-[15px] font-bold shrink-0" style={{ color: e.category.color }}>
-          <AmountText value={e.amount} className="" />
+          <AmountText value={e.amount} />
         </p>
         
         {/* Quick hide button */}
@@ -545,7 +539,7 @@ export default function ExpenseTrackerHome() {
                     className="font-semibold text-base"
                     style={{ color: e.category.color }}
                   >
-                    <AmountText value={e.amount} className="" />
+                    <AmountText value={e.amount} />
                   </span>
                 </div>
 
@@ -660,7 +654,7 @@ export default function ExpenseTrackerHome() {
                     className="font-semibold text-sm"
                     style={{ color: e.category.color }}
                   >
-                    <AmountText value={e.amount} className="" />
+                    <AmountText value={e.amount} />
                   </span>
                 </div>
               </div>
