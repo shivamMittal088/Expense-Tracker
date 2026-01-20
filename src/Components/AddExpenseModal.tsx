@@ -293,10 +293,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   })}
                   <button
                     onClick={() => setAddTileOpen(true)}
-                    className="p-2 flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/10 hover:border-white/20 transition-colors"
+                    className="p-3 flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-white/15 hover:border-white/25 transition-colors"
                   >
-                    <span className="text-white/30 text-sm">+</span>
-                    <span className="text-[8px] text-white/30">Add</span>
+                    <span className="text-white/40 text-base">+</span>
+                    <span className="text-[9px] text-white/40">Add</span>
                   </button>
                 </div>
               )}
@@ -304,8 +304,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Payment Mode - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Payment</label>
-              <div className="grid grid-cols-5 gap-1">
+              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Payment</label>
+              <div className="grid grid-cols-5 gap-1.5">
                 {paymentModes.map((mode) => {
                   const Icon = mode.icon;
                   const isSelected = paymentMode === mode.id;
@@ -313,14 +313,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                     <button
                       key={mode.id}
                       onClick={() => setPaymentMode(mode.id)}
-                      className="flex flex-col items-center gap-1 py-2 rounded-lg transition-all"
+                      className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all"
                       style={{
-                        background: isSelected ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.02)",
-                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.04)",
+                        background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
+                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
                       }}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/40'}`} />
-                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-white/40'}`}>{mode.label}</span>
+                      <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-white/50'}`} />
+                      <span className={`text-[9px] font-medium ${isSelected ? 'text-white' : 'text-white/50'}`}>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -329,22 +329,22 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Date & Time - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">When</label>
-              <div className="flex gap-2">
+              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">When</label>
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 transition-colors bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
+                  className="flex-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 transition-colors bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06]"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-white/40" />
+                  <Calendar className="w-4 h-4 text-white/50" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 font-mono transition-colors bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 font-mono transition-colors bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06]"
                 >
-                  <Clock className="w-3.5 h-3.5 text-white/40" />
+                  <Clock className="w-4 h-4 text-white/50" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
                 </button>
               </div>
@@ -383,30 +383,30 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
             {/* Notes - Compact */}
             <div>
-              <label className="text-[9px] font-semibold text-white/40 uppercase tracking-wide block mb-2">Notes</label>
+              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Notes</label>
               <textarea
                 placeholder="Optional note..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
-                rows={1}
-                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/20 bg-white/[0.02] border ${notesFocused ? 'border-white/12' : 'border-white/[0.06]'}`}
+                rows={2}
+                className={`w-full px-3 py-2.5 rounded-xl text-xs outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? 'border-white/15' : 'border-white/[0.08]'}`}
               />
             </div>
 
             {/* Buttons - Compact */}
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-white/60 rounded-lg transition-colors hover:bg-white/5 bg-white/[0.02] border border-white/[0.06]"
+                className="flex-1 py-3 text-xs font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/[0.08]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
+                className="flex-1 py-3 text-xs font-semibold rounded-xl disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
               >
                 {loading ? "..." : "Save"}
               </button>

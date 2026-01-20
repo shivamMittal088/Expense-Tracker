@@ -107,6 +107,7 @@ export default function Settings() {
     try {
       await Api.post("/api/auth/logout");
       localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to logout", { tone: "error" });
@@ -117,6 +118,7 @@ export default function Settings() {
     try {
       await Api.delete("/api/profile/delete");
       localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to delete account", { tone: "error" });

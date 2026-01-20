@@ -127,6 +127,10 @@ const Login: React.FC = () => {
           password: formData.password,
         });
 
+        // Store token in localStorage (fallback for iOS where cookies may be blocked)
+        if (res.data.token) {
+          localStorage.setItem("authToken", res.data.token);
+        }
         localStorage.setItem("isLoggedIn", "true");
         navigate("/");
         console.log(res.data);
@@ -141,6 +145,11 @@ const Login: React.FC = () => {
           name: formData.name,
           emailId: formData.emailId,
           password: formData.password,
+        }).then((res) => {
+          // Store token in localStorage (fallback for iOS where cookies may be blocked)
+          if (res.data.token) {
+            localStorage.setItem("authToken", res.data.token);
+          }
         });
         localStorage.setItem("isLoggedIn", "true");
         navigate("/");

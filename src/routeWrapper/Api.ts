@@ -13,7 +13,16 @@ const Api = axios.create({
   withCredentials: true, // 🔥 required for JWT cookies
 });
 
-// 🔐 Global auth interceptor
+// � Add Authorization header from localStorage (fallback for iOS)
+Api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// �🔐 Global auth interceptor
 Api.interceptors.response.use(
   (res) => res,
   (error) => {
@@ -37,6 +46,7 @@ Api.interceptors.response.use(
       // ⏳ Give the toast time to render
       setTimeout(() => {
         localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("authToken");
         window.location.href = "/login";
       }, 1500);
     }
