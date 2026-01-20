@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, HelpCircle, MessageSquare, X, ChevronRight } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, HelpCircle, MessageSquare, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
 import AddExpenseModal from "./AddExpenseModal";
+import api from "../routeWrapper/Api";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [isCalculatorOpen, setIsCalculatorOpen] = React.useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = React.useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const menuItems = [
@@ -46,6 +48,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       alert("Help center coming soon!");
     } else if (item.action === "feedback") {
       alert("Feedback form coming soon!");
+    } else if (item.action === "logout") {
+      handleLogout();
+    }
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await api.post("/api/auth/logout");
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
+      window.location.href = "/login";
+    } catch {
+      alert("Failed to logout. Please try again.");
+      setIsLoggingOut(false);
     }
   };
 
@@ -152,6 +169,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Logout Button */}
+            <div className="mt-4">
+              <p className="px-2 text-[9px] font-bold text-white/30 uppercase tracking-[0.15em] mb-3">Account</p>
+              <div 
+                onClick={() => !isLoggingOut && handleLogout()}
+                className={`group relative flex items-center gap-3 w-full px-2.5 py-2.5 rounded-xl transition-all duration-300 cursor-pointer overflow-hidden ${isLoggingOut ? 'opacity-50 pointer-events-none' : ''}`}
+              >
+                {/* Hover background */}
+                <div className="absolute inset-0 bg-white/0 group-hover:bg-red-500/10 transition-all duration-300 rounded-xl" />
+                
+                {/* Left accent bar on hover */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-0 group-hover:h-6 bg-red-500 rounded-full transition-all duration-300" />
+                
+                {/* Icon */}
+                <div className="relative">
+                  <div className="relative p-2 rounded-lg bg-red-500/20 group-hover:bg-red-500 group-hover:scale-105 transition-all duration-300">
+                    <LogOut size={16} className="text-red-400 group-hover:text-white transition-colors duration-300" strokeWidth={2} />
+                  </div>
+                </div>
+                
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-red-400/80 group-hover:text-red-400 transition-all duration-300">
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  </p>
+                  <p className="text-[10px] text-white/30 group-hover:text-white/50 transition-all duration-300 truncate">
+                    Sign out of your account
+                  </p>
+                </div>
+
+                {/* Arrow indicator */}
+                <div className="opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <ChevronRight size={14} className="text-red-400/50" />
+                </div>
+              </div>
             </div>
 
             {/* Pro Badge Card - Inside scrollable area, below buttons */}
