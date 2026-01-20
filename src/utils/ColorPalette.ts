@@ -52,6 +52,15 @@ export const colorPalette: PaletteColor[] = [
   { hex: "#d97706", name: "Bronze" },
   { hex: "#fcd34d", name: "Lemon" },
   
+  // Browns & Earthy
+  { hex: "#92400e", name: "Brown" },
+  { hex: "#b45309", name: "Copper" },
+  { hex: "#78350f", name: "Chocolate" },
+  { hex: "#a16207", name: "Mustard" },
+  { hex: "#854d0e", name: "Caramel" },
+  { hex: "#7c2d12", name: "Rust" },
+  { hex: "#dc2626", name: "Brick Red" },
+  
   // Neutrals
   { hex: "#64748b", name: "Slate" },
   { hex: "#475569", name: "Steel" },
