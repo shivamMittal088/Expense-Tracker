@@ -1,83 +1,21 @@
 @import "tailwindcss";
 
-/* Theme CSS Variables */
+/* Dark Theme CSS Variables */
 :root {
   --bg-primary: #000000;
-  --bg-secondary: #111111;
-  --bg-tertiary: #1f2937;
-  --bg-card: #0f1117;
-  --bg-hover: #1f2937;
-  --bg-active: #374151;
-  --bg-button: #ffffff;
-  --bg-button-hover: #e5e5e5;
-  --bg-overlay: rgba(0, 0, 0, 0.9);
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
-  --text-button: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111111;
+  --bg-card: #0a0a0a;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.1);
   --border-color: rgba(255, 255, 255, 0.1);
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --success: #10b981;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-}
-
-[data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-card: #ffffff;
-  --bg-hover: #e5e7eb;
-  --bg-active: #dbeafe;
-  --bg-button: #18181b;
-  --bg-button-hover: #27272a;
-  --bg-overlay: rgba(0, 0, 0, 0.5);
-  --text-primary: #18181b;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
-  --text-dim: #9ca3af;
-  --text-button: #ffffff;
-  --border-color: #e5e7eb;
-  --border-subtle: #d1d5db;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --success: #059669;
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
-}
-
-[data-theme="dark"] {
-  --bg-primary: #000000;
-  --bg-secondary: #111111;
-  --bg-tertiary: #1f2937;
-  --bg-card: #0f1117;
-  --bg-hover: #1f2937;
-  --bg-active: #374151;
-  --bg-button: #ffffff;
-  --bg-button-hover: #e5e5e5;
-  --bg-overlay: rgba(0, 0, 0, 0.9);
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
-  --text-button: #000000;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --success: #10b981;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
 }
 
 html, body, #root {
   height: 100%;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Custom Scrollbar - Stylish Dark Theme */

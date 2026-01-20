@@ -1,23 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 import amountReducer from "./slices/amountSlice";
-import themeReducer, { applyTheme } from "./slices/themeSlice";
 
 export const store = configureStore({
   reducer: {
     amount: amountReducer,
-    theme: themeReducer,
   },
 });
 
-// Apply theme on app load
-applyTheme(store.getState().theme.mode);
-
-// Listen for system theme changes when mode is "system"
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-  if (store.getState().theme.mode === "system") {
-    applyTheme("system");
-  }
-});
+// Apply dark theme on app load
+document.documentElement.setAttribute("data-theme", "dark");
+const metaTheme = document.querySelector('meta[name="theme-color"]');
+if (metaTheme) {
+  metaTheme.setAttribute("content", "#000000");
+}
 
 // TypeScript types
 export type RootState = ReturnType<typeof store.getState>;

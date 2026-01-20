@@ -27,26 +27,26 @@ const CategoryTiles = () => {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="group rounded-2xl bg-theme-bg-card border border-theme-border p-4
+            className="group rounded-2xl bg-[#0a0a0a] border border-white/10 p-4
             flex flex-col items-center justify-center gap-2
-            hover:border-theme-accent hover:bg-theme-bg-hover transition cursor-pointer"
+            hover:border-blue-500 hover:bg-white/5 transition cursor-pointer"
           >
             {/* Icon */}
             <div
-              className="w-11 h-11 rounded-full bg-theme-bg-hover
+              className="w-11 h-11 rounded-full bg-white/5
               flex items-center justify-center text-xl
-              group-hover:bg-theme-accent group-hover:text-white transition"
+              group-hover:bg-blue-500 group-hover:text-white transition"
             >
               {cat.emoji}
             </div>
 
             {/* Label */}
-            <span className="text-xs text-theme-text-muted group-hover:text-theme-text-primary transition">
+            <span className="text-xs text-white/50 group-hover:text-white transition">
               {cat.label}
             </span>
 
             {/* Amount */}
-            <span className="text-sm font-semibold text-theme-text-primary">
+            <span className="text-sm font-semibold text-white">
               ₹{cat.amount}
             </span>
           </div>
@@ -55,11 +55,11 @@ const CategoryTiles = () => {
         {/* Add Category Tile */}
         <button
           onClick={() => setOpenAdd(true)}
-          className="rounded-2xl border border-dashed border-theme-border p-4
+          className="rounded-2xl border border-dashed border-white/10 p-4
           flex flex-col items-center justify-center gap-2
-          text-theme-text-muted hover:border-theme-accent hover:text-theme-accent transition"
+          text-white/50 hover:border-blue-500 hover:text-blue-500 transition"
         >
-          <div className="w-11 h-11 rounded-full bg-theme-bg-hover flex items-center justify-center text-xl">
+          <div className="w-11 h-11 rounded-full bg-white/5 flex items-center justify-center text-xl">
             ➕
           </div>
           <span className="text-xs">Add Category</span>

@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Search, Bell } from "lucide-react";
 import Sidebar from "./Sidebar";
 
 const NavBar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
 
-  // Check if user is logged in
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn");
-    setIsLoggedIn(loggedIn === "true");
-  }, [location.pathname]);
+  // Check if user is logged in - read directly from localStorage each render
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   // Don't show icons on login page
   const isLoginPage = location.pathname === "/login";

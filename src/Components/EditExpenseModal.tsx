@@ -170,7 +170,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
       >
         {/* Main Card */}
         <div 
-          className="relative overflow-hidden bg-theme-bg-secondary border border-theme-border"
+          className="relative overflow-hidden bg-[#0a0a0a] border border-white/10"
           style={{
             borderRadius: "1.25rem",
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
@@ -178,14 +178,14 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
         >
           {/* Header */}
           <div 
-            className="relative px-4 py-3 flex items-center justify-between border-b border-theme-border-subtle"
+            className="relative px-4 py-3 flex items-center justify-between border-b border-white/10"
           >
-            <h2 className="text-sm font-semibold text-theme-text-primary">Edit Expense</h2>
+            <h2 className="text-sm font-semibold text-white">Edit Expense</h2>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg transition-colors hover:bg-theme-bg-hover"
+              className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
             >
-              <X className="w-4 h-4 text-theme-text-muted" />
+              <X className="w-4 h-4 text-white/50" />
             </button>
           </div>
 
@@ -202,11 +202,11 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
           >
             {/* Amount */}
             <div 
-              className={`p-3 transition-all duration-200 rounded-xl bg-theme-bg-hover ${amountFocused ? 'border border-theme-border' : 'border border-theme-border-subtle'}`}
+              className={`p-3 transition-all duration-200 rounded-xl bg-white/5 ${amountFocused ? 'border border-white/15' : 'border border-white/10'}`}
             >
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-1">Amount</label>
+              <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-1">Amount</label>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-theme-text-muted">₹</span>
+                <span className="text-lg font-bold text-white/50">₹</span>
                 <input
                   type="number"
                   placeholder="0.00"
@@ -214,17 +214,17 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                   onChange={(e) => setAmount(e.target.value)}
                   onFocus={() => setAmountFocused(true)}
                   onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-theme-text-primary placeholder-theme-text-dim"
+                  className="flex-1 text-xl font-bold border-0 outline-none bg-transparent text-white placeholder-white/30"
                 />
               </div>
             </div>
 
             {/* Category Grid */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Category</label>
+              <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-2">Category</label>
               {loadingTiles ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="w-6 h-6 rounded-full border-2 border-theme-border border-t-theme-accent animate-spin" />
+                  <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-blue-500 animate-spin" />
                 </div>
               ) : (
                 <div className="grid grid-cols-4 gap-1.5">
@@ -234,10 +234,10 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                       <button
                         key={tile._id}
                         onClick={() => setCategory(tile.name)}
-                        className={`p-2 flex flex-col items-center gap-1 rounded-lg transition-all border ${isSelected ? 'bg-theme-bg-active border-theme-border' : 'bg-theme-bg-hover border-theme-border-subtle'}`}
+                        className={`p-2 flex flex-col items-center gap-1 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/15' : 'bg-white/5 border-white/10'}`}
                       >
                         <span className="text-sm">{tile.emoji || "✨"}</span>
-                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>
+                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-white/50'}`}>
                           {tile.name}
                         </span>
                       </button>
@@ -249,7 +249,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Payment Mode */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Payment</label>
+              <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-2">Payment</label>
               <div className="grid grid-cols-5 gap-1">
                 {paymentModes.map((mode) => {
                   const Icon = mode.icon;
@@ -258,10 +258,10 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                     <button
                       key={mode.id}
                       onClick={() => setPaymentMode(mode.id)}
-                      className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all border ${isSelected ? 'bg-theme-bg-active border-theme-border' : 'bg-theme-bg-hover border-theme-border-subtle'}`}
+                      className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/15' : 'bg-white/5 border-white/10'}`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`} />
-                      <span className={`text-[8px] font-medium ${isSelected ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>{mode.label}</span>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/50'}`} />
+                      <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-white/50'}`}>{mode.label}</span>
                     </button>
                   );
                 })}
@@ -270,22 +270,22 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Date & Time */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">When</label>
+              <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-2">When</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary transition-colors bg-theme-bg-hover border border-theme-border-subtle"
+                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 transition-colors bg-white/5 border border-white/10"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-theme-text-muted" />
+                  <Calendar className="w-3.5 h-3.5 text-white/50" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-theme-text-secondary font-mono transition-colors bg-theme-bg-hover border border-theme-border-subtle"
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 font-mono transition-colors bg-white/5 border border-white/10"
                 >
-                  <Clock className="w-3.5 h-3.5 text-theme-text-muted" />
+                  <Clock className="w-3.5 h-3.5 text-white/50" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
                 </button>
               </div>
@@ -324,7 +324,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
 
             {/* Notes */}
             <div>
-              <label className="text-[9px] font-semibold text-theme-text-muted uppercase tracking-wide block mb-2">Notes</label>
+              <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-2">Notes</label>
               <textarea
                 placeholder="Optional note..."
                 value={notes}
@@ -332,7 +332,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={1}
-                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-theme-text-primary placeholder-theme-text-dim bg-theme-bg-hover border ${notesFocused ? 'border-theme-border' : 'border-theme-border-subtle'}`}
+                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/5 border ${notesFocused ? 'border-white/15' : 'border-white/10'}`}
               />
             </div>
 
@@ -340,14 +340,14 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-theme-text-secondary rounded-lg transition-colors hover:bg-theme-bg-hover bg-theme-bg-hover border border-theme-border-subtle"
+                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-lg transition-colors hover:bg-white/10 bg-white/5 border border-white/10"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-theme-bg-button text-theme-text-button hover:bg-theme-bg-button-hover"
+                className="flex-1 py-2 text-[11px] font-semibold rounded-lg disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
               >
                 {loading ? "..." : "Update"}
               </button>

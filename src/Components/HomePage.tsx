@@ -483,7 +483,7 @@ export default function ExpenseTrackerHome() {
             />
 
             {/* Dark glass background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-theme-bg-secondary/95 to-theme-bg-primary/95 backdrop-blur-md" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 to-black/95 backdrop-blur-md" />
 
             {/* Left color accent bar */}
             <div
@@ -507,27 +507,27 @@ export default function ExpenseTrackerHome() {
                     style={{ backgroundColor: e.category.color }}
                   />
                 )}
-                <span className="text-sm font-medium text-theme-text-primary truncate">
+                <span className="text-sm font-medium text-white truncate">
                   {e.category. name}
                 </span>
               </div>
 
               {/* Time */}
-              <span className="text-[11px] text-theme-text-muted flex-shrink-0">
+              <span className="text-[11px] text-white/50 shrink-0">
                 {formatLocalTime(e.occurredAt)}
               </span>
 
               {/* Notes + Payment */}
               <div className="flex-1 min-w-0 flex items-center gap-2">
-                <p className="text-[11px] text-theme-text-muted truncate">
+                <p className="text-[11px] text-white/50 truncate">
                   {e.notes || '—'}
                 </p>
                 {hasLongNotes && (
-                  <span className="text-[9px] text-theme-text-dim bg-theme-bg-button px-1.5 py-0.5 rounded shrink-0">
+                  <span className="text-[9px] text-white/40 bg-white/10 px-1.5 py-0.5 rounded shrink-0">
                     hover to read
                   </span>
                 )}
-                <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] bg-theme-bg-button/60" style={{ color: e.category.color }}>
+                <span className="inline-flex shrink-0 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] bg-white/10" style={{ color: e.category.color }}>
                   {e.payment_mode?.toUpperCase?.() || ''}
                 </span>
               </div>
@@ -549,13 +549,13 @@ export default function ExpenseTrackerHome() {
                       <button
                         onClick={(ev) => { ev.stopPropagation(); onAction(e._id); setConfirmActionId(null); }}
                         disabled={isPending}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-accent hover:bg-theme-accent-hover border border-blue-900 text-white disabled:opacity-50 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-blue-500 hover:bg-blue-600 border border-blue-600 text-white disabled:opacity-50 whitespace-nowrap text-right"
                       >
                         Confirm {actionLabel}
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
-                        className="px-2 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right ml-1"
+                        className="px-2 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-white/70 whitespace-nowrap text-right ml-1"
                       >
                         Cancel
                       </button>
@@ -565,13 +565,13 @@ export default function ExpenseTrackerHome() {
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
                         disabled={isPending}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-button hover:bg-theme-bg-button-hover border border-theme-border-subtle text-theme-text-secondary disabled:opacity-50 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-white/70 disabled:opacity-50 whitespace-nowrap text-right"
                       >
                         {isPending ? "Saving…" : actionLabel}
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-theme-bg-tertiary hover:bg-theme-bg-button border border-theme-border-subtle text-theme-text-secondary whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 whitespace-nowrap text-right"
                       >
                         Edit
                       </button>
@@ -605,7 +605,7 @@ export default function ExpenseTrackerHome() {
                   background: `linear-gradient(135deg, ${e. category.color} 0%, transparent 60%)`
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-theme-bg-secondary to-theme-bg-primary" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] to-black" />
 
               {/* Left color accent bar */}
               <div
@@ -617,7 +617,7 @@ export default function ExpenseTrackerHome() {
               <div className="relative flex items-center px-4 py-3 gap-4 h-full">
                 {/* Emoji or Notes icon */}
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: `${e.category. color}20` }}
                 >
                   {emoji ? (
@@ -639,8 +639,8 @@ export default function ExpenseTrackerHome() {
 
                 {/* Full notes text */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-theme-text-secondary mb-0.5">Notes</p>
-                  <p className="text-xs text-theme-text-secondary line-clamp-2">
+                  <p className="text-[10px] text-white/50 mb-0.5">Notes</p>
+                  <p className="text-xs text-white/70 line-clamp-2">
                     {e.notes}
                   </p>
                 </div>
