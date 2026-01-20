@@ -118,7 +118,18 @@ export default function ExpenseTrackerHome() {
     return normalized;
   };
 
+  // Abort controller ref for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const fetchExpenses = useCallback(async (hidden = false) => {
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+    
     setLoading(true);
     try {
       const res = await api.get(`/api/expense/${apiDate}`, {
@@ -127,6 +138,7 @@ export default function ExpenseTrackerHome() {
           ...(hidden ? { onlyHidden: true } : {}),
           includeHidden: true,
         },
+        signal: abortControllerRef.current.signal,
       });
 
       const normalized = normalizeExpenses(res.data.data || []);
@@ -146,7 +158,11 @@ export default function ExpenseTrackerHome() {
         const total = filtered.reduce((sum, e) => sum + e.amount, 0);
         setVisibleTotal(total);
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      // Ignore aborted requests
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       console.error("Failed to load expenses", err);
       setExpenses([]);
       if (!hidden) setVisibleTotal(0);
@@ -220,10 +236,10 @@ export default function ExpenseTrackerHome() {
       clearTimeout(debounceRef.current);
     }
     
-    // Debounce by 150ms to avoid rapid API calls when navigating dates
+    // Debounce by 300ms to avoid rapid API calls when navigating dates
     debounceRef.current = setTimeout(() => {
       fetchExpenses(showHidden);
-    }, 150);
+    }, 300);
     
     return () => {
       if (debounceRef.current) {
