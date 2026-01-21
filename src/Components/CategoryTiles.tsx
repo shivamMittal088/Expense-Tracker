@@ -27,7 +27,7 @@ const CategoryTiles = () => {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="group rounded-2xl bg-[#0a0a0a] border border-white/10 p-4
+            className="group rounded-2xl bg-[#0a0a0a] border border-white/20 p-4
             flex flex-col items-center justify-center gap-2
             hover:border-blue-500 hover:bg-white/5 transition cursor-pointer"
           >
@@ -55,7 +55,7 @@ const CategoryTiles = () => {
         {/* Add Category Tile */}
         <button
           onClick={() => setOpenAdd(true)}
-          className="rounded-2xl border border-dashed border-white/10 p-4
+          className="rounded-2xl border border-dashed border-white/20 p-4
           flex flex-col items-center justify-center gap-2
           text-white/50 hover:border-blue-500 hover:text-blue-500 transition"
         >

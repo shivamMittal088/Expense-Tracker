@@ -170,7 +170,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
       >
         {/* Main Card */}
         <div 
-          className="relative overflow-hidden bg-[#0a0a0a] border border-white/10"
+          className="relative overflow-hidden bg-[#0a0a0a] border border-white/25"
           style={{
             borderRadius: "1.25rem",
             boxShadow: "0 25px 50px rgba(0, 0, 0, 0.8)",
@@ -178,7 +178,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
         >
           {/* Header */}
           <div 
-            className="relative px-4 py-3 flex items-center justify-between border-b border-white/10"
+            className="relative px-4 py-3 flex items-center justify-between border-b border-white/20"
           >
             <h2 className="text-sm font-semibold text-white">Edit Expense</h2>
             <button
@@ -202,7 +202,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
           >
             {/* Amount */}
             <div 
-              className={`p-3 transition-all duration-200 rounded-xl bg-white/5 ${amountFocused ? 'border border-white/15' : 'border border-white/10'}`}
+              className={`p-3 transition-all duration-200 rounded-xl bg-white/5 ${amountFocused ? 'border border-white/30' : 'border border-white/20'}`}
             >
               <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-1">Amount</label>
               <div className="flex items-baseline gap-1">
@@ -234,7 +234,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                       <button
                         key={tile._id}
                         onClick={() => setCategory(tile.name)}
-                        className={`p-2 flex flex-col items-center gap-1 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/15' : 'bg-white/5 border-white/10'}`}
+                        className={`p-2 flex flex-col items-center gap-1 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/30' : 'bg-white/5 border-white/20'}`}
                       >
                         <span className="text-sm">{tile.emoji || "✨"}</span>
                         <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-white/50'}`}>
@@ -258,7 +258,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                     <button
                       key={mode.id}
                       onClick={() => setPaymentMode(mode.id)}
-                      className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/15' : 'bg-white/5 border-white/10'}`}
+                      className={`flex flex-col items-center gap-1 py-2 rounded-lg transition-all border ${isSelected ? 'bg-white/15 border-white/30' : 'bg-white/5 border-white/20'}`}
                     >
                       <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/50'}`} />
                       <span className={`text-[8px] font-medium ${isSelected ? 'text-white' : 'text-white/50'}`}>{mode.label}</span>
@@ -275,7 +275,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 transition-colors bg-white/5 border border-white/10"
+                  className="flex-1 flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 transition-colors bg-white/5 border border-white/20"
                 >
                   <Calendar className="w-3.5 h-3.5 text-white/50" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -283,7 +283,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 font-mono transition-colors bg-white/5 border border-white/10"
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] text-white/70 font-mono transition-colors bg-white/5 border border-white/20"
                 >
                   <Clock className="w-3.5 h-3.5 text-white/50" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
@@ -332,7 +332,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={1}
-                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/5 border ${notesFocused ? 'border-white/15' : 'border-white/10'}`}
+                className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/5 border ${notesFocused ? 'border-white/30' : 'border-white/20'}`}
               />
             </div>
 
@@ -340,7 +340,7 @@ export default function EditExpenseModal({ open, onClose, expense, onUpdate }: P
             <div className="flex gap-2 pt-1">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-lg transition-colors hover:bg-white/10 bg-white/5 border border-white/10"
+                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-lg transition-colors hover:bg-white/10 bg-white/5 border border-white/20"
               >
                 Cancel
               </button>

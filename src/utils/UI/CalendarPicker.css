@@ -124,7 +124,7 @@
 
 [data-theme='dark'] .calendar-modal {
     background: #18181b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 
         0 25px 60px rgba(0, 0, 0, 0.5),
         0 10px 30px rgba(0, 0, 0, 0.4);
@@ -472,7 +472,7 @@
     background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(20, 20, 25, 0.98));
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 24px;
     box-shadow: 
         0 32px 64px rgba(0, 0, 0, 0.4),
@@ -511,7 +511,7 @@
 /* Header with gradient accent */
 .time-picker-header {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 20px 24px;
     text-align: center;
     position: relative;
@@ -551,7 +551,7 @@
     justify-content: center;
     gap: 4px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
     padding: 12px 24px;
     position: relative;
@@ -623,7 +623,7 @@
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     position: relative;
     scroll-behavior: smooth;
 }
@@ -702,7 +702,7 @@
     flex: 1;
     padding: 10px 12px;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     color: rgba(255, 255, 255, 0.6);
     font-size: 11px;
@@ -719,7 +719,7 @@
 
 .time-picker-quick-btn:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
     color: white;
     transform: translateY(-1px);
 }
@@ -735,7 +735,7 @@
     gap: 10px;
     padding: 16px 20px;
     background: rgba(0, 0, 0, 0.15);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .time-picker-btn {

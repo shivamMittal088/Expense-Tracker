@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, HelpCircle, MessageSquare, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
 import AddExpenseModal from "./AddExpenseModal";
@@ -10,6 +11,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [isCalculatorOpen, setIsCalculatorOpen] = React.useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -53,18 +55,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
     try {
       await api.post("/api/auth/logout");
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("authToken");
-      window.location.href = "/login";
+      navigate("/login");
     } catch {
       alert("Failed to logout. Please try again.");
       setIsLoggingOut(false);
     }
-  };
+  }, [navigate]);
 
   return (
     <>
@@ -117,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all group"
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 transition-all group"
               >
                 <X size={14} className="text-white/50 group-hover:text-white transition-colors" />
               </button>
@@ -210,7 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             {/* Pro Badge Card - Inside scrollable area, below buttons */}
             <div className="mt-4">
-              <div className="relative overflow-hidden rounded-xl bg-white/[0.03] border border-white/10 p-3">
+              <div className="relative overflow-hidden rounded-xl bg-white/[0.03] border border-white/20 p-3">
                 <div className="relative flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black text-xs font-bold shadow-lg shadow-white/10">
                     U

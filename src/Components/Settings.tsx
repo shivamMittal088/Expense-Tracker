@@ -142,7 +142,7 @@ export default function Settings() {
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
           Sound & Notifications
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
           <SettingToggle
             icon={settings.soundEnabled ? Volume2 : VolumeX}
             label="Toast Sounds"
@@ -166,7 +166,7 @@ export default function Settings() {
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
           Preferences
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
           {/* Currency Selector */}
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
@@ -181,7 +181,7 @@ export default function Settings() {
             <select
               value={settings.currency}
               onChange={(e) => updateSetting("currency", e.target.value as UserSettings["currency"])}
-              className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-white/20"
+              className="bg-white/5 border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-white/30"
             >
               {currencies.map((c) => (
                 <option key={c.code} value={c.code} className="bg-[#1a1a1a]">
@@ -208,7 +208,7 @@ export default function Settings() {
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
           Privacy
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
           <SettingToggle
             icon={hideAmounts ? EyeOff : Eye}
             label="Hide Amounts"
@@ -227,7 +227,7 @@ export default function Settings() {
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
           Account
         </h2>
-        <div className="rounded-xl border border-white/10 bg-[#111] overflow-hidden">
+        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
           <SettingButton
             icon={Key}
             label="Update Password"
@@ -377,13 +377,13 @@ interface ConfirmModalProps {
 function ConfirmModal({ title, message, confirmLabel, danger, onCancel, onConfirm }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-[280px] rounded-xl border border-white/10 bg-[#1a1a1a] p-4 text-center">
+      <div className="w-full max-w-[280px] rounded-xl border border-white/25 bg-[#1a1a1a] p-4 text-center">
         <h3 className="text-sm font-semibold text-white mb-2">{title}</h3>
         <p className="text-[11px] text-gray-400 mb-4">{message}</p>
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+            className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/20 hover:bg-white/5 transition-colors"
           >
             Cancel
           </button>
@@ -450,7 +450,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-[300px] rounded-xl border border-white/10 bg-[#1a1a1a] p-4">
+      <div className="w-full max-w-[300px] rounded-xl border border-white/25 bg-[#1a1a1a] p-4">
         <h3 className="text-sm font-semibold text-white mb-4 text-center">Update Password</h3>
         
         <div className="space-y-3">
@@ -460,7 +460,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/20 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
               placeholder="Enter current password"
             />
           </div>
@@ -471,7 +471,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/20 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
               placeholder="Enter new password"
             />
           </div>
@@ -482,7 +482,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-lg bg-[#2a2a2a] border border-white/10 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
+              className="w-full rounded-lg bg-[#2a2a2a] border border-white/20 px-3 py-2 text-xs text-white placeholder-gray-500 focus:border-white/30 focus:outline-none"
               placeholder="Confirm new password"
             />
           </div>
@@ -495,7 +495,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
         <div className="flex gap-2 mt-4">
           <button
             onClick={onClose}
-            className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+            className="flex-1 py-2 text-[11px] font-medium text-gray-300 rounded-lg border border-white/20 hover:bg-white/5 transition-colors"
           >
             Cancel
           </button>

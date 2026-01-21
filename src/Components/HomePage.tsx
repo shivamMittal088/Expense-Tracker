@@ -588,7 +588,7 @@ export default function ExpenseTrackerHome() {
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(null); }}
-                        className="px-2 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-white/70 whitespace-nowrap text-right ml-1"
+                        className="px-2 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/20 text-white/70 whitespace-nowrap text-right ml-1"
                       >
                         Cancel
                       </button>
@@ -598,13 +598,13 @@ export default function ExpenseTrackerHome() {
                       <button
                         onClick={(ev) => { ev.stopPropagation(); setConfirmActionId(e._id); }}
                         disabled={isPending}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-white/70 disabled:opacity-50 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/10 hover:bg-white/15 border border-white/20 text-white/70 disabled:opacity-50 whitespace-nowrap text-right"
                       >
                         {isPending ? "Saving…" : actionLabel}
                       </button>
                       <button
                         onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
-                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 whitespace-nowrap text-right"
+                        className="px-2.5 py-1 text-[10px] rounded-md bg-white/5 hover:bg-white/10 border border-white/20 text-white/70 whitespace-nowrap text-right"
                       >
                         Edit
                       </button>
@@ -716,7 +716,7 @@ export default function ExpenseTrackerHome() {
           <div className="absolute inset-0 bg-[#0a0a0a]" />
           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
           {/* Visible border */}
-          <div className="absolute inset-0 border border-white/10 rounded-2xl" />
+          <div className="absolute inset-0 border border-white/20 rounded-2xl" />
           {/* Top accent line */}
           <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
           {/* Corner accents */}
@@ -959,7 +959,7 @@ export default function ExpenseTrackerHome() {
               
               {/* Mobile Income Input Modal */}
               {isEditingIncome && (
-                <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/20">
                   <p className="text-xs text-white/50 mb-2">Enter your monthly income</p>
                   <div className="flex items-center gap-2">
                     <span className="text-white/60">₹</span>
@@ -1007,7 +1007,7 @@ export default function ExpenseTrackerHome() {
           <div className="absolute inset-0 bg-[#0a0a0a]" />
           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02]" />
           {/* Visible border */}
-          <div className="absolute inset-0 border border-white/10 rounded-2xl" />
+          <div className="absolute inset-0 border border-white/20 rounded-2xl" />
           {/* Top accent line */}
           <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
           {/* Corner accents */}
@@ -1019,7 +1019,7 @@ export default function ExpenseTrackerHome() {
             <div className="flex items-center justify-between mb-4 lg:mb-5">
               <div className="flex items-center gap-2.5">
                 {/* Icon badge */}
-                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center">
+                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-white/[0.05] border border-white/20 flex items-center justify-center">
                   <span className="text-sm lg:text-base">📝</span>
                 </div>
                 <div>
@@ -1040,7 +1040,7 @@ export default function ExpenseTrackerHome() {
                   onClick={() => setShowAll(!showAll)}
                   className={`px-2.5 py-1 lg:px-4 lg:py-1.5 rounded-lg text-[11px] lg:text-xs font-medium transition-all touch-manipulation ${
                     showAll
-                      ? 'bg-white/[0.05] border border-white/10 text-white/70 hover:bg-white/[0.08]'
+                      ? 'bg-white/[0.05] border border-white/20 text-white/70 hover:bg-white/[0.08]'
                       : 'bg-white/90 text-black hover:bg-white'
                   }`}
                 >

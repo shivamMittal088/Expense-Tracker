@@ -30,7 +30,7 @@ const NavBar: React.FC = () => {
             {showIcons && (
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="group relative w-9 h-9 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 flex items-center justify-center"
+                className="group relative w-9 h-9 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300 flex items-center justify-center"
                 aria-label="Toggle menu"
               >
                 <div className="w-4 h-3.5 flex flex-col justify-between items-center">
@@ -79,12 +79,12 @@ const NavBar: React.FC = () => {
           {showIcons && (
             <div className="flex items-center gap-1.5">
               {/* Search Button */}
-              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
+              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300">
                 <Search size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
               </button>
 
               {/* Notification Button */}
-              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
+              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300">
                 <Bell size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
                 {/* Notification Dot */}
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-white rounded-full ring-1 ring-black/50">

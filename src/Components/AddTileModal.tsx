@@ -60,7 +60,7 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
       <div className="w-full max-w-[340px] rounded-2xl border border-white/20 bg-[#1a1a1a] text-white shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/20">
           <h2 className="text-lg font-semibold">New Tile</h2>
           <button
             onClick={onClose}
@@ -123,7 +123,7 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
             </div>
 
             {/* Emoji Grid */}
-            <div className="grid grid-cols-8 gap-1.5 p-3 rounded-xl bg-black/40 border border-white/10 max-h-32 overflow-y-auto">
+            <div className="grid grid-cols-8 gap-1.5 p-3 rounded-xl bg-black/40 border border-white/20 max-h-32 overflow-y-auto">
               {currentEmojis.map((emoji, idx) => (
                 <button
                   key={`${emoji}-${idx}`}
@@ -162,7 +162,7 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 flex gap-3 border-t border-white/10">
+        <div className="px-5 py-4 flex gap-3 border-t border-white/20">
           <button
             onClick={onClose}
             className="flex-1 py-3 text-sm font-medium text-white/70 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"

@@ -46,7 +46,7 @@
 .calc-premium-modal {
   position: relative;
   background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 20px;
   padding: 14px;
   width: 100%;
@@ -54,9 +54,9 @@
   animation: calcSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   box-shadow: 
-    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
     0 20px 60px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .calc-premium-modal.closing {
@@ -140,7 +140,7 @@
   height: 26px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
@@ -163,7 +163,7 @@
 /* ========== Display Container ========== */
 .calc-display-container {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 10px;
@@ -221,7 +221,7 @@
   min-width: 24px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
@@ -263,7 +263,7 @@
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .calc-clear-history {
@@ -376,13 +376,13 @@
 /* Number buttons */
 .calc-btn-num {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
   color: #ffffff;
 }
 
 .calc-btn-num:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .calc-btn-num:active,
@@ -398,7 +398,7 @@
 /* Function buttons (AC, DEL, %) */
 .calc-btn-func {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
   font-weight: 500;
@@ -418,7 +418,7 @@
 /* Operator buttons */
 .calc-btn-op {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   font-size: 18px;
   font-weight: 300;
@@ -426,7 +426,7 @@
 
 .calc-btn-op:hover {
   background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .calc-btn-op:active,
@@ -521,7 +521,7 @@
 
 /* ========== Previous Calculations Preview ========== */
 .calc-prev-calculations {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   padding-bottom: 8px;
   margin-bottom: 8px;
 }

@@ -195,15 +195,15 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           style={{
             background: "#0a0a0a",
             borderRadius: "1.5rem",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+            border: "1px solid rgba(255, 255, 255, 0.25)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1)",
           }}
         >
           {/* Header - Compact */}
           <div 
             className="relative px-5 py-4 flex items-center justify-between"
             style={{ 
-              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
               background: "#0a0a0a",
             }}
           >
@@ -232,7 +232,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               style={{
                 background: amountFocused ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.03)",
                 borderRadius: "1rem",
-                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.08)",
+                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.2)",
               }}
             >
               <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Amount</label>
@@ -269,7 +269,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                         className="group relative p-3 flex flex-col items-center gap-1.5 rounded-xl transition-all"
                         style={{
                           background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
-                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
+                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.15)",
                           opacity: isDeleting ? 0.5 : 1,
                         }}
                         disabled={isDeleting}
@@ -316,7 +316,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                       className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all"
                       style={{
                         background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
-                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
+                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.15)",
                       }}
                     >
                       <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-white/50'}`} />
@@ -334,7 +334,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 transition-colors bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06]"
+                  className="flex-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 transition-colors bg-white/[0.03] border border-white/20 hover:bg-white/[0.06]"
                 >
                   <Calendar className="w-4 h-4 text-white/50" />
                   {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
@@ -342,7 +342,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 font-mono transition-colors bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06]"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 font-mono transition-colors bg-white/[0.03] border border-white/20 hover:bg-white/[0.06]"
                 >
                   <Clock className="w-4 h-4 text-white/50" />
                   {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
@@ -391,7 +391,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                 onFocus={() => setNotesFocused(true)}
                 onBlur={() => setNotesFocused(false)}
                 rows={2}
-                className={`w-full px-3 py-2.5 rounded-xl text-xs outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? 'border-white/15' : 'border-white/[0.08]'}`}
+                className={`w-full px-3 py-2.5 rounded-xl text-xs outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? 'border-white/30' : 'border-white/20'}`}
               />
             </div>
 
@@ -399,7 +399,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={onClose}
-                className="flex-1 py-3 text-xs font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/[0.08]"
+                className="flex-1 py-3 text-xs font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/20"
               >
                 Cancel
               </button>
@@ -430,7 +430,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       {/* Delete Confirmation Modal */}
       {tileToDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[240px] rounded-xl border border-white/[0.08] p-4 text-center bg-black">
+          <div className="w-full max-w-[240px] rounded-xl border border-white/20 p-4 text-center bg-black">
             <div
               className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: tileToDelete.color }}
@@ -444,7 +444,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div className="flex gap-2">
               <button
                 onClick={() => setTileToDelete(null)}
-                className="flex-1 py-2 text-[11px] font-medium text-white/60 rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                className="flex-1 py-2 text-[11px] font-medium text-white/60 rounded-lg border border-white/20 hover:bg-white/5 transition-colors"
               >
                 Cancel
               </button>

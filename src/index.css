@@ -8,8 +8,8 @@
   --bg-card: #0a0a0a;
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(255, 255, 255, 0.1);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(255, 255, 255, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.15);
 }
 
 html, body, #root {

@@ -57,7 +57,7 @@ export const showToast = (
   card.style.cssText = [
     "background:#0f1117",
     "color:#f7f7f7",
-    "border:1px solid rgba(255,255,255,0.08)",
+    "border:1px solid rgba(255,255,255,0.25)",
     "box-shadow:0 25px 70px rgba(0,0,0,0.55)",
     "border-radius:14px",
     "padding:20px",
@@ -97,7 +97,7 @@ export const showToast = (
   close.style.cssText = [
     "padding:10px 14px",
     "border-radius:10px",
-    "border:1px solid rgba(255,255,255,0.12)",
+    "border:1px solid rgba(255,255,255,0.25)",
     "background:linear-gradient(120deg,#2563eb,#7c3aed)",
     "color:white",
     "cursor:pointer",

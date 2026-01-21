@@ -248,11 +248,11 @@ export default function Profile() {
               <img
                 src={profile.photoURL}
                 alt={profile.name}
-                className="w-20 h-20 rounded-full object-cover border border-white/10 shadow-xl shadow-black"
+                className="w-14 h-14 rounded-full object-cover border border-white/20 shadow-xl shadow-black"
               />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/10 shadow-xl shadow-black">
-                <User className="w-8 h-8 text-white/30" />
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
+                <User className="w-6 h-6 text-white/30" />
               </div>
             )}
           </div>
@@ -267,12 +267,12 @@ export default function Profile() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
-            className="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
+            className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
           >
             {uploadingPhoto ? (
-              <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+              <Loader2 className="w-3 h-3 text-white animate-spin" />
             ) : (
-              <Camera className="w-3.5 h-3.5 text-white" />
+              <Camera className="w-3 h-3 text-white" />
             )}
           </button>
         </div>
@@ -286,7 +286,7 @@ export default function Profile() {
                 type="text"
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-base font-semibold text-white focus:border-white/30 focus:outline-none w-full"
+                className="bg-white/5 border border-white/20 rounded-lg px-3 py-1.5 text-base font-semibold text-white focus:border-white/40 focus:outline-none w-full"
                 autoFocus
                 maxLength={30}
               />
@@ -328,7 +328,7 @@ export default function Profile() {
                   value={statusValue}
                   onChange={(e) => setStatusValue(e.target.value)}
                   placeholder="What's on your mind?"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
+                  className="w-full bg-white/[0.03] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
                   autoFocus
                   maxLength={50}
                 />
@@ -354,7 +354,7 @@ export default function Profile() {
           ) : (
             <button
               onClick={() => setEditingStatus(true)}
-              className="group flex items-center gap-2 mt-2 px-3 py-1.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 hover:bg-white/[0.04] transition-all"
+              className="group flex items-center gap-2 mt-2 px-3 py-1.5 rounded-xl bg-white/[0.02] border border-white/15 hover:border-white/25 hover:bg-white/[0.04] transition-all"
             >
               <span className="text-lg">💭</span>
               <span className={`text-sm ${profile.statusMessage ? 'text-white/60' : 'text-white/30 italic'}`}>
@@ -371,7 +371,7 @@ export default function Profile() {
         <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Account Info
         </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 overflow-hidden">
           {/* Email */}
           <div className="flex items-center gap-3 px-4 py-4">
             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -403,7 +403,7 @@ export default function Profile() {
         <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Activity
         </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 overflow-hidden">
           {/* Member Since */}
           <div className="flex items-center gap-3 px-4 py-4">
             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -436,15 +436,15 @@ export default function Profile() {
           Quick Stats
         </h2>
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
             <p className="text-2xl font-bold text-white">-</p>
             <p className="text-[10px] text-white/30 uppercase mt-1">Total Expenses</p>
           </div>
-          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
             <p className="text-2xl font-bold text-white">-</p>
             <p className="text-[10px] text-white/30 uppercase mt-1">This Month</p>
           </div>
-          <div className="rounded-2xl bg-[#0a0a0a] p-4 text-center">
+          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
             <p className="text-2xl font-bold text-emerald-400">{profile.currency}</p>
             <p className="text-[10px] text-white/30 uppercase mt-1">Currency</p>
           </div>
@@ -456,7 +456,7 @@ export default function Profile() {
         <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
           Login History
         </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] overflow-hidden">
+        <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 overflow-hidden">
           {loginHistory.length === 0 ? (
             <div className="px-4 py-8 text-center text-white/30 text-sm">
               No login history available

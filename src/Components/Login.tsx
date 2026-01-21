@@ -173,7 +173,7 @@ const Login: React.FC = () => {
           {/* Glow effect behind card */}
           <div className="absolute -inset-1 bg-gradient-to-b from-white/10 via-white/5 to-transparent rounded-3xl blur-xl" />
           
-          <div className="relative bg-[#0a0a0a] border border-white/15 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.08)] overflow-hidden">
+          <div className="relative bg-[#0a0a0a] border border-white/25 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.08)] overflow-hidden">
             {/* Top accent line */}
             <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             {/* Corner accents */}
@@ -298,7 +298,7 @@ const Login: React.FC = () => {
               {/* Glow behind modal */}
               <div className="absolute -inset-2 bg-gradient-to-b from-white/10 to-transparent rounded-2xl blur-xl" />
               
-              <div className="relative bg-[#0a0a0a] border border-white/15 rounded-xl w-full max-w-[280px] p-5 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+              <div className="relative bg-[#0a0a0a] border border-white/25 rounded-xl w-full max-w-[280px] p-5 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
                 {/* Top accent */}
                 <div className="absolute top-0 left-[25%] right-[25%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                 
@@ -320,7 +320,7 @@ const Login: React.FC = () => {
                 <input
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full bg-black/80 border border-white/15 rounded-lg py-2.5 px-3 text-white text-sm mb-3 placeholder-white/30 focus:outline-none focus:border-white/30"
+                  className="w-full bg-black/80 border border-white/25 rounded-lg py-2.5 px-3 text-white text-sm mb-3 placeholder-white/30 focus:outline-none focus:border-white/40"
                   placeholder="you@example.com"
                 />
 
