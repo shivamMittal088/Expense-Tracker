@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import api from "../routeWrapper/Api";
-import Heatmap from "../utils/UI/Heatmap";
 
 type DropdownType = "date" | "payment" | "category" | "amount" | null;
 
@@ -462,11 +461,6 @@ const Analytics = () => {
           color="rose"
           delay={300}
         />
-      </div>
-
-      {/* Contribution Calendar - LeetCode style heatmap */}
-      <div className="mb-6">
-        <Heatmap />
       </div>
 
       {/* Filter Bar */}

@@ -5,6 +5,7 @@ import { showTopToast } from "../utils/Redirecttoast";
 import EditExpenseModal from "./EditExpenseModal";
 import { AmountText } from "./Amount";
 import { useAppSelector } from "../store/hooks";
+import Heatmap from "../utils/UI/Heatmap";
 
 type Expense = {
   _id: string;
@@ -999,6 +1000,11 @@ export default function ExpenseTrackerHome() {
               )}
             </div>
           </div>
+        </section>
+
+        {/* Transaction Activity Heatmap */}
+        <section className="max-w-3xl mx-auto">
+          <Heatmap />
         </section>
 
         {/* Expenses Section - Separate Card */}
