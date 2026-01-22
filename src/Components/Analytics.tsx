@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import api from "../routeWrapper/Api";
+import Heatmap from "../utils/UI/Heatmap";
 
 type DropdownType = "date" | "payment" | "category" | "amount" | null;
 
@@ -101,17 +102,20 @@ const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number;
   const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius;
   
-  let currentOffset = 0;
+  // Pre-calculate offsets to avoid reassignment during render
+  const segments = data.map((item, index) => {
+    const percentage = (item.value / total) * 100;
+    const strokeDasharray = (percentage / 100) * circumference;
+    const offset = data.slice(0, index).reduce((acc, d) => {
+      return acc + ((d.value / total) * circumference);
+    }, 0);
+    return { ...item, strokeDasharray, offset };
+  });
   
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        {data.map((item, index) => {
-          const percentage = (item.value / total) * 100;
-          const strokeDasharray = (percentage / 100) * circumference;
-          const strokeDashoffset = -currentOffset;
-          currentOffset += strokeDasharray;
-          
+        {segments.map((item, index) => {
           return (
             <circle
               key={index}
@@ -121,8 +125,8 @@ const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number;
               fill="none"
               stroke={item.color}
               strokeWidth={16}
-              strokeDasharray={`${strokeDasharray} ${circumference}`}
-              strokeDashoffset={strokeDashoffset}
+              strokeDasharray={`${item.strokeDasharray} ${circumference}`}
+              strokeDashoffset={-item.offset}
               className="transition-all duration-700 ease-out"
               style={{ animationDelay: `${index * 100}ms` }}
             />
@@ -458,6 +462,11 @@ const Analytics = () => {
           color="rose"
           delay={300}
         />
+      </div>
+
+      {/* Contribution Calendar - LeetCode style heatmap */}
+      <div className="mb-6">
+        <Heatmap />
       </div>
 
       {/* Filter Bar */}
