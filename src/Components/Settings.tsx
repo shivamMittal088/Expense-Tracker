@@ -12,11 +12,14 @@ import {
   Key,
   EyeOff,
   Eye,
+  Target,
+  Flame,
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
+import { updateDailyBudget } from "../store/slices/budgetSlice";
 
 interface UserSettings {
   soundEnabled: boolean;
@@ -33,6 +36,7 @@ const currencies = [
 
 export default function Settings() {
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
+  const { dailyBudget: reduxDailyBudget } = useAppSelector((state) => state.budget);
   const dispatch = useAppDispatch();
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [settings, setSettings] = useState<UserSettings>({
@@ -46,6 +50,16 @@ export default function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  
+  // Daily budget for streak tracking (use Redux value as initial)
+  const [dailyBudget, setDailyBudget] = useState<number>(reduxDailyBudget);
+  const [isEditingBudget, setIsEditingBudget] = useState(false);
+  const [budgetInput, setBudgetInput] = useState("");
+
+  // Sync local state with Redux when it changes
+  useEffect(() => {
+    setDailyBudget(reduxDailyBudget);
+  }, [reduxDailyBudget]);
 
   useEffect(() => {
     // Load settings from localStorage and API
@@ -61,6 +75,9 @@ export default function Settings() {
           currency: data.currency || "INR",
           startWeekOnMonday: data.preferences?.startWeekOnMonday ?? false,
         }));
+        if (typeof data.dailyBudget === 'number') {
+          setDailyBudget(data.dailyBudget);
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -200,6 +217,94 @@ export default function Settings() {
             enabled={settings.startWeekOnMonday}
             onChange={(v) => updateSetting("startWeekOnMonday", v)}
           />
+        </div>
+      </section>
+
+      {/* Budget Streak */}
+      <section className="mb-6">
+        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+          Budget Streak
+        </h2>
+        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm text-white">Daily Budget</p>
+                <p className="text-[10px] text-gray-500">Stay under this to build your streak</p>
+              </div>
+            </div>
+            {isEditingBudget ? (
+              <div className="flex items-center gap-2">
+                <span className="text-white/60 text-sm">₹</span>
+                <input
+                  type="number"
+                  value={budgetInput}
+                  onChange={(e) => setBudgetInput(e.target.value)}
+                  className="w-20 bg-white/5 border border-orange-500/50 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-orange-400"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const value = parseFloat(budgetInput) || 0;
+                      setIsEditingBudget(false);
+                      dispatch(updateDailyBudget(value))
+                        .unwrap()
+                        .then(() => {
+                          showTopToast(value > 0 ? `Daily budget set to ₹${value}` : 'Daily budget cleared', { duration: 1500 });
+                        })
+                        .catch(() => {
+                          showTopToast('Failed to save budget', { tone: 'error' });
+                        });
+                    } else if (e.key === 'Escape') {
+                      setIsEditingBudget(false);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const value = parseFloat(budgetInput) || 0;
+                    setIsEditingBudget(false);
+                    dispatch(updateDailyBudget(value))
+                      .unwrap()
+                      .then(() => {
+                        showTopToast(value > 0 ? `Daily budget set to ₹${value}` : 'Daily budget cleared', { duration: 1500 });
+                      })
+                      .catch(() => {
+                        showTopToast('Failed to save budget', { tone: 'error' });
+                      });
+                  }}
+                  className="text-orange-400 hover:text-orange-300 text-xs font-medium"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setBudgetInput(dailyBudget > 0 ? dailyBudget.toString() : '');
+                  setIsEditingBudget(true);
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                {dailyBudget > 0 ? (
+                  <>
+                    <span className="text-sm font-medium text-white">₹{dailyBudget.toLocaleString()}</span>
+                    <Target className="w-3 h-3 text-white/40" />
+                  </>
+                ) : (
+                  <span className="text-xs text-white/50">Set budget</span>
+                )}
+              </button>
+            )}
+          </div>
+          <div className="h-px bg-white/5" />
+          <div className="px-4 py-3">
+            <p className="text-[10px] text-gray-500 leading-relaxed">
+              🔥 Build a streak by spending ≤ your daily budget. Days with no spending count as under budget!
+            </p>
+          </div>
         </div>
       </section>
 

@@ -4,8 +4,10 @@ import api from "../routeWrapper/Api"; // axios instance with auth token
 import { showTopToast } from "../utils/Redirecttoast";
 import EditExpenseModal from "./EditExpenseModal";
 import { AmountText } from "./Amount";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { fetchBudgetAndStreak, refreshStreak } from "../store/slices/budgetSlice";
 import Heatmap from "../utils/UI/Heatmap";
+import { Flame, Trophy, Target } from "lucide-react";
 
 type Expense = {
   _id: string;
@@ -43,7 +45,10 @@ interface RawExpense {
 }
 
 export default function ExpenseTrackerHome() {
+  const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
+  const { isEnabled: budgetEnabled, streak: streakData } = useAppSelector((state) => state.budget);
+  
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -75,7 +80,16 @@ export default function ExpenseTrackerHome() {
       }
     };
     fetchIncome();
-  }, []);
+    // Fetch budget and streak from Redux
+    dispatch(fetchBudgetAndStreak());
+  }, [dispatch]);
+
+  // Refetch streak when expenses change
+  useEffect(() => {
+    const handler = () => dispatch(refreshStreak());
+    window.addEventListener("expense:added", handler);
+    return () => window.removeEventListener("expense:added", handler);
+  }, [dispatch]);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -712,7 +726,7 @@ export default function ExpenseTrackerHome() {
       <main className="max-w-6xl mx-auto px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-6 space-y-8 lg:space-y-10">
 
         {/* Top Bar - Premium Glass Card - Compact & Centered */}
-        <section className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.04)]">
+        <section className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.04)]">
           {/* Solid dark background with subtle gradient */}
           <div className="absolute inset-0 bg-[#0a0a0a]" />
           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
@@ -871,6 +885,30 @@ export default function ExpenseTrackerHome() {
                     )}
                   </button>
                 )}
+
+                {/* Budget Streak Badge - Only show when budget is enabled */}
+                {budgetEnabled && streakData && (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20">
+                    <div className="flex items-center gap-1">
+                      <Flame className={`w-4 h-4 ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/30'}`} />
+                      <span className={`text-sm font-bold ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/40'}`}>
+                        {streakData.currentStreak}
+                      </span>
+                    </div>
+                    <div className="w-px h-4 bg-white/10" />
+                    <div className="flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5 text-amber-500/60" />
+                      <span className="text-xs text-white/40">{streakData.longestStreak}</span>
+                    </div>
+                    <div className="w-px h-4 bg-white/10" />
+                    <div className="flex items-center gap-1">
+                      <Target className={`w-3.5 h-3.5 ${streakData.todayUnderBudget ? 'text-emerald-400' : 'text-red-400'}`} />
+                      <span className={`text-xs font-medium ${streakData.todayUnderBudget ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {hideAmounts ? '•••' : `₹${streakData.remainingToday}`}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -956,6 +994,21 @@ export default function ExpenseTrackerHome() {
                     <p className="text-[10px] text-white/50">💰 Set income</p>
                   )}
                 </button>
+
+                {/* Mobile Streak Badge - Only show when budget is enabled */}
+                {budgetEnabled && streakData && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20">
+                    <Flame className={`w-3.5 h-3.5 ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/30'}`} />
+                    <span className={`text-[10px] font-bold ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/40'}`}>
+                      {streakData.currentStreak} day{streakData.currentStreak !== 1 ? 's' : ''}
+                    </span>
+                    {streakData.todayUnderBudget ? (
+                      <span className="text-[9px] text-emerald-400">✓</span>
+                    ) : (
+                      <span className="text-[9px] text-red-400">!</span>
+                    )}
+                  </div>
+                )}
               </div>
               
               {/* Mobile Income Input Modal */}

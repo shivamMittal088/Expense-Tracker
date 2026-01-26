@@ -17,6 +17,7 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
   const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
   const [loading, setLoading] = useState(true);
   const [hoveredDay, setHoveredDay] = useState<{ date: string; count: number; amount: number; x: number; y: number } | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Fetch heatmap data
   useEffect(() => {
@@ -33,7 +34,14 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
       }
     };
     fetchHeatmapData();
-  }, [year]);
+  }, [year, refreshKey]);
+
+  // Refetch when expense is added/updated
+  useEffect(() => {
+    const handleExpenseChange = () => setRefreshKey((k) => k + 1);
+    window.addEventListener("expense:added", handleExpenseChange);
+    return () => window.removeEventListener("expense:added", handleExpenseChange);
+  }, []);
 
   // Create a map for quick lookup
   const dataMap = useMemo(() => {
@@ -86,9 +94,18 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
     return "bg-emerald-400"; // 6+ transactions
   };
 
-  // Format date for display
+  // Format date for display (use local date, not UTC)
   const formatDate = (date: Date): string => {
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  // Get today's date in local timezone
+  const getTodayStr = (): string => {
+    const now = new Date();
+    return formatDate(now);
   };
 
   // Get month labels with positions
@@ -123,7 +140,7 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
     // Calculate streak
     let currentStreak = 0;
     let maxStreak = 0;
-    const today = new Date().toISOString().split("T")[0];
+    const today = getTodayStr();
     const sortedDates = [...heatmapData].sort((a, b) => b.date.localeCompare(a.date));
     
     for (let i = 0; i < sortedDates.length; i++) {
@@ -266,7 +283,7 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
                       const count = data?.count || 0;
                       const amount = data?.totalAmount || 0;
                       const isCurrentYear = day.getFullYear() === year;
-                      const isToday = dateStr === new Date().toISOString().split("T")[0];
+                      const isToday = dateStr === getTodayStr();
                       const isFuture = day > new Date();
 
                       return (
