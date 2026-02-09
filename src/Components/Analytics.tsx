@@ -37,6 +37,31 @@ type Expense = {
   currency?: string;
 };
 
+type RecurringPayment = {
+  name: string;
+  emoji: string;
+  color: string;
+  amount: number;
+  count: number;
+  frequency: "daily" | "weekly" | "bi-weekly" | "monthly" | "quarterly" | "irregular";
+  frequencyLabel: string;
+  nextExpectedDate: string | null;
+  estimatedMonthlyAmount: number;
+  lastOccurrence: string;
+  confidenceScore: number;
+};
+
+type PaymentBreakdown = {
+  mode: string;
+  label: string;
+  color: string;
+  icon: string;
+  totalAmount: number;
+  count: number;
+  avgAmount: number;
+  percentage: number;
+};
+
 // Stat Card Component
 const StatCard = ({
   icon: Icon,
@@ -213,7 +238,13 @@ const Analytics = () => {
   const [activeView, setActiveView] = useState<"list" | "chart">("chart");
 
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
+  const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
+  const [totalMonthlyRecurring, setTotalMonthlyRecurring] = useState(0);
+  const [paymentBreakdown, setPaymentBreakdown] = useState<PaymentBreakdown[]>([]);
+  const [paymentBreakdownLoading, setPaymentBreakdownLoading] = useState(true);
+  const [paymentPeriod, setPaymentPeriod] = useState<"week" | "month" | "3month" | "6month" | "year">("month");
   const [loading, setLoading] = useState(true);
+  const [recurringLoading, setRecurringLoading] = useState(true);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -253,8 +284,44 @@ const Analytics = () => {
       }
     };
 
+    const fetchRecurringPayments = async () => {
+      try {
+        setRecurringLoading(true);
+        const response = await api.get('/api/expenses/recurring');
+        const data = response.data?.data || [];
+        const summary = response.data?.summary || {};
+        
+        setRecurringPayments(data);
+        setTotalMonthlyRecurring(summary.totalMonthlyEstimate || 0);
+      } catch (error) {
+        console.error("Failed to fetch recurring payments:", error);
+      } finally {
+        setRecurringLoading(false);
+      }
+    };
+
     fetchExpenses();
+    fetchRecurringPayments();
   }, []);
+
+  // Fetch payment breakdown when period changes
+  useEffect(() => {
+    const fetchPaymentBreakdown = async () => {
+      try {
+        setPaymentBreakdownLoading(true);
+        const response = await api.get('/api/expenses/payment-breakdown', {
+          params: { period: paymentPeriod },
+        });
+        setPaymentBreakdown(response.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch payment breakdown:", error);
+      } finally {
+        setPaymentBreakdownLoading(false);
+      }
+    };
+
+    fetchPaymentBreakdown();
+  }, [paymentPeriod]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -711,6 +778,80 @@ const Analytics = () => {
         </div>
       </div>
 
+      {/* Payment Mode Breakdown - Compact Premium */}
+      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <CreditCard size={14} className="text-blue-400" />
+            <h2 className="text-xs font-semibold text-white">Payment Methods</h2>
+          </div>
+          <div className="flex items-center gap-0.5 bg-zinc-800/70 rounded-md p-0.5">
+            {(["week", "month", "3month", "6month", "year"] as const).map((period) => (
+              <button
+                key={period}
+                onClick={() => setPaymentPeriod(period)}
+                className={`px-1.5 py-0.5 text-[9px] font-medium rounded transition-all ${
+                  paymentPeriod === period
+                    ? "bg-blue-500/90 text-white shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {period === "week" ? "7D" : period === "month" ? "1M" : period === "3month" ? "3M" : period === "6month" ? "6M" : "1Y"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {paymentBreakdownLoading ? (
+          <div className="flex gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-1 h-16 bg-zinc-800/40 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : paymentBreakdown.length === 0 ? (
+          <div className="text-center py-4">
+            <p className="text-zinc-500 text-xs">No data</p>
+          </div>
+        ) : (
+          <>
+            {/* Horizontal bar showing all payment modes */}
+            <div className="h-3 rounded-full overflow-hidden flex mb-3">
+              {paymentBreakdown.map((item, index) => (
+                <div
+                  key={item.mode}
+                  className="h-full transition-all duration-500 first:rounded-l-full last:rounded-r-full"
+                  style={{
+                    width: `${item.percentage}%`,
+                    backgroundColor: item.color,
+                    marginLeft: index > 0 ? '2px' : '0',
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Compact grid of payment modes */}
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {paymentBreakdown.map((item) => (
+                <div
+                  key={item.mode}
+                  className="group relative bg-zinc-800/30 hover:bg-zinc-800/50 rounded-xl p-2 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-[10px] text-zinc-400 font-medium">{item.label}</span>
+                  </div>
+                  <p className="text-white text-sm font-bold">₹{item.totalAmount >= 1000 ? `${(item.totalAmount / 1000).toFixed(1)}k` : item.totalAmount}</p>
+                  <p className="text-zinc-600 text-[9px]">{item.percentage}% • {item.count}x</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
       {/* Recurring Payments Section */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -724,41 +865,59 @@ const Analytics = () => {
           </span>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {[
-            { emoji: "🎬", name: "Netflix", amount: 649, count: 6, color: "#e50914" },
-            { emoji: "🏠", name: "Rent", amount: 15000, count: 4, color: "#10b981" },
-            { emoji: "💪", name: "Gym", amount: 1200, count: 3, color: "#f59e0b" },
-            { emoji: "📱", name: "Mobile", amount: 599, count: 5, color: "#3b82f6" },
-            { emoji: "🌐", name: "Internet", amount: 899, count: 4, color: "#8b5cf6" },
-            { emoji: "🎵", name: "Spotify", amount: 119, count: 6, color: "#1db954" },
-          ].map((item) => (
-            <div
-              key={item.name}
-              className="group flex items-center gap-3 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-xl px-3 py-2.5 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
-            >
-              <div 
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-base"
-                style={{ backgroundColor: `${item.color}20` }}
-              >
-                {item.emoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                <p className="text-zinc-500 text-[11px]">{item.count}x paid</p>
-              </div>
-              <div className="text-right">
-                <p className="text-emerald-400 text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
-                <p className="text-zinc-600 text-[10px]">/month</p>
-              </div>
+        {recurringLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-16 bg-zinc-800/40 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : recurringPayments.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="w-12 h-12 rounded-full bg-zinc-800/50 flex items-center justify-center mx-auto mb-3">
+              <RefreshCw className="text-zinc-600" size={20} />
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center justify-between">
-          <span className="text-xs text-zinc-500">Total recurring</span>
-          <span className="text-emerald-400 font-bold text-sm">₹18,466/month</span>
-        </div>
+            <p className="text-zinc-400 text-sm font-medium">No recurring payments detected</p>
+            <p className="text-zinc-600 text-xs mt-1">Keep tracking to find patterns</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {recurringPayments.slice(0, 6).map((item) => (
+                <div
+                  key={item.name}
+                  className="group flex items-center gap-3 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-xl px-3 py-2.5 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
+                >
+                  <div 
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-base"
+                    style={{ backgroundColor: `${item.color}20` }}
+                  >
+                    {item.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{item.name}</p>
+                    <p className="text-zinc-500 text-[11px]">
+                      {item.frequencyLabel}
+                    </p>
+                    {item.nextExpectedDate && (
+                      <p className={`text-[10px] ${item.nextExpectedDate.includes('Overdue') ? 'text-rose-400' : 'text-amber-400'}`}>
+                        {item.nextExpectedDate}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-emerald-400 text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
+                    <p className="text-zinc-600 text-[10px]">~₹{item.estimatedMonthlyAmount.toLocaleString()}/mo</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center justify-between">
+              <span className="text-xs text-zinc-500">Estimated monthly total</span>
+              <span className="text-emerald-400 font-bold text-sm">₹{totalMonthlyRecurring.toLocaleString()}/month</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* View Toggle */}
