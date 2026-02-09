@@ -213,11 +213,9 @@ const WeeklyTrendChart = ({ data }: { data: { day: string; amount: number }[] })
 const SpendingTrendsChart = ({ 
   data, 
   view,
-  summary 
 }: { 
   data: SpendingTrend[]; 
   view: "daily" | "monthly" | "yearly";
-  summary: SpendingTrendsSummary | null;
 }) => {
   const maxAmount = Math.max(...data.map(d => d.totalAmount), 1);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -228,14 +226,14 @@ const SpendingTrendsChart = ({
       // Show only every 5th day or first/last
       if (index % 5 === 0 || index === data.length - 1) {
         // Parse date manually to avoid timezone issues (period is "YYYY-MM-DD")
-        const [year, month, day] = period.split("-");
+        const [, month, day] = period.split("-");
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         return `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
       }
       return "";
     } else if (view === "monthly") {
       // period is "YYYY-MM"
-      const [year, month] = period.split("-");
+      const [, month] = period.split("-");
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       return `${monthNames[parseInt(month) - 1]}`;
     } else {
@@ -737,7 +735,7 @@ const Analytics = () => {
             No data available
           </div>
         ) : (
-          <SpendingTrendsChart data={spendingTrends} view={trendsView} summary={spendingTrendsSummary} />
+          <SpendingTrendsChart data={spendingTrends} view={trendsView} />
         )}
 
         {/* Summary Stats */}
