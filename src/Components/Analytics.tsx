@@ -62,6 +62,25 @@ type PaymentBreakdown = {
   percentage: number;
 };
 
+type SpendingTrend = {
+  period: string;
+  totalAmount: number;
+  count: number;
+  avgAmount: number;
+  maxAmount: number;
+};
+
+type SpendingTrendsSummary = {
+  view: string;
+  totalSpent: number;
+  totalTransactions: number;
+  avgPerPeriod: number;
+  highestPeriod: SpendingTrend;
+  lowestPeriod: SpendingTrend;
+  trendPercentage: number;
+  trendDirection: "up" | "down" | "flat";
+};
+
 // Stat Card Component
 const StatCard = ({
   icon: Icon,
@@ -190,6 +209,129 @@ const WeeklyTrendChart = ({ data }: { data: { day: string; amount: number }[] })
   );
 };
 
+// Spending Trends Chart Component
+const SpendingTrendsChart = ({ 
+  data, 
+  view,
+  summary 
+}: { 
+  data: SpendingTrend[]; 
+  view: "daily" | "monthly" | "yearly";
+  summary: SpendingTrendsSummary | null;
+}) => {
+  const maxAmount = Math.max(...data.map(d => d.totalAmount), 1);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  // Format period label based on view
+  const formatLabel = (period: string, index: number) => {
+    if (view === "daily") {
+      // Show only every 5th day or first/last
+      if (index % 5 === 0 || index === data.length - 1) {
+        // Parse date manually to avoid timezone issues (period is "YYYY-MM-DD")
+        const [year, month, day] = period.split("-");
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
+      }
+      return "";
+    } else if (view === "monthly") {
+      // period is "YYYY-MM"
+      const [year, month] = period.split("-");
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${monthNames[parseInt(month) - 1]}`;
+    } else {
+      // yearly - just show the full year (e.g., 2022, 2023)
+      return period;
+    }
+  };
+
+  // Get bar color based on amount intensity
+  const getBarColor = (amount: number, index: number) => {
+    if (hoveredIndex === index) return "bg-white/90";
+    if (amount === 0) return "bg-zinc-700";
+    
+    // Create a gradient of colors based on the amount relative to max
+    const intensity = amount / maxAmount;
+    
+    if (intensity > 0.8) return "bg-emerald-400"; // Highest - bright green
+    if (intensity > 0.6) return "bg-emerald-500"; // High - green
+    if (intensity > 0.4) return "bg-teal-500"; // Medium-high - teal
+    if (intensity > 0.2) return "bg-cyan-500"; // Medium - cyan
+    if (intensity > 0.1) return "bg-blue-500"; // Low - blue
+    return "bg-blue-400"; // Lowest - light blue
+  };
+
+  // Calculate bar height in pixels
+  const chartHeight = 128; // h-32 = 8rem = 128px
+  const getBarHeight = (amount: number) => {
+    if (amount === 0) return 2;
+    return Math.max(4, (amount / maxAmount) * chartHeight);
+  };
+
+  return (
+    <div className="relative">
+      {/* Y-axis labels */}
+      <div className="absolute left-0 top-0 h-32 w-10 flex flex-col justify-between text-[9px] text-zinc-500">
+        <span>₹{maxAmount >= 1000 ? `${(maxAmount / 1000).toFixed(0)}k` : maxAmount}</span>
+        <span>₹{maxAmount >= 2000 ? `${(maxAmount / 2000).toFixed(0)}k` : Math.round(maxAmount / 2)}</span>
+        <span>₹0</span>
+      </div>
+      
+      {/* Chart area */}
+      <div className="ml-12 relative">
+        {/* Grid lines */}
+        <div className="absolute inset-0 h-32 flex flex-col justify-between pointer-events-none">
+          <div className="border-b border-zinc-800/50" />
+          <div className="border-b border-zinc-800/30" />
+          <div className="border-b border-zinc-800/50" />
+        </div>
+        
+        {/* Bars */}
+        <div className={`flex items-end h-32 ${view === "yearly" ? "justify-between gap-4" : "gap-[2px]"}`}>
+          {data.map((item, index) => (
+            <div 
+              key={item.period} 
+              className={`relative flex flex-col items-center justify-end ${view === "yearly" ? "flex-1" : view === "daily" ? "flex-1 min-w-[4px]" : "flex-1"}`}
+              style={{ height: chartHeight }}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              {/* Tooltip */}
+              {hoveredIndex === index && (
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 shadow-xl z-20 whitespace-nowrap">
+                  <p className="text-white text-xs font-semibold">₹{item.totalAmount.toLocaleString()}</p>
+                  <p className="text-zinc-400 text-[10px]">{item.count} transactions</p>
+                  <p className="text-zinc-500 text-[10px]">{item.period}</p>
+                </div>
+              )}
+              
+              {/* Bar */}
+              <div
+                className={`${view === "yearly" ? "w-full max-w-[40px]" : "w-full"} ${getBarColor(item.totalAmount, index)} rounded-t-sm transition-all duration-300 cursor-pointer hover:opacity-80`}
+                style={{ height: getBarHeight(item.totalAmount) }}
+              />
+            </div>
+          ))}
+        </div>
+        
+        {/* X-axis labels */}
+        <div className={`flex mt-1.5 ${view === "yearly" ? "justify-between" : ""}`}>
+          {data.map((item, index) => {
+            const label = formatLabel(item.period, index);
+            return (
+              <div 
+                key={item.period} 
+                className={`text-[9px] text-zinc-500 text-center flex-1`}
+              >
+                {label}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Filter Chip Component
 const FilterChip = ({
   icon: Icon,
@@ -245,6 +387,12 @@ const Analytics = () => {
   const [paymentPeriod, setPaymentPeriod] = useState<"week" | "month" | "3month" | "6month" | "year">("month");
   const [loading, setLoading] = useState(true);
   const [recurringLoading, setRecurringLoading] = useState(true);
+
+  // Spending Trends State
+  const [spendingTrends, setSpendingTrends] = useState<SpendingTrend[]>([]);
+  const [spendingTrendsSummary, setSpendingTrendsSummary] = useState<SpendingTrendsSummary | null>(null);
+  const [trendsView, setTrendsView] = useState<"daily" | "monthly" | "yearly">("daily");
+  const [trendsLoading, setTrendsLoading] = useState(true);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -322,6 +470,26 @@ const Analytics = () => {
 
     fetchPaymentBreakdown();
   }, [paymentPeriod]);
+
+  // Fetch spending trends when view changes
+  useEffect(() => {
+    const fetchSpendingTrends = async () => {
+      try {
+        setTrendsLoading(true);
+        const response = await api.get('/api/expenses/spending-trends', {
+          params: { view: trendsView },
+        });
+        setSpendingTrends(response.data?.data || []);
+        setSpendingTrendsSummary(response.data?.summary || null);
+      } catch (error) {
+        console.error("Failed to fetch spending trends:", error);
+      } finally {
+        setTrendsLoading(false);
+      }
+    };
+
+    fetchSpendingTrends();
+  }, [trendsView]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -528,6 +696,90 @@ const Analytics = () => {
           color="rose"
           delay={300}
         />
+      </div>
+
+      {/* Spending Trends Chart */}
+      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-5 border border-zinc-800/50 backdrop-blur-xl mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 size={18} className="text-emerald-400" />
+            <div>
+              <h3 className="text-sm font-semibold text-white">Spending Trends</h3>
+              <p className="text-[10px] text-zinc-500">
+                {trendsView === "daily" ? "Last 30 days" : trendsView === "monthly" ? "Last 12 months" : "Last 5 years"}
+              </p>
+            </div>
+          </div>
+          
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-zinc-800/70 rounded-lg p-1">
+            {(["daily", "monthly", "yearly"] as const).map((view) => (
+              <button
+                key={view}
+                onClick={() => setTrendsView(view)}
+                className={`px-2.5 py-1 text-[10px] font-medium rounded-md transition-all ${
+                  trendsView === view
+                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
+                    : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+                }`}
+              >
+                {view === "daily" ? "Days" : view === "monthly" ? "Months" : "Years"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Chart */}
+        {trendsLoading ? (
+          <div className="h-40 bg-zinc-800/30 rounded-xl animate-pulse" />
+        ) : spendingTrends.length === 0 ? (
+          <div className="h-40 flex items-center justify-center text-zinc-500 text-sm">
+            No data available
+          </div>
+        ) : (
+          <SpendingTrendsChart data={spendingTrends} view={trendsView} summary={spendingTrendsSummary} />
+        )}
+
+        {/* Summary Stats */}
+        {spendingTrendsSummary && !trendsLoading && (
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-800/50">
+            <div className="text-center">
+              <p className="text-[10px] text-zinc-500 mb-0.5">Total</p>
+              <p className="text-white text-sm font-bold">
+                ₹{spendingTrendsSummary.totalSpent >= 100000 
+                  ? `${(spendingTrendsSummary.totalSpent / 100000).toFixed(1)}L` 
+                  : spendingTrendsSummary.totalSpent.toLocaleString()}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] text-zinc-500 mb-0.5">
+                Avg/{trendsView === "daily" ? "Day" : trendsView === "monthly" ? "Month" : "Year"}
+              </p>
+              <p className="text-white text-sm font-bold">
+                ₹{spendingTrendsSummary.avgPerPeriod >= 1000 
+                  ? `${(spendingTrendsSummary.avgPerPeriod / 1000).toFixed(1)}K` 
+                  : spendingTrendsSummary.avgPerPeriod.toLocaleString()}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] text-zinc-500 mb-0.5">Trend</p>
+              <p className={`text-sm font-bold flex items-center justify-center gap-1 ${
+                spendingTrendsSummary.trendDirection === "up" 
+                  ? "text-rose-400" 
+                  : spendingTrendsSummary.trendDirection === "down" 
+                    ? "text-emerald-400" 
+                    : "text-zinc-400"
+              }`}>
+                {spendingTrendsSummary.trendDirection === "up" ? (
+                  <ArrowUpRight size={14} />
+                ) : spendingTrendsSummary.trendDirection === "down" ? (
+                  <ArrowDownRight size={14} />
+                ) : null}
+                {Math.abs(spendingTrendsSummary.trendPercentage)}%
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filter Bar */}
