@@ -22,6 +22,10 @@ const getFullPhotoURL = (photoURL?: string) => {
 export default function PublicProfile() {
   const { id } = useParams();
   const [profile, setProfile] = useState<PublicProfileData | null | undefined>(undefined);
+  const [followStatus, setFollowStatus] = useState<"none" | "pending" | "accepted">("none");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -33,6 +37,23 @@ export default function PublicProfile() {
       .catch(() => {
         showTopToast("Failed to load profile", { tone: "error" });
         setProfile(null);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    api
+      .get(`/api/profile/follow-status/${id}`)
+      .then((res) => {
+        const status = res.data?.status || "none";
+        if (status === "pending" || status === "accepted") {
+          setFollowStatus(status);
+        } else {
+          setFollowStatus("none");
+        }
+      })
+      .catch(() => {
+        setFollowStatus("none");
       });
   }, [id]);
 
@@ -59,6 +80,37 @@ export default function PublicProfile() {
     .slice(0, 2)
     .join("") || "U";
 
+  const handleFollow = async () => {
+    if (!id || followStatus !== "none") return;
+    setIsFollowing(true);
+    try {
+      const trimmed = note.trim();
+      const res = await api.post(`/api/profile/follow/${id}`, {
+        ...(trimmed ? { note: trimmed } : {}),
+      });
+      const status = res.data?.status || "pending";
+      setFollowStatus(status === "accepted" ? "accepted" : "pending");
+      setNote("");
+    } catch {
+      showTopToast("Failed to send follow request", { tone: "error" });
+    } finally {
+      setIsFollowing(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!id || followStatus !== "pending") return;
+    setIsCancelling(true);
+    try {
+      await api.delete(`/api/profile/follow/${id}`);
+      setFollowStatus("none");
+    } catch {
+      showTopToast("Failed to cancel request", { tone: "error" });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white px-4 py-6">
       <div className="max-w-lg mx-auto rounded-3xl border border-white/15 bg-[#0b0b0b] p-6 shadow-2xl shadow-black/60">
@@ -73,18 +125,55 @@ export default function PublicProfile() {
           <div className="flex-1 min-w-0">
             <p className="text-lg font-semibold text-white truncate">{profile.name}</p>
             <p className="text-sm text-white/50 truncate">{profile.emailId}</p>
+            {profile.statusMessage && (
+              <div className="mt-2 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1">
+                <span className="text-[11px]">💬</span>
+                <span className="text-[11px] text-white/70 truncate">{profile.statusMessage}</span>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="mt-6">
+          {followStatus === "none" && (
+            <div className="mb-3">
+              <label className="text-[11px] text-white/40 uppercase tracking-[0.2em]">Note</label>
+              <textarea
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                maxLength={200}
+                rows={3}
+                placeholder="Add a short note (optional)"
+                className="mt-2 w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+              />
+              <div className="mt-1 text-[10px] text-white/30 text-right">{note.length}/200</div>
+            </div>
+          )}
           <button
             type="button"
-            disabled
-            className="w-full py-2.5 rounded-xl bg-white/10 text-white/60 text-sm font-medium cursor-not-allowed"
+            onClick={followStatus === "pending" ? handleCancel : handleFollow}
+            disabled={followStatus === "accepted" || isFollowing || isCancelling}
+            className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              followStatus === "none"
+                ? "bg-white text-black hover:bg-white/90"
+                : followStatus === "pending"
+                  ? "bg-white/10 text-white/70 hover:bg-white/15"
+                  : "bg-white/10 text-white/60 cursor-not-allowed"
+            }`}
           >
-            Follow
+            {followStatus === "pending"
+              ? isCancelling
+                ? "Cancelling..."
+                : "Cancel request"
+              : followStatus === "accepted"
+                ? "Following"
+                : isFollowing
+                  ? "Sending..."
+                  : "Follow"}
           </button>
-          <p className="text-[11px] text-white/30 mt-2 text-center">Follow will be available soon</p>
+          {followStatus === "pending" && (
+            <p className="text-[11px] text-white/30 mt-2 text-center">Request pending</p>
+          )}
         </div>
       </div>
     </div>
