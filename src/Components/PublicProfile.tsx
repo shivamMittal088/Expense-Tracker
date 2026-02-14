@@ -113,8 +113,8 @@ export default function PublicProfile() {
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-6">
-      <div className="max-w-lg mx-auto rounded-3xl border border-white/15 bg-[#0b0b0b] p-6 shadow-2xl shadow-black/60">
-        <div className="flex items-center gap-4">
+      <div className="max-w-xs mx-auto rounded-3xl border border-white/15 bg-[#0b0b0b] p-5 shadow-2xl shadow-black/60">
+        <div className="flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
             {photo ? (
               <img src={photo} alt={profile.name} className="w-full h-full object-cover" />
@@ -122,29 +122,29 @@ export default function PublicProfile() {
               <span className="text-xl font-semibold text-white/70">{initials}</span>
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold text-white truncate">{profile.name}</p>
-            <p className="text-sm text-white/50 truncate">{profile.emailId}</p>
-            {profile.statusMessage && (
-              <div className="mt-2 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1">
-                <span className="text-[11px]">💬</span>
-                <span className="text-[11px] text-white/70 truncate">{profile.statusMessage}</span>
-              </div>
-            )}
+          <div className="mt-3">
+            <p className="text-base font-semibold text-white">{profile.name}</p>
+            <p className="text-xs text-white/50">{profile.emailId}</p>
           </div>
+          {profile.statusMessage && (
+            <div className="mt-2 inline-flex max-w-[220px] items-start gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-1.5">
+              <span className="text-[11px]">💬</span>
+              <span className="text-[11px] text-white/70 break-words">{profile.statusMessage}</span>
+            </div>
+          )}
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {followStatus === "none" && (
             <div className="mb-3">
-              <label className="text-[11px] text-white/40 uppercase tracking-[0.2em]">Note</label>
+              <label className="text-[11px] text-white/40 uppercase tracking-[0.2em]">Send a note</label>
               <textarea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 maxLength={200}
                 rows={3}
                 placeholder="Add a short note (optional)"
-                className="mt-2 w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
+                className="mt-2 w-full rounded-xl bg-black/60 border border-white/10 px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30"
               />
               <div className="mt-1 text-[10px] text-white/30 text-right">{note.length}/200</div>
             </div>
@@ -153,7 +153,7 @@ export default function PublicProfile() {
             type="button"
             onClick={followStatus === "pending" ? handleCancel : handleFollow}
             disabled={followStatus === "accepted" || isFollowing || isCancelling}
-            className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`w-full py-2.5 rounded-xl text-xs font-medium transition-colors ${
               followStatus === "none"
                 ? "bg-white text-black hover:bg-white/90"
                 : followStatus === "pending"
