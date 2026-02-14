@@ -3,7 +3,11 @@ import { useLocation } from "react-router-dom";
 import { Search, Bell } from "lucide-react";
 import Sidebar from "./Sidebar";
 
-const NavBar: React.FC = () => {
+interface NavBarProps {
+  onSearchClick?: () => void;
+}
+
+const NavBar: React.FC<NavBarProps> = ({ onSearchClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -23,7 +27,7 @@ const NavBar: React.FC = () => {
         {/* Very subtle top glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 h-14 relative flex items-center justify-between">
           {/* Left side - Animated Menu Button + App Name */}
           <div className="flex items-center gap-3 relative">
             {/* Animated Hamburger Button - only show when logged in */}
@@ -77,20 +81,25 @@ const NavBar: React.FC = () => {
 
           {/* Actions - only show when logged in */}
           {showIcons && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 md:absolute md:left-1/2 md:-translate-x-1/2">
               {/* Search Button */}
-              <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300">
+              <button
+                className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300"
+                onClick={onSearchClick}
+                aria-label="Search people"
+              >
                 <Search size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
               </button>
 
               {/* Notification Button */}
+              {/*
               <button className="group relative p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/20 hover:border-white/30 transition-all duration-300">
                 <Bell size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
-                {/* Notification Dot */}
                 <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-white rounded-full ring-1 ring-black/50">
                   <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-50" />
                 </span>
               </button>
+              */}
             </div>
           )}
         </div>
