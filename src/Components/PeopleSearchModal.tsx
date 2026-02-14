@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
 import api from "../routeWrapper/Api";
-import { showTopToast } from "../utils/Redirecttoast";
 
 type UserResult = {
   _id: string;
@@ -26,6 +26,7 @@ const getFullPhotoURL = (photoURL?: string) => {
 };
 
 export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalProps) {
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<UserResult[]>([]);
@@ -42,8 +43,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    api
-      .get("/api/profile/search-users", {
+    api.get("/api/profile/search-users", {
         params: { q: trimmed, limit: 10 },
       })
       .then((res) => {
@@ -66,9 +66,9 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
     return () => window.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
-  const handleUserSelect = () => {
-    showTopToast("Viewing other profiles coming soon", { tone: "info" });
+  const handleUserSelect = (userId: string) => {
     onClose();
+    navigate(`/profile/${userId}`);
   };
 
   const hasNoResults = !searching && query.trim() && results.length === 0;
@@ -129,7 +129,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
                   {results.map((user, index) => (
                     <button
                       key={user._id}
-                      onClick={() => handleUserSelect()}
+                      onClick={() => handleUserSelect(user._id)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition"
                     >
                       <AvatarCircle user={user} index={index} />
