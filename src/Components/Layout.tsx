@@ -44,6 +44,16 @@ export default function Layout() {
     setIsNotificationsOpen(true);
   };
 
+  const handleAcceptRequest = async (requestId: string) => {
+    await api.post(`/api/profile/follow-requests/${requestId}/accept`);
+    setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
+  };
+
+  const handleDeclineRequest = async (requestId: string) => {
+    await api.delete(`/api/profile/follow-requests/${requestId}`);
+    setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
+  };
+
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <NavBar
@@ -71,6 +81,8 @@ export default function Layout() {
         count={notificationRequests?.length || 0}
         requests={notificationRequests || []}
         loading={loadingNotifications}
+        onAccept={handleAcceptRequest}
+        onDecline={handleDeclineRequest}
       />
     </div>
   );

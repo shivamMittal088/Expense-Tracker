@@ -26,6 +26,8 @@ interface ProfileData {
   photoURL?: string;
   statusMessage?: string;
   currency: "INR" | "USD" | "EUR";
+  followersCount?: number;
+  followingCount?: number;
   preferences?: {
     theme?: string;
     startWeekOnMonday?: boolean;
@@ -240,45 +242,50 @@ export default function Profile() {
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-lg mx-auto px-4 py-6 pb-28">
       {/* Profile Header */}
-      <div className="flex items-center justify-center sm:justify-start gap-4 mb-8">
-        {/* Avatar */}
-        <div className="relative flex-shrink-0">
-          <div className="relative">
-            {profile.photoURL ? (
-              <img
-                src={profile.photoURL}
-                alt={profile.name}
-                className="w-14 h-14 rounded-full object-cover border border-white/20 shadow-xl shadow-black"
-              />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
-                <User className="w-6 h-6 text-white/30" />
+      <div className="relative rounded-2xl overflow-hidden mb-6">
+        <div className="absolute inset-0 bg-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.03]" />
+        <div className="absolute inset-0 border border-white/15 rounded-2xl" />
+        <div className="relative p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            {/* Avatar */}
+            <div className="relative flex-shrink-0 self-center sm:self-auto">
+              <div className="relative">
+                {profile.photoURL ? (
+                  <img
+                    src={profile.photoURL}
+                    alt={profile.name}
+                    className="w-16 h-16 rounded-full object-cover border border-white/20 shadow-xl shadow-black"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
+                    <User className="w-6 h-6 text-white/30" />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-            onChange={handlePhotoUpload}
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingPhoto}
-            className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
-          >
-            {uploadingPhoto ? (
-              <Loader2 className="w-3 h-3 text-white animate-spin" />
-            ) : (
-              <Camera className="w-3 h-3 text-white" />
-            )}
-          </button>
-        </div>
 
-        {/* Name & Status */}
-        <div className="flex-1 min-w-0">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
+              >
+                {uploadingPhoto ? (
+                  <Loader2 className="w-3 h-3 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-3 h-3 text-white" />
+                )}
+              </button>
+            </div>
+
+            {/* Name & Status */}
+            <div className="flex-1 min-w-0">
           {/* Name - Editable */}
           {editingName ? (
             <div className="flex items-center gap-2">
@@ -357,12 +364,29 @@ export default function Profile() {
               className="group flex items-center gap-2 mt-2 px-3 py-1.5 rounded-xl bg-white/[0.02] border border-white/15 hover:border-white/25 hover:bg-white/[0.04] transition-all"
             >
               <span className="text-lg">💭</span>
-              <span className={`text-sm ${profile.statusMessage ? 'text-white/60' : 'text-white/30 italic'}`}>
+              <span className={`text-sm ${profile.statusMessage ? "text-white/60" : "text-white/30 italic"}`}>
                 {profile.statusMessage || "Share what's on your mind..."}
               </span>
               <Edit3 className="w-3 h-3 text-white/20 group-hover:text-white/40 transition-colors ml-auto" />
             </button>
           )}
+
+              <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-white/60">
+                <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15">
+                  <span className="text-white/90 font-semibold">
+                    {profile.followersCount ?? 0}
+                  </span>{" "}
+                  Followers
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15">
+                  <span className="text-white/90 font-semibold">
+                    {profile.followingCount ?? 0}
+                  </span>{" "}
+                  Following
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

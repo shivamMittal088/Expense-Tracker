@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Check, X, UserPlus } from "lucide-react";
 
 interface NotificationsModalProps {
@@ -7,6 +7,8 @@ interface NotificationsModalProps {
   count: number;
   requests: FollowRequest[];
   loading: boolean;
+  onAccept: (requestId: string) => Promise<void>;
+  onDecline: (requestId: string) => Promise<void>;
 }
 
 export type FollowRequest = {
@@ -36,7 +38,16 @@ const formatTimeAgo = (value?: string) => {
   return `${days}d ago`;
 };
 
-export default function NotificationsModal({ open, onClose, count, requests, loading }: NotificationsModalProps) {
+export default function NotificationsModal({
+  open,
+  onClose,
+  count,
+  requests,
+  loading,
+  onAccept,
+  onDecline,
+}: NotificationsModalProps) {
+  const [actionId, setActionId] = useState<string | null>(null);
   useEffect(() => {
     if (!open) return;
     const handleEsc = (event: KeyboardEvent) => {
@@ -122,16 +133,40 @@ export default function NotificationsModal({ open, onClose, count, requests, loa
                   <div className="mt-2 flex items-center gap-2">
                     <button
                       type="button"
-                      disabled
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-500/15 px-2.5 py-1 text-[10px] text-emerald-300 cursor-not-allowed"
+                      disabled={actionId === request.id}
+                      onClick={async () => {
+                        setActionId(request.id);
+                        try {
+                          await onAccept(request.id);
+                        } finally {
+                          setActionId(null);
+                        }
+                      }}
+                      className={`flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] transition ${
+                        actionId === request.id
+                          ? "bg-emerald-500/10 text-emerald-200 cursor-wait"
+                          : "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                      }`}
                     >
                       <Check size={11} />
                       Accept
                     </button>
                     <button
                       type="button"
-                      disabled
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 text-[10px] text-white/70 cursor-not-allowed"
+                      disabled={actionId === request.id}
+                      onClick={async () => {
+                        setActionId(request.id);
+                        try {
+                          await onDecline(request.id);
+                        } finally {
+                          setActionId(null);
+                        }
+                      }}
+                      className={`flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] transition ${
+                        actionId === request.id
+                          ? "bg-white/5 text-white/40 cursor-wait"
+                          : "bg-white/10 text-white/70 hover:bg-white/15"
+                      }`}
                     >
                       <X size={11} />
                       Decline

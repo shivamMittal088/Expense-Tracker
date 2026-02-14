@@ -61,6 +61,15 @@ export default function ExpenseTrackerHome() {
   const [hiddenCount, setHiddenCount] = useState(0);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   
+  const dummyStories = [
+    { id: "story-1", name: "Aman", color: "#ff2d55" },
+    { id: "story-2", name: "Nia", color: "#34d399" },
+    { id: "story-3", name: "Ravi", color: "#60a5fa" },
+    { id: "story-4", name: "Zara", color: "#f97316" },
+    { id: "story-5", name: "Leo", color: "#a855f7" },
+    { id: "story-6", name: "Mia", color: "#facc15" },
+  ];
+
   // Income tracking
   const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
   const [isEditingIncome, setIsEditingIncome] = useState(false);
@@ -1051,6 +1060,54 @@ export default function ExpenseTrackerHome() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </section>
+
+        {/* Stories - Dummy Avatars */}
+        <section className="max-w-4xl mx-auto">
+          <div className="relative rounded-lg overflow-hidden">
+            <div className="absolute inset-0 bg-[#0a0a0a]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.03]" />
+            <div className="absolute inset-0 border border-white/15 rounded-lg" />
+            <div className="relative px-3 py-2.5">
+              <div className="mb-2" />
+
+              <div className="flex gap-3 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory">
+                <div className="flex flex-col items-center gap-1 min-w-14 snap-start">
+                  <button
+                    type="button"
+                    className="relative w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center"
+                    aria-label="Create story"
+                  >
+                    <span className="text-base text-white/60">+</span>
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#ff2d55] text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-black">
+                      +
+                    </span>
+                  </button>
+                  <span className="text-[9px] text-white/50 truncate w-14 text-center">
+                    Your Story
+                  </span>
+                </div>
+
+                {dummyStories.map((story) => (
+                  <div key={story.id} className="flex flex-col items-center gap-1 min-w-14 snap-start">
+                    <div
+                      className="w-12 h-12 rounded-full p-[2px]"
+                      style={{ background: `conic-gradient(from 180deg, ${story.color}, #ffffff33)` }}
+                    >
+                      <div className="w-full h-full rounded-full bg-[#0a0a0a] flex items-center justify-center">
+                        <span className="text-[11px] font-semibold text-white/90">
+                          {story.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[9px] text-white/50 truncate w-14 text-center">
+                      {story.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
