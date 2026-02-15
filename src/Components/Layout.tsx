@@ -35,6 +35,21 @@ export default function Layout() {
   }, [fetchNotifications]);
 
   useEffect(() => {
+    const seedKey = "seedFollowersOnce";
+    if (localStorage.getItem(seedKey) === "true") {
+      return;
+    }
+
+    api.post("/api/seed/followers")
+      .then(() => {
+        localStorage.setItem(seedKey, "true");
+      })
+      .catch(() => {
+        // Ignore failures to avoid blocking app load.
+      });
+  }, []);
+
+  useEffect(() => {
     if (!isNotificationsOpen) return;
     if (notificationRequests !== null) return;
     fetchNotifications();
