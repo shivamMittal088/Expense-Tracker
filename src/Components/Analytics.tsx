@@ -114,26 +114,26 @@ const StatCard = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-linear-to-br ${colorClasses[color]} border backdrop-blur-xl p-4 transition-all duration-500 hover:scale-[1.02] hover:shadow-lg hover:shadow-${color}-500/10`}
+      className={`relative overflow-hidden rounded-lg bg-linear-to-br ${colorClasses[color]} border backdrop-blur-xl p-2.5 transition-all duration-500 hover:scale-[1.01] hover:shadow-lg hover:shadow-${color}-500/10`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className={`p-2 rounded-xl ${iconBgClasses[color]}`}>
-          <Icon size={18} strokeWidth={2} />
+      <div className="flex items-start justify-between mb-1.5">
+        <div className={`p-1 rounded-md ${iconBgClasses[color]}`}>
+          <Icon size={14} strokeWidth={2} />
         </div>
         {trend && (
-          <div className={`flex items-center gap-0.5 text-xs font-medium ${trend.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-            {trend.isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+          <div className={`flex items-center gap-0.5 text-[9px] font-medium ${trend.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
+            {trend.isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
             {Math.abs(trend.value)}%
           </div>
         )}
       </div>
-      <p className="text-zinc-400 text-xs font-medium mb-1">{label}</p>
-      <p className="text-white text-xl font-bold tracking-tight">{value}</p>
-      {subValue && <p className="text-zinc-500 text-xs mt-1">{subValue}</p>}
+      <p className="text-zinc-400 text-[10px] font-medium mb-0.5">{label}</p>
+      <p className="text-white text-base font-bold tracking-tight">{value}</p>
+      {subValue && <p className="text-zinc-500 text-[9px] mt-0.5">{subValue}</p>}
       
       {/* Decorative glow */}
-      <div className={`absolute -top-12 -right-12 w-24 h-24 bg-${color}-500/10 rounded-full blur-2xl`} />
+      <div className={`absolute -top-8 -right-8 w-16 h-16 bg-${color}-500/10 rounded-full blur-2xl`} />
     </div>
   );
 };
@@ -181,29 +181,6 @@ const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number;
           <p className="text-zinc-500 text-[10px]">Total</p>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Mini Bar Chart for Weekly Trend
-const WeeklyTrendChart = ({ data }: { data: { day: string; amount: number }[] }) => {
-  const maxAmount = Math.max(...data.map(d => d.amount), 1);
-  
-  return (
-    <div className="flex items-end justify-between gap-1 h-16">
-      {data.map((item, index) => (
-        <div key={index} className="flex flex-col items-center gap-1 flex-1">
-          <div
-            className="w-full bg-linear-to-t from-emerald-500 to-emerald-400 rounded-t-sm transition-all duration-500 hover:from-emerald-400 hover:to-emerald-300"
-            style={{ 
-              height: `${(item.amount / maxAmount) * 100}%`,
-              minHeight: item.amount > 0 ? '4px' : '0px',
-              animationDelay: `${index * 50}ms`
-            }}
-          />
-          <span className="text-[9px] text-zinc-500 font-medium">{item.day}</span>
-        </div>
-      ))}
     </div>
   );
 };
@@ -623,24 +600,6 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
     const highest = Math.max(...filteredExpenses.map(e => e.amount), 0);
     const count = filteredExpenses.length;
     
-    // Calculate weekly trend
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (6 - i));
-      return date;
-    });
-    
-    const weeklyData = last7Days.map(date => {
-      const dayExpenses = filteredExpenses.filter(e => {
-        const expDate = new Date(e.occurredAt);
-        return expDate.toDateString() === date.toDateString();
-      });
-      return {
-        day: date.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2),
-        amount: dayExpenses.reduce((sum, e) => sum + e.amount, 0)
-      };
-    });
-    
     // Calculate category breakdown
     const categoryMap = new Map<string, { amount: number; emoji?: string; color: string }>();
     filteredExpenses.forEach((e, index) => {
@@ -661,7 +620,7 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
     
-    return { total, avg, highest, count, weeklyData, categoryData };
+    return { total, avg, highest, count, categoryData };
   }, [filteredExpenses]);
 
   const getDateLabel = () => {
@@ -709,7 +668,7 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
 
   if (isTransactionsOnly && loading) {
     return (
-      <div className="p-4 pb-28 max-w-3xl mx-auto">
+      <div className="p-4 pb-28 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="h-7 w-36 bg-zinc-800 rounded-lg animate-pulse" />
@@ -1197,27 +1156,6 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
           )}
         </div>
 
-        {/* Weekly Trend */}
-        <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <BarChart3 size={16} className="text-emerald-400" />
-              <h3 className="text-sm font-semibold text-white">Weekly Trend</h3>
-            </div>
-            <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">Last 7 days</span>
-          </div>
-          
-          <WeeklyTrendChart data={stats.weeklyData} />
-          
-          <div className="mt-4 pt-3 border-t border-zinc-800/50">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-500">Daily average</span>
-              <span className="text-emerald-400 font-semibold">
-                ₹{Math.round(stats.weeklyData.reduce((sum, d) => sum + d.amount, 0) / 7).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Payment Mode Breakdown - Compact Premium */}
@@ -1323,32 +1261,34 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {recurringPayments.slice(0, 6).map((item) => (
                 <div
                   key={item.name}
-                  className="group flex items-center gap-3 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-xl px-3 py-2.5 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
+                  className="group flex items-center gap-2 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-lg sm:rounded-2xl px-2 py-2 sm:px-3 sm:py-3 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
                 >
                   <div 
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-base"
+                    className="w-7 h-7 sm:w-10 sm:h-10 rounded-md sm:rounded-xl flex items-center justify-center text-[13px]"
                     style={{ backgroundColor: `${item.color}20` }}
                   >
                     {item.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-zinc-500 text-[11px]">
-                      {item.frequencyLabel}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white text-[12px] sm:text-sm font-medium truncate">{item.name}</p>
+                      <span className="text-[9px] text-zinc-500 bg-white/5 px-1.5 py-0.5 rounded-full">
+                        {item.frequencyLabel}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-emerald-400 text-[12px] sm:text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
+                    <p className="text-[8px] text-zinc-500 sm:hidden">~₹{item.estimatedMonthlyAmount.toLocaleString()}/mo</p>
                     {item.nextExpectedDate && (
-                      <p className={`text-[10px] ${item.nextExpectedDate.includes('Overdue') ? 'text-rose-400' : 'text-amber-400'}`}>
+                      <p className={`hidden sm:block text-[10px] ${item.nextExpectedDate.includes('Overdue') ? 'text-rose-400' : 'text-amber-400'}`}>
                         {item.nextExpectedDate}
                       </p>
                     )}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-emerald-400 text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
-                    <p className="text-zinc-600 text-[10px]">~₹{item.estimatedMonthlyAmount.toLocaleString()}/mo</p>
                   </div>
                 </div>
               ))}

@@ -10,6 +10,8 @@ interface PublicProfileData {
   photoURL?: string;
   statusMessage?: string;
   createdAt?: string;
+  followersCount?: number;
+  followingCount?: number;
 }
 
 const getFullPhotoURL = (photoURL?: string) => {
@@ -131,6 +133,21 @@ export default function PublicProfile() {
                 <span className="text-[11px] text-white/70 break-words">{profile.statusMessage}</span>
               </div>
             )}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+            <p className="text-[11px] uppercase tracking-wide text-white/40">Followers</p>
+            <p className="text-lg font-semibold text-white">
+              {profile.followersCount ?? 0}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+            <p className="text-[11px] uppercase tracking-wide text-white/40">Following</p>
+            <p className="text-lg font-semibold text-white">
+              {profile.followingCount ?? 0}
+            </p>
           </div>
         </div>
 
