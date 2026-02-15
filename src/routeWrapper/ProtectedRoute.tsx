@@ -18,7 +18,13 @@ const ProtectedRoute = ()=> {
       .finally(() => setLoading(false));
   }, [hasStoredSession]);
 
-  if (loading) return <div>Checking session...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-start justify-center px-4 pt-6">
+        <div className="w-8 h-8 rounded-full border-2 border-emerald-400/20 border-t-emerald-400/80 animate-spin" />
+      </div>
+    );
+  }
 
   return auth ? <Outlet /> : <Navigate to="/login" replace />;
 }
