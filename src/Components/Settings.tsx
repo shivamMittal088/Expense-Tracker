@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import {
-  Bell,
   Volume2,
   VolumeX,
-  Globe,
   Shield,
-  Trash2,
   LogOut,
   ChevronRight,
   Loader2,
@@ -25,12 +22,6 @@ interface UserSettings {
   soundEnabled: boolean;
   currency: "INR" | "USD" | "EUR";
 }
-
-const currencies = [
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-];
 
 export default function Settings() {
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
@@ -141,7 +132,7 @@ export default function Settings() {
         <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Sound & Notifications
         </h2>
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingToggle
             icon={settings.soundEnabled ? Volume2 : VolumeX}
             label="Toast Sounds"
@@ -157,10 +148,10 @@ export default function Settings() {
         <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Budget Streak
         </h2>
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-linear-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
                 <Flame className="w-4 h-4 text-orange-300" />
               </div>
               <div>
@@ -245,7 +236,7 @@ export default function Settings() {
         <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Privacy
         </h2>
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingToggle
             icon={hideAmounts ? EyeOff : Eye}
             label="Hide Amounts"
@@ -274,7 +265,7 @@ export default function Settings() {
         <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Account
         </h2>
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingButton
             icon={Key}
             label="Update Password"
@@ -335,25 +326,25 @@ interface SettingToggleProps {
 
 function SettingToggle({ icon: Icon, label, description, enabled, onChange }: SettingToggleProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center justify-between px-4 py-4">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-          <Icon className="w-4 h-4 text-gray-400" />
+        <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+          <Icon className="w-4 h-4 text-white/60" />
         </div>
         <div>
           <p className="text-sm text-white">{label}</p>
-          <p className="text-[10px] text-gray-500">{description}</p>
+          <p className="text-[11px] text-white/40">{description}</p>
         </div>
       </div>
       <button
         onClick={() => onChange(!enabled)}
-        className={`w-10 h-6 rounded-full transition-colors relative ${
-          enabled ? "bg-blue-500" : "bg-white/10"
+        className={`w-11 h-6 rounded-full transition-colors relative border ${
+          enabled ? "bg-emerald-500/70 border-emerald-500/60" : "bg-white/5 border-white/10"
         }`}
       >
         <span
-          className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-            enabled ? "left-5" : "left-1"
+          className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+            enabled ? "left-5" : "left-0.5"
           }`}
         />
       </button>
@@ -372,17 +363,17 @@ function SettingButton({ icon: Icon, label, danger, onClick }: SettingButtonProp
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
+      className="w-full flex items-center justify-between px-4 py-4 hover:bg-white/5 transition-colors"
     >
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-          danger ? "bg-red-500/10" : "bg-white/5"
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
+          danger ? "bg-red-500/10 border-red-500/20" : "bg-white/5 border-white/10"
         }`}>
-          <Icon className={`w-4 h-4 ${danger ? "text-red-400" : "text-gray-400"}`} />
+          <Icon className={`w-4 h-4 ${danger ? "text-red-400" : "text-white/60"}`} />
         </div>
         <p className={`text-sm ${danger ? "text-red-400" : "text-white"}`}>{label}</p>
       </div>
-      <ChevronRight className={`w-4 h-4 ${danger ? "text-red-400/50" : "text-gray-600"}`} />
+      <ChevronRight className={`w-4 h-4 ${danger ? "text-red-400/50" : "text-white/25"}`} />
     </button>
   );
 }
@@ -399,7 +390,7 @@ interface ConfirmModalProps {
 function ConfirmModal({ title, message, confirmLabel, danger, onCancel, onConfirm }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-[280px] rounded-xl border border-white/25 bg-[#1a1a1a] p-4 text-center">
+      <div className="w-full max-w-70 rounded-xl border border-white/25 bg-[#1a1a1a] p-4 text-center">
         <h3 className="text-sm font-semibold text-white mb-2">{title}</h3>
         <p className="text-[11px] text-gray-400 mb-4">{message}</p>
         <div className="flex gap-2">
@@ -472,7 +463,7 @@ function PasswordModal({ onClose }: PasswordModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-[300px] rounded-xl border border-white/25 bg-[#1a1a1a] p-4">
+      <div className="w-full max-w-75 rounded-xl border border-white/25 bg-[#1a1a1a] p-4">
         <h3 className="text-sm font-semibold text-white mb-4 text-center">Update Password</h3>
         
         <div className="space-y-3">
