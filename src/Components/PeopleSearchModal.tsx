@@ -25,6 +25,10 @@ const getFullPhotoURL = (photoURL?: string) => {
   return `${baseUrl}${photoURL}`;
 };
 
+const accentFontStyle = {
+  fontFamily: '"Arial Narrow", "Helvetica Neue Condensed", "Roboto Condensed", "Noto Sans", sans-serif',
+};
+
 export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalProps) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,25 +122,26 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
 
   return (
     <div
-      className="fixed inset-0 z-70 flex items-start justify-center bg-black/70 backdrop-blur-sm px-3 py-8"
+      className="fixed inset-0 z-70 flex items-start justify-center bg-black/60 py-3"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-3xl bg-[#0b0b0b] border border-white/20 shadow-2xl shadow-black/60 overflow-hidden"
+        className="w-full max-w-sm rounded-3xl bg-[#111111] border border-white/30 shadow-2xl shadow-black/70 overflow-hidden"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="relative">
           <div className="px-4 pt-4 pb-3">
-            <div className="mb-2.5">
+            <div className="mb-2">
               <div className="group relative">
-                <div className="relative flex items-center gap-2.5 px-3.5 py-2 rounded-3xl bg-black/70 border border-white/15 group-focus-within:border-sky-500 shadow-inner shadow-black/80 transition-colors">
-                  <div className="w-7 h-7 rounded-lg bg-white/5 text-white/70 flex items-center justify-center transition-colors group-focus-within:text-white">
-                    <Search size={18} />
+                <div className="relative flex items-center gap-2 px-3.5 py-2 rounded-3xl bg-black/70 border border-white/15 group-focus-within:border-sky-500 shadow-inner shadow-black/80 transition-colors">
+                  <div className="w-5 h-5 rounded-lg bg-white/5 text-white/70 flex items-center justify-center transition-colors group-focus-within:text-white">
+                    <Search size={12} />
                   </div>
                   <input
                     ref={inputRef}
                     type="text"
                     value={query}
+                    style={accentFontStyle}
                     onChange={(event) => {
                       const nextValue = event.target.value;
                       setQuery(nextValue);
@@ -194,13 +199,14 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
             ) : recentResults.length > 0 ? (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">
+                  <p className="text-[7px] uppercase tracking-[0.35em] text-white/30">
                     Recent
                   </p>
                   <button
                     type="button"
                     onClick={handleClearRecent}
-                    className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white/80 transition cursor-pointer font-semibold"
+                    style={accentFontStyle}
+                    className="text-[7px] uppercase tracking-[0.25em] text-white/60 hover:text-white/90 transition cursor-pointer font-semibold border border-white/15 hover:border-white/30 rounded-[999px] px-2 py-0.5"
                   >
                     Clear
                   </button>
@@ -258,8 +264,8 @@ function AvatarCircle({
   const photo = getFullPhotoURL(user.photoURL);
   const palette = ["#f97316", "#a855f7", "#22d3ee", "#facc15", "#fb7185"];
   const ringColor = palette[index % palette.length];
-  const dimension = size === "sm" ? 40 : 48;
-  const fontSize = size === "sm" ? "12px" : "14px";
+  const dimension = size === "sm" ? 34 : 44;
+  const fontSize = size === "sm" ? "11px" : "13px";
   const initials = user.name
     .split(" ")
     .map((part) => part.charAt(0).toUpperCase())
