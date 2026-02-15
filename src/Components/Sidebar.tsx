@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, HelpCircle, MessageSquare, X, ChevronRight, LogOut } from "lucide-react";
+import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
 import AddExpenseModal from "./AddExpenseModal";
 import api from "../routeWrapper/Api";
@@ -21,8 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { icon: CalculatorIcon, label: "Calculator", description: "Quick calculations", action: "calculator" },
     { icon: FileDown, label: "Download PDF", description: "Export as PDF report", action: "pdf" },
     { icon: FileSpreadsheet, label: "Export to Excel", description: "Download spreadsheet", action: "excel" },
-    { icon: HelpCircle, label: "Help & FAQ", description: "Get assistance", action: "help" },
-    { icon: MessageSquare, label: "Send Feedback", description: "Share your thoughts", action: "feedback" },
+    { icon: Settings, label: "Settings", description: "Manage preferences", action: "settings" },
   ];
 
   // Close menu when clicking outside
@@ -46,10 +45,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       alert("PDF download coming soon!");
     } else if (item.action === "excel") {
       alert("Excel export coming soon!");
-    } else if (item.action === "help") {
-      alert("Help center coming soon!");
-    } else if (item.action === "feedback") {
-      alert("Feedback form coming soon!");
+    } else if (item.action === "settings") {
+      navigate("/settings");
     } else if (item.action === "logout") {
       handleLogout();
     }

@@ -23,9 +23,7 @@ import { updateDailyBudget } from "../store/slices/budgetSlice";
 
 interface UserSettings {
   soundEnabled: boolean;
-  notifications: boolean;
   currency: "INR" | "USD" | "EUR";
-  startWeekOnMonday: boolean;
 }
 
 const currencies = [
@@ -41,13 +39,10 @@ export default function Settings() {
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: true,
-    notifications: true,
     currency: "INR",
-    startWeekOnMonday: false,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   
@@ -73,7 +68,6 @@ export default function Settings() {
         setSettings((prev) => ({
           ...prev,
           currency: data.currency || "INR",
-          startWeekOnMonday: data.preferences?.startWeekOnMonday ?? false,
         }));
         if (typeof data.dailyBudget === 'number') {
           setDailyBudget(data.dailyBudget);
@@ -103,11 +97,6 @@ export default function Settings() {
       const payload: Record<string, unknown> = {};
       if (key === "currency") {
         payload.currency = value;
-      } else if (key === "startWeekOnMonday") {
-        payload.preferences = {
-          ...settings,
-          [key]: value,
-        };
       }
 
       await Api.patch("/api/profile/update", payload);
@@ -131,16 +120,6 @@ export default function Settings() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      await Api.delete("/api/profile/delete");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("authToken");
-      window.location.href = "/login";
-    } catch {
-      showTopToast("Failed to delete account", { tone: "error" });
-    }
-  };
 
   if (loading) {
     return (
@@ -151,15 +130,18 @@ export default function Settings() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 pb-28">
-      <h1 className="text-xl font-bold text-white mb-6">Settings</h1>
+    <div className="max-w-xl mx-auto px-4 py-8 pb-28">
+      <div className="mb-7">
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
+        <p className="text-sm text-white/40 mt-1">Personalize your experience and privacy.</p>
+      </div>
 
       {/* Sound & Notifications */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Sound & Notifications
         </h2>
-        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingToggle
             icon={settings.soundEnabled ? Volume2 : VolumeX}
             label="Toast Sounds"
@@ -167,73 +149,23 @@ export default function Settings() {
             enabled={settings.soundEnabled}
             onChange={(v) => updateSetting("soundEnabled", v)}
           />
-          <div className="h-px bg-white/5" />
-          <SettingToggle
-            icon={Bell}
-            label="Push Notifications"
-            description="Receive expense reminders"
-            enabled={settings.notifications}
-            onChange={(v) => updateSetting("notifications", v)}
-          />
-        </div>
-      </section>
-
-      {/* Preferences */}
-      <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
-          Preferences
-        </h2>
-        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
-          {/* Currency Selector */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                <Globe className="w-4 h-4 text-gray-400" />
-              </div>
-              <div>
-                <p className="text-sm text-white">Currency</p>
-                <p className="text-[10px] text-gray-500">Default currency for expenses</p>
-              </div>
-            </div>
-            <select
-              value={settings.currency}
-              onChange={(e) => updateSetting("currency", e.target.value as UserSettings["currency"])}
-              className="bg-white/5 border border-white/20 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-white/30"
-            >
-              {currencies.map((c) => (
-                <option key={c.code} value={c.code} className="bg-[#1a1a1a]">
-                  {c.symbol} {c.code}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="h-px bg-white/5" />
-
-          <SettingToggle
-            icon={Globe}
-            label="Week Starts Monday"
-            description="Calendar week begins on Monday"
-            enabled={settings.startWeekOnMonday}
-            onChange={(v) => updateSetting("startWeekOnMonday", v)}
-          />
         </div>
       </section>
 
       {/* Budget Streak */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Budget Streak
         </h2>
-        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3">
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
-                <Flame className="w-4 h-4 text-orange-400" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-orange-300" />
               </div>
               <div>
                 <p className="text-sm text-white">Daily Budget</p>
-                <p className="text-[10px] text-gray-500">Stay under this to build your streak</p>
+                <p className="text-[11px] text-white/40">Stay under this to build your streak</p>
               </div>
             </div>
             {isEditingBudget ? (
@@ -243,7 +175,7 @@ export default function Settings() {
                   type="number"
                   value={budgetInput}
                   onChange={(e) => setBudgetInput(e.target.value)}
-                  className="w-20 bg-white/5 border border-orange-500/50 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-orange-400"
+                  className="w-24 bg-white/5 border border-orange-500/50 rounded-xl px-2.5 py-1.5 text-xs text-white outline-none focus:border-orange-400"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -275,7 +207,7 @@ export default function Settings() {
                         showTopToast('Failed to save budget', { tone: 'error' });
                       });
                   }}
-                  className="text-orange-400 hover:text-orange-300 text-xs font-medium"
+                  className="text-orange-300 hover:text-orange-200 text-xs font-medium"
                 >
                   Save
                 </button>
@@ -286,7 +218,7 @@ export default function Settings() {
                   setBudgetInput(dailyBudget > 0 ? dailyBudget.toString() : '');
                   setIsEditingBudget(true);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
               >
                 {dailyBudget > 0 ? (
                   <>
@@ -301,7 +233,7 @@ export default function Settings() {
           </div>
           <div className="h-px bg-white/5" />
           <div className="px-4 py-3">
-            <p className="text-[10px] text-gray-500 leading-relaxed">
+            <p className="text-[11px] text-white/40 leading-relaxed">
               🔥 Build a streak by spending ≤ your daily budget. Days with no spending count as under budget!
             </p>
           </div>
@@ -310,10 +242,10 @@ export default function Settings() {
 
       {/* Privacy */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Privacy
         </h2>
-        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingToggle
             icon={hideAmounts ? EyeOff : Eye}
             label="Hide Amounts"
@@ -324,15 +256,25 @@ export default function Settings() {
               showTopToast(v ? "Amounts hidden" : "Amounts visible", { duration: 1500 });
             }}
           />
+          <div className="h-px bg-white/5" />
+          <SettingToggle
+            icon={Shield}
+            label="Private Account"
+            description="Only approved followers can see your profile"
+            enabled={false}
+            onChange={() => {
+              showTopToast("Coming soon", { tone: "info" });
+            }}
+          />
         </div>
       </section>
 
       {/* Account */}
       <section className="mb-6">
-        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
           Account
         </h2>
-        <div className="rounded-xl border border-white/20 bg-[#111] overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02] shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
           <SettingButton
             icon={Key}
             label="Update Password"
@@ -340,34 +282,21 @@ export default function Settings() {
           />
           <div className="h-px bg-white/5" />
           <SettingButton
-            icon={Shield}
-            label="Privacy & Security"
-            onClick={() => showTopToast("Coming soon", { tone: "info" })}
-          />
-          <div className="h-px bg-white/5" />
-          <SettingButton
             icon={LogOut}
             label="Log Out"
             onClick={() => setShowLogoutConfirm(true)}
-          />
-          <div className="h-px bg-white/5" />
-          <SettingButton
-            icon={Trash2}
-            label="Delete Account"
-            danger
-            onClick={() => setShowDeleteConfirm(true)}
           />
         </div>
       </section>
 
       {/* Version */}
-      <p className="text-center text-[10px] text-gray-600 mt-8">
+      <p className="text-center text-[11px] text-white/30 mt-8">
         Expense Tracker v1.0.0
       </p>
 
       {/* Saving indicator */}
       {saving && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 border border-white/10">
           <Loader2 className="w-3 h-3 text-white animate-spin" />
           <span className="text-xs text-white">Saving...</span>
         </div>
@@ -381,18 +310,6 @@ export default function Settings() {
           confirmLabel="Log Out"
           onCancel={() => setShowLogoutConfirm(false)}
           onConfirm={handleLogout}
-        />
-      )}
-
-      {/* Delete Confirmation */}
-      {showDeleteConfirm && (
-        <ConfirmModal
-          title="Delete Account?"
-          message="This action cannot be undone. All your data will be permanently deleted."
-          confirmLabel="Delete"
-          danger
-          onCancel={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDeleteAccount}
         />
       )}
 

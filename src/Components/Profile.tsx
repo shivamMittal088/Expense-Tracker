@@ -461,27 +461,6 @@ export default function Profile() {
         </div>
       </section>
 
-      {/* Stats Preview */}
-      <section className="mb-6">
-        <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">
-          Quick Stats
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
-            <p className="text-2xl font-bold text-white">-</p>
-            <p className="text-[10px] text-white/30 uppercase mt-1">Total Expenses</p>
-          </div>
-          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
-            <p className="text-2xl font-bold text-white">-</p>
-            <p className="text-[10px] text-white/30 uppercase mt-1">This Month</p>
-          </div>
-          <div className="rounded-2xl bg-[#0a0a0a] border border-white/20 p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-400">{profile.currency}</p>
-            <p className="text-[10px] text-white/30 uppercase mt-1">Currency</p>
-          </div>
-        </div>
-      </section>
-
       {/* Login History */}
       <section className="mb-6">
         <h2 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-3 px-1">

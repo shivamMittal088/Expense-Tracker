@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { 
   Calendar, 
   CreditCard, 
@@ -14,7 +14,6 @@ import {
   PieChart,
   RefreshCw,
   Sparkles,
-  ChevronRight,
   Filter
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -115,7 +114,7 @@ const StatCard = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${colorClasses[color]} border backdrop-blur-xl p-4 transition-all duration-500 hover:scale-[1.02] hover:shadow-lg hover:shadow-${color}-500/10`}
+      className={`relative overflow-hidden rounded-2xl bg-linear-to-br ${colorClasses[color]} border backdrop-blur-xl p-4 transition-all duration-500 hover:scale-[1.02] hover:shadow-lg hover:shadow-${color}-500/10`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -195,7 +194,7 @@ const WeeklyTrendChart = ({ data }: { data: { day: string; amount: number }[] })
       {data.map((item, index) => (
         <div key={index} className="flex flex-col items-center gap-1 flex-1">
           <div
-            className="w-full bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-sm transition-all duration-500 hover:from-emerald-400 hover:to-emerald-300"
+            className="w-full bg-linear-to-t from-emerald-500 to-emerald-400 rounded-t-sm transition-all duration-500 hover:from-emerald-400 hover:to-emerald-300"
             style={{ 
               height: `${(item.amount / maxAmount) * 100}%`,
               minHeight: item.amount > 0 ? '4px' : '0px',
@@ -284,11 +283,11 @@ const SpendingTrendsChart = ({
         </div>
         
         {/* Bars */}
-        <div className={`flex items-end h-32 ${view === "yearly" ? "justify-between gap-4" : "gap-[2px]"}`}>
+        <div className={`flex items-end h-32 ${view === "yearly" ? "justify-between gap-4" : "gap-0.5"}`}>
           {data.map((item, index) => (
             <div 
               key={item.period} 
-              className={`relative flex flex-col items-center justify-end ${view === "yearly" ? "flex-1" : view === "daily" ? "flex-1 min-w-[4px]" : "flex-1"}`}
+              className={`relative flex flex-col items-center justify-end ${view === "yearly" ? "flex-1" : view === "daily" ? "flex-1 min-w-1" : "flex-1"}`}
               style={{ height: chartHeight }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
@@ -304,7 +303,7 @@ const SpendingTrendsChart = ({
               
               {/* Bar */}
               <div
-                className={`${view === "yearly" ? "w-full max-w-[40px]" : "w-full"} ${getBarColor(item.totalAmount, index)} rounded-t-sm transition-all duration-300 cursor-pointer hover:opacity-80`}
+                className={`${view === "yearly" ? "w-full max-w-10" : "w-full"} ${getBarColor(item.totalAmount, index)} rounded-t-sm transition-all duration-300 cursor-pointer hover:opacity-80`}
                 style={{ height: getBarHeight(item.totalAmount) }}
               />
             </div>
@@ -360,22 +359,19 @@ const FilterChip = ({
   </button>
 );
 
-const ITEMS_PER_PAGE = 15;
-
 const CATEGORY_COLORS = [
   "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#3b82f6", 
   "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#84cc16"
 ];
 
-const Analytics = () => {
+const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions" }) => {
+  const isTransactionsOnly = mode === "transactions";
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("month");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
   const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
-  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
-  const [activeView, setActiveView] = useState<"list" | "chart">("chart");
 
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
@@ -385,6 +381,13 @@ const Analytics = () => {
   const [paymentPeriod, setPaymentPeriod] = useState<"week" | "month" | "3month" | "6month" | "year">("month");
   const [loading, setLoading] = useState(true);
   const [recurringLoading, setRecurringLoading] = useState(true);
+  const [transactions, setTransactions] = useState<Expense[]>([]);
+  const [transactionsCursor, setTransactionsCursor] = useState<string | null>(null);
+  const [transactionsHasMore, setTransactionsHasMore] = useState(true);
+  const [transactionsLoadingMore, setTransactionsLoadingMore] = useState(false);
+  const transactionsInFlight = useRef(false);
+  const transactionsListRef = useRef<HTMLDivElement | null>(null);
+  const transactionsSentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Spending Trends State
   const [spendingTrends, setSpendingTrends] = useState<SpendingTrend[]>([]);
@@ -403,6 +406,9 @@ const Analytics = () => {
 
   // Fetch expenses on mount - using date range endpoint (1 API call instead of 30)
   useEffect(() => {
+    if (isTransactionsOnly) {
+      return;
+    }
     const fetchExpenses = async () => {
       try {
         setLoading(true);
@@ -448,10 +454,13 @@ const Analytics = () => {
 
     fetchExpenses();
     fetchRecurringPayments();
-  }, []);
+  }, [isTransactionsOnly]);
 
   // Fetch payment breakdown when period changes
   useEffect(() => {
+    if (isTransactionsOnly) {
+      return;
+    }
     const fetchPaymentBreakdown = async () => {
       try {
         setPaymentBreakdownLoading(true);
@@ -467,10 +476,13 @@ const Analytics = () => {
     };
 
     fetchPaymentBreakdown();
-  }, [paymentPeriod]);
+  }, [isTransactionsOnly, paymentPeriod]);
 
   // Fetch spending trends when view changes
   useEffect(() => {
+    if (isTransactionsOnly) {
+      return;
+    }
     const fetchSpendingTrends = async () => {
       try {
         setTrendsLoading(true);
@@ -487,7 +499,77 @@ const Analytics = () => {
     };
 
     fetchSpendingTrends();
-  }, [trendsView]);
+  }, [isTransactionsOnly, trendsView]);
+
+  const fetchTransactionsPage = useCallback(async (cursor: string | null, append: boolean) => {
+    if (transactionsInFlight.current) return;
+    transactionsInFlight.current = true;
+
+    if (append) {
+      setTransactionsLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const params: Record<string, string> = {};
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const { data } = await api.get("/api/expenses/paged", { params });
+      const list = data?.data || [];
+
+      setTransactions((prev) => (append ? [...prev, ...list] : list));
+      setTransactionsCursor(data?.nextCursor ?? null);
+      setTransactionsHasMore(Boolean(data?.nextCursor) && list.length > 0);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      if (!append) {
+        setTransactions([]);
+      }
+      setTransactionsHasMore(false);
+    } finally {
+      transactionsInFlight.current = false;
+      setLoading(false);
+      setTransactionsLoadingMore(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isTransactionsOnly) {
+      return;
+    }
+
+    setTransactions([]);
+    setTransactionsCursor(null);
+    setTransactionsHasMore(true);
+    fetchTransactionsPage(null, false);
+  }, [fetchTransactionsPage, isTransactionsOnly]);
+
+  useEffect(() => {
+    if (!isTransactionsOnly || !transactionsHasMore) {
+      return;
+    }
+
+    const root = transactionsListRef.current;
+    const target = transactionsSentinelRef.current;
+    if (!root || !target) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          fetchTransactionsPage(transactionsCursor, true);
+        }
+      },
+      { root, rootMargin: "200px 0px", threshold: 0 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchTransactionsPage, isTransactionsOnly, transactionsCursor, transactionsHasMore]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -499,7 +581,10 @@ const Analytics = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredExpenses = allExpenses.filter((expense) => {
+  const filteredExpenses = (isTransactionsOnly ? transactions : allExpenses).filter((expense) => {
+    if (isTransactionsOnly) {
+      return true;
+    }
     const paymentMatch = selectedPayments.length === 0 || selectedPayments.includes(expense.payment_mode);
     const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(expense.category.name);
     
@@ -622,6 +707,113 @@ const Analytics = () => {
     setOpenDropdown(openDropdown === type ? null : type);
   };
 
+  if (isTransactionsOnly && loading) {
+    return (
+      <div className="p-4 pb-28 max-w-3xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="h-7 w-36 bg-zinc-800 rounded-lg animate-pulse" />
+            <div className="h-3 w-44 bg-zinc-900 rounded-md mt-2 animate-pulse" />
+          </div>
+        </div>
+        <div className="h-64 bg-zinc-800/50 rounded-2xl animate-pulse" />
+      </div>
+    );
+  }
+
+  if (isTransactionsOnly) {
+    return (
+      <div className="p-4 pb-28 max-w-3xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Wallet className="text-emerald-400" size={24} />
+              Transactions
+            </h1>
+            <p className="text-zinc-500 text-sm mt-0.5">All expenses, newest first</p>
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a]">
+          <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_20%_-20%,#1f2937_0%,transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_90%_10%,#0f172a_0%,transparent_60%)]" />
+          <div className="absolute inset-0 bg-linear-to-b from-white/4 via-transparent to-white/2" />
+          {transactions.length === 0 ? (
+            <div className="relative text-center py-14">
+              <div className="w-16 h-16 rounded-full bg-zinc-800/50 flex items-center justify-center mx-auto mb-4">
+                <Wallet className="text-zinc-600" size={28} />
+              </div>
+              <p className="text-zinc-400 text-sm font-medium">No transactions yet</p>
+              <p className="text-zinc-600 text-xs mt-1">Add an expense to see it here</p>
+            </div>
+          ) : (
+            <>
+              <div
+                ref={transactionsListRef}
+                className="relative divide-y divide-white/5 max-h-140 overflow-y-auto"
+              >
+                {transactions.map((expense, index) => {
+                  const occurredAt = new Date(expense.occurredAt);
+                  return (
+                    <div
+                      key={expense._id}
+                      className="group flex items-center gap-3 px-4 py-4 transition-all hover:bg-white/5"
+                      style={{ animationDelay: `${index * 20}ms` }}
+                    >
+                      <div
+                        className="relative w-11 h-11 rounded-2xl flex items-center justify-center text-lg shrink-0"
+                        style={{ backgroundColor: `${expense.category.color || "#10b981"}18` }}
+                      >
+                        <span className="drop-shadow">{expense.category.emoji || "💰"}</span>
+                        <span
+                          className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-black"
+                          style={{ backgroundColor: expense.category.color || "#10b981" }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-semibold tracking-wide truncate">
+                          {expense.category.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[11px] uppercase tracking-wide text-emerald-300/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                            {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
+                          </span>
+                          {expense.notes && (
+                            <span className="text-zinc-500 text-xs truncate">{expense.notes}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-semibold">
+                          <span className="text-emerald-300">₹</span>{expense.amount.toLocaleString()}
+                        </p>
+                        <p className="text-[11px] text-zinc-500">
+                          {occurredAt.toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                          {" · "}
+                          {occurredAt.toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={transactionsSentinelRef} />
+                {transactionsLoadingMore && (
+                  <div className="py-4 text-center text-xs text-zinc-500">Loading more...</div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Loading skeleton
   if (loading) {
     return (
@@ -697,7 +889,7 @@ const Analytics = () => {
       </div>
 
       {/* Spending Trends Chart */}
-      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-5 border border-zinc-800/50 backdrop-blur-xl mb-6">
+      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-5 border border-zinc-800/50 backdrop-blur-xl mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} className="text-emerald-400" />
@@ -833,7 +1025,7 @@ const Analytics = () => {
 
         {/* Dropdown Panels */}
         {openDropdown === "date" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-2 shadow-2xl z-50 min-w-[180px]">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-2 shadow-2xl z-50 min-w-45">
             {(["week", "month", "year", "all"] as const).map((range) => (
               <button
                 key={range}
@@ -854,7 +1046,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "payment" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-[240px]">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-60">
             <p className="text-xs font-medium text-zinc-500 mb-3 uppercase tracking-wider">Payment Methods</p>
             <div className="flex flex-wrap gap-2">
               {paymentModes.map((mode) => (
@@ -887,7 +1079,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "category" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-[260px]">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-65">
             <p className="text-xs font-medium text-zinc-500 mb-3 uppercase tracking-wider">Categories</p>
             {categories.length === 0 ? (
               <p className="text-zinc-500 text-sm">No categories found</p>
@@ -927,7 +1119,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "amount" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-5 shadow-2xl z-50 min-w-[280px]">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-5 shadow-2xl z-50 min-w-70">
             <p className="text-xs font-medium text-zinc-500 mb-4 uppercase tracking-wider">Amount Range</p>
             <div className="flex items-center gap-4">
               <div className="flex-1">
@@ -971,7 +1163,7 @@ const Analytics = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {/* Category Breakdown */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
+        <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <PieChart size={16} className="text-violet-400" />
@@ -1006,7 +1198,7 @@ const Analytics = () => {
         </div>
 
         {/* Weekly Trend */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
+        <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <BarChart3 size={16} className="text-emerald-400" />
@@ -1029,7 +1221,7 @@ const Analytics = () => {
       </div>
 
       {/* Payment Mode Breakdown - Compact Premium */}
-      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
+      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <CreditCard size={14} className="text-blue-400" />
@@ -1103,7 +1295,7 @@ const Analytics = () => {
       </div>
 
       {/* Recurring Payments Section */}
-      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
+      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <RefreshCw size={16} className="text-amber-400" />
@@ -1170,143 +1362,6 @@ const Analytics = () => {
         )}
       </div>
 
-      {/* View Toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-          All Transactions
-          <span className="text-xs font-normal text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">
-            {filteredExpenses.length}
-          </span>
-        </h2>
-        <div className="flex items-center gap-1 bg-zinc-800/50 rounded-lg p-1">
-          <button
-            onClick={() => setActiveView("chart")}
-            className={`p-1.5 rounded-md transition-all ${activeView === "chart" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-white"}`}
-            title="Grid View"
-          >
-            <PieChart size={14} />
-          </button>
-          <button
-            onClick={() => setActiveView("list")}
-            className={`p-1.5 rounded-md transition-all ${activeView === "list" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-white"}`}
-            title="List View"
-          >
-            <BarChart3 size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Expense Views */}
-      <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 rounded-2xl border border-zinc-800/50 backdrop-blur-xl overflow-hidden">
-        {filteredExpenses.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-zinc-800/50 flex items-center justify-center mx-auto mb-4">
-              <Wallet className="text-zinc-600" size={28} />
-            </div>
-            <p className="text-zinc-400 text-sm font-medium">No expenses match your filters</p>
-            <p className="text-zinc-600 text-xs mt-1">Try adjusting your filter criteria</p>
-            <button 
-              onClick={clearAllFilters}
-              className="mt-4 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-xl text-sm font-medium hover:bg-emerald-500/30 transition-all"
-            >
-              Clear all filters
-            </button>
-          </div>
-        ) : activeView === "chart" ? (
-          /* Grid/Card View */
-          <>
-            <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto">
-              {filteredExpenses.slice(0, displayCount).map((expense, index) => (
-                <div
-                  key={expense._id}
-                  className="bg-zinc-800/50 hover:bg-zinc-800/80 rounded-xl p-3 transition-all cursor-pointer border border-zinc-700/30 hover:border-zinc-600/50 group"
-                  style={{ animationDelay: `${index * 20}ms` }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                      style={{ backgroundColor: `${expense.category.color || '#10b981'}20` }}
-                    >
-                      {expense.category.emoji || "💰"}
-                    </div>
-                    <span className="text-[10px] text-zinc-500">
-                      {new Date(expense.occurredAt).toLocaleDateString('en-IN', { 
-                        day: '2-digit', 
-                        month: 'short' 
-                      })}
-                    </span>
-                  </div>
-                  <p className="text-white text-xs font-medium truncate mb-1">{expense.category.name}</p>
-                  <p className="text-emerald-400 font-bold text-sm">₹{expense.amount.toLocaleString()}</p>
-                  <div className="flex items-center gap-1 mt-1.5">
-                    <span className="text-[10px] text-zinc-500 bg-zinc-700/50 px-1.5 py-0.5 rounded">
-                      {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {displayCount < filteredExpenses.length && (
-              <button
-                onClick={() => setDisplayCount((prev) => prev + ITEMS_PER_PAGE)}
-                className="w-full py-3 text-sm text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/30 transition-all font-medium border-t border-zinc-800/50"
-              >
-                Load more ({filteredExpenses.length - displayCount} remaining)
-              </button>
-            )}
-          </>
-        ) : (
-          /* List View */
-          <>
-            <div className="divide-y divide-zinc-800/50 max-h-[400px] overflow-y-auto">
-              {filteredExpenses.slice(0, displayCount).map((expense, index) => (
-                <div
-                  key={expense._id}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800/30 transition-all group"
-                  style={{ animationDelay: `${index * 30}ms` }}
-                >
-                  <div 
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
-                    style={{ backgroundColor: `${expense.category.color || '#10b981'}20` }}
-                  >
-                    {expense.category.emoji || "💰"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{expense.category.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-zinc-500 text-xs">{expense.payment_mode}</span>
-                      {expense.notes && (
-                        <>
-                          <span className="text-zinc-700">•</span>
-                          <span className="text-zinc-600 text-xs truncate">{expense.notes}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-emerald-400 font-semibold">₹{expense.amount.toLocaleString()}</p>
-                    <p className="text-zinc-600 text-[11px]">
-                      {new Date(expense.occurredAt).toLocaleDateString('en-IN', { 
-                        day: '2-digit', 
-                        month: 'short' 
-                      })}
-                    </p>
-                  </div>
-                  <ChevronRight size={16} className="text-zinc-700 group-hover:text-zinc-500 transition-colors" />
-                </div>
-              ))}
-            </div>
-            {displayCount < filteredExpenses.length && (
-              <button
-                onClick={() => setDisplayCount((prev) => prev + ITEMS_PER_PAGE)}
-                className="w-full py-3 text-sm text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/30 transition-all font-medium border-t border-zinc-800/50"
-              >
-                Load more ({filteredExpenses.length - displayCount} remaining)
-              </button>
-            )}
-          </>
-        )}
-      </div>
     </div>
   );
 };

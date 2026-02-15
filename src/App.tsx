@@ -24,6 +24,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="analytics" element={<Analytics />} />
+              <Route path="transactions" element={<Analytics mode="transactions" />} />
               <Route path="profile" element={<Profile />} />
               <Route path="profile/followers" element={<FollowListPage mode="followers" />} />
               <Route path="profile/following" element={<FollowListPage mode="following" />} />

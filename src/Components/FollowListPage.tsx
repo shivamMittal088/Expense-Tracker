@@ -43,6 +43,7 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
   const [items, setItems] = useState<FollowItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [unfollowId, setUnfollowId] = useState<string | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -53,7 +54,7 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
 
   const emptyCopy = useMemo(() => {
     if (mode === "followers") return "No followers yet";
-    return "Not following anyone yet";
+    return "Follow people for more engagement";
   }, [mode]);
 
   const fetchPage = useCallback(
@@ -93,6 +94,19 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
     },
     [endpoint, mode]
   );
+
+  const handleUnfollow = useCallback(async (userId: string) => {
+    if (unfollowId) return;
+    setUnfollowId(userId);
+    try {
+      await Api.delete(`/api/profile/follow/${userId}`);
+      setItems((prev) => prev.filter((item) => item.following?._id !== userId));
+    } catch {
+      showTopToast("Failed to unfollow", { tone: "error" });
+    } finally {
+      setUnfollowId(null);
+    }
+  }, [unfollowId]);
 
   useEffect(() => {
     setItems([]);
@@ -160,23 +174,34 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
                 .join("") || "U";
 
               return (
-                <Link
+                <div
                   key={item.id}
-                  to={`/profile/${user._id}`}
                   className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 py-2 hover:border-white/20 transition-colors"
                 >
-                  <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-                    {photo ? (
-                      <img src={photo} alt={user.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-[11px] font-semibold text-white/70">{initials}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-white truncate">{user.name}</p>
-                    <p className="text-[11px] text-white/50 truncate">{user.emailId}</p>
-                  </div>
-                </Link>
+                  <Link to={`/profile/${user._id}`} className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                      {photo ? (
+                        <img src={photo} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-[11px] font-semibold text-white/70">{initials}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-white truncate">{user.name}</p>
+                      <p className="text-[11px] text-white/50 truncate">{user.emailId}</p>
+                    </div>
+                  </Link>
+                  {mode === "following" && (
+                    <button
+                      type="button"
+                      onClick={() => handleUnfollow(user._id)}
+                      disabled={unfollowId === user._id}
+                      className="shrink-0 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 hover:text-white hover:border-white/30 transition-colors disabled:opacity-50"
+                    >
+                      {unfollowId === user._id ? "Removing..." : "Unfollow"}
+                    </button>
+                  )}
+                </div>
               );
             })}
             {hasMore && (

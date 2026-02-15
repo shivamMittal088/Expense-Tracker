@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { NavLink } from "react-router-dom";
-import { Home, BarChart3, User, Settings, Plus } from "lucide-react";
+import { Home, BarChart3, User, List, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 import Api from "../routeWrapper/Api";
@@ -116,15 +116,15 @@ const Footer: FC = () => {
             </NavLink>
 
             <NavLink 
-              to="/settings" 
+              to="/transactions" 
               className={({ isActive }) =>
                 `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all ${
                   isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
                 }`
               }
             >
-              <Settings size={16} />
-              <span className="text-[10px] font-medium">Settings</span>
+              <List size={16} />
+              <span className="text-[10px] font-medium">Transactions</span>
             </NavLink>
 
           </div>

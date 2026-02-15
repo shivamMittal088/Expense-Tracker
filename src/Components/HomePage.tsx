@@ -111,6 +111,19 @@ export default function ExpenseTrackerHome() {
 
   const displayLabel = isToday ? "Today" : formattedDate;
 
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setIsCalendarOpen(false);
+  };
+
+  const changeDateBy = (days: number) => {
+    setSelectedDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + days);
+      return next;
+    });
+  };
+
   // Convert JS Date → YYYY-MM-DD (using local date to avoid timezone issues)
   const getFormattedDate = (date: Date) => {
     const year = date.getFullYear();
@@ -253,18 +266,16 @@ export default function ExpenseTrackerHome() {
 
   // Debounce API calls when date changes rapidly
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
   useEffect(() => {
-    // Cancel previous pending request
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    
-    // Debounce by 300ms to avoid rapid API calls when navigating dates
+
     debounceRef.current = setTimeout(() => {
       fetchExpenses(showHidden);
-    }, 300);
-    
+    }, 250);
+
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
@@ -272,43 +283,12 @@ export default function ExpenseTrackerHome() {
     };
   }, [fetchExpenses, showHidden]);
 
-  useEffect(() => {
-    const handler = () => fetchExpenses(showHidden);
-    window.addEventListener("expense:added", handler);
-    return () => window.removeEventListener("expense:added", handler);
-  }, [fetchExpenses, showHidden]);
-
-  /* ---------------- Compute total ---------------- */
-
-  const visibleSum = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const totalForDay = showHidden ? visibleTotal : visibleSum;
-
-  /* ---------------- Determine which expenses to show ---------------- */
+  const totalForDay = visibleTotal;
   const INITIAL_LIMIT = 6;
   const hasMoreThanLimit = expenses.length > INITIAL_LIMIT;
-  const displayedExpenses = showAll ?  expenses : expenses.slice(0, INITIAL_LIMIT);
+  const displayedExpenses = showAll ? expenses : expenses.slice(0, INITIAL_LIMIT);
 
-  /* ---------------- Date controls ---------------- */
-
-  const changeDateBy = (days: number) => {
-    setSelectedDate(prevDate => {
-      const newDate = new Date(prevDate);
-      newDate. setDate(newDate.getDate() + days);
-      if (newDate > today) {
-        return prevDate;
-      }
-      return newDate;
-    });
-  };
-
-  /* ---------------- Handle Calendar Date Selection ---------------- */
-  const handleDateSelect = (date: Date) => {
-    const normalizedDate = new Date(date. getFullYear(), date.getMonth(), date.getDate());
-    setSelectedDate(normalizedDate);
-    setIsCalendarOpen(false);
-  };
-
-  /* ---------------- Expense Card (Responsive) ---------------- */
+  /* ---------------- Mobile Expense Card ---------------- */
   const MobileExpenseCard = ({ e, index, onAction, isPending }: { e: Expense; index: number; onAction: (id: string) => void; isPending: boolean }) => {
     const emoji = e.emoji || e.category?.emoji || "✨";
     const timeLabel = formatLocalTime(e.occurredAt);
@@ -316,36 +296,28 @@ export default function ExpenseTrackerHome() {
 
     return (
       <div
-        className="group relative bg-[#0a0a0a] rounded-2xl overflow-hidden active:scale-[0.98] lg:active:scale-100 lg:hover:bg-[#111] transition-all touch-manipulation cursor-pointer"
-        style={{ animation: `slideUp 0.3s ease-out ${index * 0.05}s both` }}
-        onClick={() => setShowActions(!showActions)}
+        className="group"
+        style={{ animation: `fadeIn 0.2s ease-out ${index * 0.03}s both` }}
+        onClick={() => setShowActions(prev => !prev)}
       >
-        {/* Subtle gradient accent */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-1 opacity-80"
-          style={{ background: `linear-gradient(90deg, ${e.category.color}, transparent)` }}
-        />
-        
-        <div className="p-4">
-          {/* Main content row */}
-          <div className="flex items-center gap-3">
-            {/* Emoji avatar */}
-            <div 
-              className="w-11 h-11 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center text-xl shrink-0"
-              style={{ background: `${e.category.color}15` }}
+        <div className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 lg:p-5 transition-shadow">
+          <div className="flex items-start gap-3">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
+              style={{ background: `${e.category.color}12` }}
             >
               {emoji}
             </div>
-            
-            {/* Category & Notes */}
+
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold text-white truncate">{e.category.name}</p>
-              <p className="text-[13px] text-white/40 truncate">
-                {e.notes || "No notes"}
-              </p>
+              {e.notes ? (
+                <p className="text-[11px] text-white/35 line-clamp-2">{e.notes}</p>
+              ) : (
+                <p className="text-[11px] text-white/25">No notes</p>
+              )}
             </div>
-            
-            {/* Amount */}
+
             <div className="text-right shrink-0">
               <p className="text-lg font-bold" style={{ color: e.category.color }}>
                 <AmountText value={e.amount} />
@@ -353,17 +325,17 @@ export default function ExpenseTrackerHome() {
               <p className="text-[11px] text-white/30">{timeLabel}</p>
             </div>
           </div>
-          
+
           {/* Payment mode tag */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-            <span 
+            <span
               className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wide"
               style={{ background: `${e.category.color}12`, color: e.category.color }}
             >
               {e.payment_mode || "Cash"}
             </span>
             <span className="text-[11px] text-white/25 lg:hidden">tap for actions</span>
-            
+
             {/* Desktop hover actions */}
             <div className="hidden lg:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
@@ -381,9 +353,9 @@ export default function ExpenseTrackerHome() {
               </button>
             </div>
           </div>
-          
+
           {/* Mobile slide-up actions */}
-          <div className={`lg:hidden overflow-hidden transition-all duration-200 ${showActions ? 'max-h-16 mt-3' : 'max-h-0'}`}>
+          <div className={`lg:hidden overflow-hidden transition-all duration-200 ${showActions ? "max-h-16 mt-3" : "max-h-0"}`}>
             <div className="flex gap-2">
               <button
                 onClick={(ev) => { ev.stopPropagation(); openEdit(e); }}
@@ -1115,96 +1087,6 @@ export default function ExpenseTrackerHome() {
         {/* Transaction Activity Heatmap */}
         <section className="max-w-3xl mx-auto">
           <Heatmap />
-        </section>
-
-        {/* Expenses Section - Separate Card */}
-        <section className="relative rounded-2xl overflow-hidden">
-          {/* Glass background matching top section */}
-          <div className="absolute inset-0 bg-[#0a0a0a]" />
-          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.02]" />
-          {/* Visible border */}
-          <div className="absolute inset-0 border border-white/20 rounded-2xl" />
-          {/* Top accent line */}
-          <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-          {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-12 h-12 bg-gradient-to-br from-white/[0.06] to-transparent" />
-          <div className="absolute bottom-0 right-0 w-12 h-12 bg-gradient-to-tl from-white/[0.04] to-transparent" />
-          
-          <div className="relative px-4 lg:px-5 py-4 lg:py-5">
-            {/* Section header - Premium style */}
-            <div className="flex items-center justify-between mb-4 lg:mb-5">
-              <div className="flex items-center gap-2.5">
-                {/* Icon badge */}
-                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-white/[0.05] border border-white/20 flex items-center justify-center">
-                  <span className="text-sm lg:text-base">📝</span>
-                </div>
-                <div>
-                  <h3 className="text-sm lg:text-base font-semibold text-white">Expenses</h3>
-                  {expenses.length > 0 && (
-                    <p className="text-[9px] lg:text-[10px] text-white/40">
-                      {showAll
-                        ? `All ${expenses.length} transactions`
-                        : `${Math.min(INITIAL_LIMIT, expenses.length)} of ${expenses.length}`
-                      }
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {hasMoreThanLimit && (
-                <button
-                  onClick={() => setShowAll(!showAll)}
-                  className={`px-2.5 py-1 lg:px-4 lg:py-1.5 rounded-lg text-[11px] lg:text-xs font-medium transition-all touch-manipulation ${
-                    showAll
-                      ? 'bg-white/[0.05] border border-white/20 text-white/70 hover:bg-white/[0.08]'
-                      : 'bg-white/90 text-black hover:bg-white'
-                  }`}
-                >
-                  {showAll ? '← Cards' : `View All ${expenses.length}`}
-                </button>
-              )}
-            </div>
-
-            {/* Loading */}
-            {loading && (
-              <div className="flex items-center justify-center py-16 lg:py-24">
-              <div className="animate-spin rounded-full h-8 w-8 lg:h-10 lg:w-10 border-2 border-white/20 border-t-white"></div>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && expenses.length === 0 && (
-            <div className="text-center py-16 lg:py-24 px-6">
-              <div className="w-20 h-20 lg:w-28 lg:h-28 mx-auto mb-4 lg:mb-6 rounded-2xl lg:rounded-3xl bg-white/5 flex items-center justify-center">
-                <span className="text-4xl lg:text-6xl">💸</span>
-              </div>
-              <p className="text-white/60 font-medium lg:text-lg">No expenses for {displayLabel}</p>
-              <p className="text-xs lg:text-sm text-white/30 mt-1 lg:mt-2">Tap + to add your first expense</p>
-            </div>
-          )}
-
-          {/* Expense List */}
-          {!loading && expenses.length > 0 && (
-            <>
-              {!showAll ? (
-                <MobileExpenseList />
-              ) : (
-                <div className="space-y-2">
-                  {expenses.map((e, index) => (
-                    <FlippableCard
-                      key={e._id}
-                      e={e}
-                      index={index}
-                      onAction={showHidden ? handleRestore : handleHide}
-                      isPending={pendingId === e._id}
-                      actionLabel={showHidden ? "Restore" : "Hide"}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-          </div>
         </section>
 
         <style>{`

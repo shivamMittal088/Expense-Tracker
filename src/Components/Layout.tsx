@@ -50,6 +50,36 @@ export default function Layout() {
   }, []);
 
   useEffect(() => {
+    const seedKey = "seedTransactionsOnce";
+    if (localStorage.getItem(seedKey) === "true") {
+      return;
+    }
+
+    api.post("/api/seed/transactions")
+      .then(() => {
+        localStorage.setItem(seedKey, "true");
+      })
+      .catch(() => {
+        // Ignore failures to avoid blocking app load.
+      });
+  }, []);
+
+  useEffect(() => {
+    const seedKey = "seedTilesOnce";
+    if (localStorage.getItem(seedKey) === "true") {
+      return;
+    }
+
+    api.post("/api/seed/tiles")
+      .then(() => {
+        localStorage.setItem(seedKey, "true");
+      })
+      .catch(() => {
+        // Ignore failures to avoid blocking app load.
+      });
+  }, []);
+
+  useEffect(() => {
     if (!isNotificationsOpen) return;
     if (notificationRequests !== null) return;
     fetchNotifications();
