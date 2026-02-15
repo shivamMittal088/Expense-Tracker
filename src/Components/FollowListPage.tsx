@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Loader2, Users } from "lucide-react";
 import Api from "../routeWrapper/Api";
@@ -23,6 +23,7 @@ interface FollowItem {
 interface FollowListResponse {
   followers?: FollowItem[];
   following?: FollowItem[];
+  nextCursor?: string | null;
 }
 
 interface FollowListPageProps {
@@ -41,6 +42,11 @@ const getFullPhotoURL = (photoURL?: string) => {
 export default function FollowListPage({ mode }: FollowListPageProps) {
   const [items, setItems] = useState<FollowItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const inFlightRef = useRef(false);
 
   const title = mode === "followers" ? "Followers" : "Following";
   const endpoint = mode === "followers" ? "/api/profile/all-followers" : "/api/profile/all-following";
@@ -50,36 +56,69 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
     return "Not following anyone yet";
   }, [mode]);
 
-  useEffect(() => {
-    let isMounted = true;
-    queueMicrotask(() => {
-      if (isMounted) {
-        setLoading(true);
+  const fetchPage = useCallback(
+    async (cursor: string | null, append: boolean) => {
+      if (inFlightRef.current) return;
+      inFlightRef.current = true;
+
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        queueMicrotask(() => setLoading(true));
       }
-    });
-    Api.get<FollowListResponse>(endpoint)
-      .then(({ data }) => {
-        const list = mode === "followers" ? data.followers || [] : data.following || [];
-        if (isMounted) {
-          setItems(list);
+
+      try {
+        const params: Record<string, string | number> = { limit: 20 };
+        if (cursor) {
+          params.cursor = cursor;
         }
-      })
-      .catch(() => {
+
+        const { data } = await Api.get<FollowListResponse>(endpoint, { params });
+        const list = mode === "followers" ? data.followers || [] : data.following || [];
+
+        setItems((prev) => (append ? [...prev, ...list] : list));
+        setNextCursor(data.nextCursor ?? null);
+        setHasMore(Boolean(data.nextCursor) && list.length > 0);
+      } catch {
         showTopToast("Failed to load list", { tone: "error" });
-        if (isMounted) {
+        if (!append) {
           setItems([]);
         }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setLoading(false);
-        }
-      });
+        setHasMore(false);
+      } finally {
+        inFlightRef.current = false;
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [endpoint, mode]
+  );
 
-    return () => {
-      isMounted = false;
-    };
-  }, [endpoint, mode]);
+  useEffect(() => {
+    setItems([]);
+    setNextCursor(null);
+    setHasMore(true);
+    fetchPage(null, false);
+  }, [fetchPage]);
+
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore || !nextCursor) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first?.isIntersecting) {
+          fetchPage(nextCursor, true);
+        }
+      },
+      { rootMargin: "120px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchPage, hasMore, loading, loadingMore, nextCursor]);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -140,6 +179,11 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
                 </Link>
               );
             })}
+            {hasMore && (
+              <div ref={sentinelRef} className="flex items-center justify-center py-6">
+                {loadingMore && <Loader2 className="w-5 h-5 text-white/40 animate-spin" />}
+              </div>
+            )}
           </div>
         )}
       </div>
