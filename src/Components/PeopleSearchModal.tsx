@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, X } from "lucide-react";
 import api from "../routeWrapper/Api";
 
 type UserResult = {
@@ -30,6 +30,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<UserResult[]>([]);
+  const [recentResults, setRecentResults] = useState<UserResult[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +58,21 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
 
   useEffect(() => {
     if (!open) return;
+    if (query.trim()) return;
+    api.get("/api/profile/recent-searches")
+      .then((res) => {
+        const recent = (res.data?.recent || [])
+          .map((entry: { user?: UserResult | null }) => entry.user)
+          .filter(Boolean) as UserResult[];
+        setRecentResults(recent);
+      })
+      .catch(() => {
+        setRecentResults([]);
+      });
+  }, [open, query]);
+
+  useEffect(() => {
+    if (!open) return;
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -66,9 +82,32 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
     return () => window.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
-  const handleUserSelect = (userId: string) => {
+  const handleUserSelect = async (userId: string) => {
+    try {
+      await api.post("/api/profile/recent-searches", { userId });
+    } catch {
+      // ignore recent-search errors
+    }
     onClose();
     navigate(`/profile/${userId}`);
+  };
+
+  const handleRemoveRecent = async (userId: string) => {
+    try {
+      await api.delete(`/api/profile/recent-searches/${userId}`);
+      setRecentResults((prev) => (prev ? prev.filter((u) => u._id !== userId) : prev));
+    } catch {
+      // ignore recent-search errors
+    }
+  };
+
+  const handleClearRecent = async () => {
+    try {
+      await api.delete("/api/profile/recent-searches");
+      setRecentResults([]);
+    } catch {
+      // ignore recent-search errors
+    }
   };
 
   const hasNoResults = !searching && query.trim() && results.length === 0;
@@ -83,7 +122,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-3xl bg-[#0b0b0b] border border-white/20 shadow-2xl shadow-black/60 overflow-hidden"
+        className="w-full max-w-sm rounded-3xl bg-[#0b0b0b] border border-white/20 shadow-2xl shadow-black/60 overflow-hidden"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="relative">
@@ -150,6 +189,51 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
                   )}
                 </div>
               </div>
+            ) : recentResults === null ? (
+              <div className="text-center py-10 text-white/40 text-xs">Loading recent...</div>
+            ) : recentResults.length > 0 ? (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">
+                    Recent
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleClearRecent}
+                    className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white/80 transition cursor-pointer font-semibold"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="space-y-1 max-h-44 overflow-y-auto pr-1">
+                  {recentResults.map((user, index) => (
+                    <button
+                      key={user._id}
+                      onClick={() => handleUserSelect(user._id)}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition"
+                    >
+                      <AvatarCircle user={user} index={index} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-white truncate">{user.name}</p>
+                        <p className="text-[10px] text-white/40 truncate">
+                          {user.statusMessage || user.emailId || "No status yet"}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void handleRemoveRecent(user._id);
+                        }}
+                        aria-label={`Remove ${user.name} from recent searches`}
+                        className="w-5 h-5 rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/85 flex items-center justify-center transition-colors cursor-pointer"
+                      >
+                        <X size={10} className="stroke-[2.5]" />
+                      </button>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : (
               <div className="text-center py-12 text-white/40 text-sm">
                 Start typing to search for people.
@@ -162,10 +246,20 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
   );
 }
 
-function AvatarCircle({ user, index }: { user: UserResult; index: number }) {
+function AvatarCircle({
+  user,
+  index,
+  size = "md",
+}: {
+  user: UserResult;
+  index: number;
+  size?: "sm" | "md";
+}) {
   const photo = getFullPhotoURL(user.photoURL);
   const palette = ["#f97316", "#a855f7", "#22d3ee", "#facc15", "#fb7185"];
   const ringColor = palette[index % palette.length];
+  const dimension = size === "sm" ? 40 : 48;
+  const fontSize = size === "sm" ? "12px" : "14px";
   const initials = user.name
     .split(" ")
     .map((part) => part.charAt(0).toUpperCase())
@@ -175,8 +269,11 @@ function AvatarCircle({ user, index }: { user: UserResult; index: number }) {
   return (
     <div className="relative">
       <div
-        className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold text-white"
+        className="rounded-full flex items-center justify-center font-semibold text-white"
         style={{
+          width: `${dimension}px`,
+          height: `${dimension}px`,
+          fontSize,
           border: `2px solid ${ringColor}`,
           background: photo ? "transparent" : `${ringColor}20`,
         }}

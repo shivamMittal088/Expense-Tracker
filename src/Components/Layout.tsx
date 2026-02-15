@@ -70,11 +70,12 @@ export default function Layout() {
       {/* {!hideUI && <Footer />} */}
       <Footer />
 
-      <PeopleSearchModal
-        key={isSearchOpen ? "search-open" : "search-closed"}
-        open={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-      />
+      {isSearchOpen && (
+        <PeopleSearchModal
+          open={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+        />
+      )}
       <NotificationsModal
         open={isNotificationsOpen}
         onClose={() => setIsNotificationsOpen(false)}
