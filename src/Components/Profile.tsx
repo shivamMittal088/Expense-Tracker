@@ -245,12 +245,6 @@ export default function Profile() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_10%_-20%,#1f2937_0%,transparent_55%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_circle_at_90%_0%,#0f172a_0%,transparent_60%)]" />
         <div className="relative max-w-xl mx-auto px-4 py-8 pb-28">
-        <div className="mb-7">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-white/40">Your Space</p>
-          <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: '"Allura", cursive' }}>
-            Profile
-          </h1>
-        </div>
         {/* Profile Header */}
         <div className="relative rounded-3xl overflow-hidden mb-6 border border-white/10 bg-[#0a0a0a]">
           <div className="absolute inset-0 bg-linear-to-br from-white/6 via-transparent to-white/3" />
@@ -258,16 +252,16 @@ export default function Profile() {
           <div className="relative p-5">
             <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             {/* Avatar */}
-            <div className="relative flex-shrink-0 self-center sm:self-auto">
+            <div className="relative shrink-0 self-center sm:self-auto">
               <div className="relative">
                 {profile.photoURL ? (
                   <img
                     src={profile.photoURL}
                     alt={profile.name}
-                    className="w-20 h-20 rounded-2xl object-cover border border-white/20 shadow-xl shadow-black"
+                    className="w-20 h-20 rounded-full object-cover border border-white/20 shadow-xl shadow-black"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
+                  <div className="w-20 h-20 rounded-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
                     <User className="w-7 h-7 text-white/30" />
                   </div>
                 )}
@@ -328,7 +322,7 @@ export default function Profile() {
               <h1 className="text-lg font-semibold text-white truncate">{profile.name}</h1>
               <button
                 onClick={() => setEditingName(true)}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors shrink-0"
               >
                 <Edit3 className="w-3.5 h-3.5" />
               </button>
@@ -344,7 +338,7 @@ export default function Profile() {
                   value={statusValue}
                   onChange={(e) => setStatusValue(e.target.value)}
                   placeholder="What's on your mind?"
-                  className="w-full bg-white/[0.03] border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/[0.05] focus:outline-none transition-all"
+                  className="w-full bg-white/3 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/5 focus:outline-none transition-all"
                   autoFocus
                   maxLength={50}
                 />
@@ -370,7 +364,7 @@ export default function Profile() {
           ) : (
             <button
               onClick={() => setEditingStatus(true)}
-              className="group flex items-center gap-2 mt-3 px-3 py-2 rounded-2xl bg-white/[0.02] border border-white/15 hover:border-white/25 hover:bg-white/[0.04] transition-all"
+              className="group flex items-center gap-2 mt-3 px-3 py-2 rounded-2xl bg-white/2 border border-white/15 hover:border-white/25 hover:bg-white/4 transition-all"
             >
               <span className="text-lg">💭</span>
               <span className={`text-sm ${profile.statusMessage ? "text-white/60" : "text-white/30 italic"}`}>
@@ -536,6 +530,7 @@ export default function Profile() {
           )}
         </div>
       </section>
+        </div>
       </div>
     </div>
   );
