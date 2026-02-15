@@ -8,6 +8,7 @@ import Profile from "./Components/Profile";
 import Settings from "./Components/Settings";
 import Login from "./Components/Login";
 import PublicProfile from "./Components/PublicProfile";
+import FollowListPage from "./Components/FollowListPage";
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
 const App: React.FC = () => {
@@ -24,6 +25,8 @@ const App: React.FC = () => {
               <Route index element={<HomePage />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="profile/followers" element={<FollowListPage mode="followers" />} />
+              <Route path="profile/following" element={<FollowListPage mode="following" />} />
               <Route path="profile/:id" element={<PublicProfile />} />
               <Route path="settings" element={<Settings />} />
             </Route>

@@ -1,0 +1,148 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Loader2, Users } from "lucide-react";
+import Api from "../routeWrapper/Api";
+import { showTopToast } from "../utils/Redirecttoast";
+
+type FollowListMode = "followers" | "following";
+
+interface ConnectionUser {
+  _id: string;
+  name: string;
+  emailId: string;
+  photoURL?: string;
+}
+
+interface FollowItem {
+  id: string;
+  createdAt: string;
+  follower?: ConnectionUser | null;
+  following?: ConnectionUser | null;
+}
+
+interface FollowListResponse {
+  followers?: FollowItem[];
+  following?: FollowItem[];
+}
+
+interface FollowListPageProps {
+  mode: FollowListMode;
+}
+
+const getFullPhotoURL = (photoURL?: string) => {
+  if (!photoURL) return undefined;
+  if (photoURL.startsWith("http://") || photoURL.startsWith("https://")) {
+    return photoURL;
+  }
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  return `${baseUrl}${photoURL}`;
+};
+
+export default function FollowListPage({ mode }: FollowListPageProps) {
+  const [items, setItems] = useState<FollowItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const title = mode === "followers" ? "Followers" : "Following";
+  const endpoint = mode === "followers" ? "/api/profile/all-followers" : "/api/profile/all-following";
+
+  const emptyCopy = useMemo(() => {
+    if (mode === "followers") return "No followers yet";
+    return "Not following anyone yet";
+  }, [mode]);
+
+  useEffect(() => {
+    let isMounted = true;
+    queueMicrotask(() => {
+      if (isMounted) {
+        setLoading(true);
+      }
+    });
+    Api.get<FollowListResponse>(endpoint)
+      .then(({ data }) => {
+        const list = mode === "followers" ? data.followers || [] : data.following || [];
+        if (isMounted) {
+          setItems(list);
+        }
+      })
+      .catch(() => {
+        showTopToast("Failed to load list", { tone: "error" });
+        if (isMounted) {
+          setItems([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [endpoint, mode]);
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <div className="px-8 pt-6 pb-2">
+        <div className="relative flex items-center">
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm">Back</span>
+          </Link>
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <Users className="w-4 h-4 text-white/60" />
+            <h1 className="text-lg font-semibold text-white">{title}</h1>
+          </div>
+        </div>
+      </div>
+      <div className="max-w-lg mx-auto px-4 pb-28 pt-2">
+
+        {loading ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-6 h-6 text-white/40 animate-spin" />
+          </div>
+        ) : items.length === 0 ? (
+          <div className="rounded-2xl border border-white/10 bg-white/2 p-6 text-center text-sm text-white/50">
+            {emptyCopy}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {items.map((item) => {
+              const user = mode === "followers" ? item.follower : item.following;
+              if (!user) return null;
+              const photo = getFullPhotoURL(user.photoURL);
+              const initials = user.name
+                .split(" ")
+                .map((part) => part.charAt(0).toUpperCase())
+                .slice(0, 2)
+                .join("") || "U";
+
+              return (
+                <Link
+                  key={item.id}
+                  to={`/profile/${user._id}`}
+                  className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 py-2 hover:border-white/20 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                    {photo ? (
+                      <img src={photo} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[11px] font-semibold text-white/70">{initials}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-white truncate">{user.name}</p>
+                    <p className="text-[11px] text-white/50 truncate">{user.emailId}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

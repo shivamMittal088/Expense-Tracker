@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   User,
   Mail,
@@ -372,18 +373,24 @@ export default function Profile() {
           )}
 
               <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-white/60">
-                <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15">
+                <Link
+                  to="/profile/followers"
+                  className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15 hover:border-white/30 hover:bg-white/10 transition-colors"
+                >
                   <span className="text-white/90 font-semibold">
                     {profile.followersCount ?? 0}
                   </span>{" "}
                   Followers
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15">
+                </Link>
+                <Link
+                  to="/profile/following"
+                  className="px-2.5 py-1 rounded-full bg-white/5 border border-white/15 hover:border-white/30 hover:bg-white/10 transition-colors"
+                >
                   <span className="text-white/90 font-semibold">
                     {profile.followingCount ?? 0}
                   </span>{" "}
                   Following
-                </span>
+                </Link>
               </div>
             </div>
           </div>
