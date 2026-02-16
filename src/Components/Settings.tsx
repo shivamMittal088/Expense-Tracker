@@ -19,6 +19,10 @@ interface UserSettings {
   soundEnabled: boolean;
 }
 
+interface ProfileView {
+  isPublic?: boolean;
+}
+
 export default function Settings() {
   const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
@@ -26,17 +30,26 @@ export default function Settings() {
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: true,
   });
+  const [isPublic, setIsPublic] = useState(true);
+  const [privacyUpdating, setPrivacyUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   
   useEffect(() => {
-    // Load settings from localStorage and API
     const savedSound = localStorage.getItem("soundEnabled");
     if (savedSound !== null) {
       setSettings((prev) => ({ ...prev, soundEnabled: savedSound === "true" }));
     }
-    setLoading(false);
+
+    Api.get<ProfileView>("/api/profile/view")
+      .then(({ data }) => {
+        setIsPublic(data.isPublic ?? true);
+      })
+      .catch(() => {
+        showTopToast("Failed to load privacy setting", { tone: "error" });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const updateSetting = async <K extends keyof UserSettings>(
@@ -63,6 +76,23 @@ export default function Settings() {
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to logout", { tone: "error" });
+    }
+  };
+
+  const handlePrivacyToggle = async (isPrivate: boolean) => {
+    const nextIsPublic = !isPrivate;
+    setPrivacyUpdating(true);
+    try {
+      await Api.patch("/api/profile/privacy", { isPublic: nextIsPublic });
+      setIsPublic(nextIsPublic);
+      showTopToast(nextIsPublic ? "Account is now public" : "Account is now private", {
+        duration: 1500,
+      });
+      setTimeout(() => window.location.reload(), 300);
+    } catch {
+      showTopToast("Failed to update privacy", { tone: "error" });
+    } finally {
+      setPrivacyUpdating(false);
     }
   };
 
@@ -119,10 +149,9 @@ export default function Settings() {
             icon={Shield}
             label="Private Account"
             description="Only approved followers can see your profile"
-            enabled={false}
-            onChange={() => {
-              showTopToast("Coming soon", { tone: "info" });
-            }}
+            enabled={!isPublic}
+            disabled={privacyUpdating}
+            onChange={handlePrivacyToggle}
           />
         </div>
       </section>
@@ -180,10 +209,11 @@ interface SettingToggleProps {
   label: string;
   description: string;
   enabled: boolean;
+  disabled?: boolean;
   onChange: (value: boolean) => void;
 }
 
-function SettingToggle({ icon: Icon, label, description, enabled, onChange }: SettingToggleProps) {
+function SettingToggle({ icon: Icon, label, description, enabled, disabled, onChange }: SettingToggleProps) {
   return (
     <div className="flex items-center justify-between px-4 py-4">
       <div className="flex items-center gap-3">
@@ -197,9 +227,10 @@ function SettingToggle({ icon: Icon, label, description, enabled, onChange }: Se
       </div>
       <button
         onClick={() => onChange(!enabled)}
+        disabled={disabled}
         className={`w-11 h-6 rounded-full transition-colors relative border ${
           enabled ? "bg-emerald-500/70 border-emerald-500/60" : "bg-white/5 border-white/10"
-        }`}
+        } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         <span
           className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${

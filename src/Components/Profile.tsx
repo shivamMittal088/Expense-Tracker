@@ -22,10 +22,6 @@ interface ProfileData {
   statusMessage?: string;
   followersCount?: number;
   followingCount?: number;
-  preferences?: {
-    theme?: string;
-    startWeekOnMonday?: boolean;
-  };
   createdAt: string;
   updatedAt: string;
 }
