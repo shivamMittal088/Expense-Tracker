@@ -136,49 +136,8 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
     const totalTransactions = heatmapData.reduce((sum, d) => sum + d.count, 0);
     const totalAmount = heatmapData.reduce((sum, d) => sum + d.totalAmount, 0);
     const maxCount = Math.max(...heatmapData.map((d) => d.count), 0);
-    
-    // Calculate streak
-    let currentStreak = 0;
-    let maxStreak = 0;
-    const today = getTodayStr();
-    const sortedDates = [...heatmapData].sort((a, b) => b.date.localeCompare(a.date));
-    
-    for (let i = 0; i < sortedDates.length; i++) {
-      const date = new Date(sortedDates[i].date);
-      const expectedDate = new Date();
-      expectedDate.setDate(expectedDate.getDate() - i);
-      
-      if (formatDate(date) === formatDate(expectedDate)) {
-        currentStreak++;
-      } else if (i === 0 && formatDate(date) === today) {
-        // First day check
-        continue;
-      } else {
-        break;
-      }
-    }
 
-    // Max streak calculation
-    let streak = 0;
-    const allDates = heatmapData.map((d) => d.date).sort();
-    for (let i = 0; i < allDates.length; i++) {
-      if (i === 0) {
-        streak = 1;
-      } else {
-        const prevDate = new Date(allDates[i - 1]);
-        const currDate = new Date(allDates[i]);
-        const diffDays = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
-        if (diffDays === 1) {
-          streak++;
-        } else {
-          maxStreak = Math.max(maxStreak, streak);
-          streak = 1;
-        }
-      }
-    }
-    maxStreak = Math.max(maxStreak, streak);
-
-    return { totalDays, totalTransactions, totalAmount, maxCount, currentStreak, maxStreak };
+    return { totalDays, totalTransactions, totalAmount, maxCount };
   }, [heatmapData]);
 
   const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -217,7 +176,7 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
           <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Total Spent</p>
           <p className="text-white font-bold text-sm">₹{stats.totalAmount.toLocaleString()}</p>
@@ -229,10 +188,6 @@ const Heatmap = ({ onDateClick }: HeatmapProps) => {
         <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
           <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Active Days</p>
           <p className="text-white font-bold text-sm">{stats.totalDays}</p>
-        </div>
-        <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-          <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Max Streak</p>
-          <p className="text-emerald-400 font-bold text-sm">{stats.maxStreak} days</p>
         </div>
       </div>
 

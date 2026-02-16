@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { fetchBudgetAndStreak, refreshStreak } from "../store/slices/budgetSlice";
+import { useAppSelector } from "../store/hooks";
 import Heatmap from "../utils/UI/Heatmap";
-import { Flame, Trophy, Target } from "lucide-react";
 
 type Expense = {
   _id: string;
@@ -40,9 +38,7 @@ interface RawExpense {
 }
 
 export default function ExpenseTrackerHome() {
-  const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
-  const { isEnabled: budgetEnabled, streak: streakData } = useAppSelector((state) => state.budget);
   
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -78,16 +74,7 @@ export default function ExpenseTrackerHome() {
       }
     };
     fetchIncome();
-    // Fetch budget and streak from Redux
-    dispatch(fetchBudgetAndStreak());
-  }, [dispatch]);
-
-  // Refetch streak when expenses change
-  useEffect(() => {
-    const handler = () => dispatch(refreshStreak());
-    window.addEventListener("expense:added", handler);
-    return () => window.removeEventListener("expense:added", handler);
-  }, [dispatch]);
+  }, []);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -368,29 +355,6 @@ export default function ExpenseTrackerHome() {
                   </button>
                 )}
 
-                {/* Budget Streak Badge - Only show when budget is enabled */}
-                {budgetEnabled && streakData && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-linear-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20">
-                    <div className="flex items-center gap-1">
-                      <Flame className={`w-4 h-4 ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/30'}`} />
-                      <span className={`text-sm font-bold ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/40'}`}>
-                        {streakData.currentStreak}
-                      </span>
-                    </div>
-                    <div className="w-px h-4 bg-white/10" />
-                    <div className="flex items-center gap-1">
-                      <Trophy className="w-3.5 h-3.5 text-amber-500/60" />
-                      <span className="text-xs text-white/40">{streakData.longestStreak}</span>
-                    </div>
-                    <div className="w-px h-4 bg-white/10" />
-                    <div className="flex items-center gap-1">
-                      <Target className={`w-3.5 h-3.5 ${streakData.todayUnderBudget ? 'text-emerald-400' : 'text-red-400'}`} />
-                      <span className={`text-xs font-medium ${streakData.todayUnderBudget ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {hideAmounts ? '•••' : `₹${streakData.remainingToday}`}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -477,20 +441,6 @@ export default function ExpenseTrackerHome() {
                   )}
                 </button>
 
-                {/* Mobile Streak Badge - Only show when budget is enabled */}
-                {budgetEnabled && streakData && (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-linear-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20">
-                    <Flame className={`w-3.5 h-3.5 ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/30'}`} />
-                    <span className={`text-[10px] font-bold ${streakData.currentStreak > 0 ? 'text-orange-400' : 'text-white/40'}`}>
-                      {streakData.currentStreak} day{streakData.currentStreak !== 1 ? 's' : ''}
-                    </span>
-                    {streakData.todayUnderBudget ? (
-                      <span className="text-[9px] text-emerald-400">✓</span>
-                    ) : (
-                      <span className="text-[9px] text-red-400">!</span>
-                    )}
-                  </div>
-                )}
               </div>
               
               {/* Mobile Income Input Modal */}
