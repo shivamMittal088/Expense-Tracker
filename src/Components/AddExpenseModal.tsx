@@ -133,7 +133,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       },
       payment_mode: paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
       notes,
-      currency: "INR",
       ...(occurredAt ? { occurredAt } : {}),
     };
 

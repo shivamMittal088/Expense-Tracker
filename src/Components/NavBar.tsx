@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Search, Heart, Bell } from "lucide-react";
+import { Search, Heart } from "lucide-react";
 import Sidebar from "./Sidebar";
 
 interface NavBarProps {
@@ -111,15 +111,6 @@ const NavBar: React.FC<NavBarProps> = ({ onSearchClick, onNotificationClick, not
                 )}
               </button>
 
-              {/* Dummy Notification Button */}
-              <button
-                className="group relative p-2 rounded-lg bg-white/3 hover:bg-white/8 border border-white/20 hover:border-white/30 transition-all duration-300"
-                onClick={() => {}}
-                aria-label="Notifications (dummy)"
-                type="button"
-              >
-                <Bell size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
-              </button>
             </div>
           )}
         </div>

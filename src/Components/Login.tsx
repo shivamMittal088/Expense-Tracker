@@ -133,7 +133,6 @@ const Login: React.FC = () => {
         }
         localStorage.setItem("isLoggedIn", "true");
         navigate("/");
-        console.log(res.data);
       } else {
         // SIGNUP
         if (formData.password !== formData.confirmPassword) {

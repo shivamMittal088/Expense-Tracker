@@ -41,10 +41,14 @@ npm run dev
 
 - Expense tracking UI with day navigation
 - Profile management (name, status, avatar)
+- Transactions feed with cursor pagination and infinite scroll
+- Followers/following lists and public profiles
 - Search people modal (navbar)
-- Public profile view for searched users (`/profile/:id`) with a placeholder Follow button
+- Public profile view for searched users (`/profile/:id`) with follow actions and counts
+- Analytics dashboard with trends, categories, payment breakdown, and recurring insights
 
 ## Notes
 
 - The search modal opens from the navbar search icon.
 - Clicking a search result routes to `/profile/:id` and fetches minimal user info.
+- The `/transactions` route shows a dedicated transactions-only view.

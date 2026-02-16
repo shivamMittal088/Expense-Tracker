@@ -12,8 +12,6 @@ export default function Layout() {
   const [notificationRequests, setNotificationRequests] = useState<FollowRequest[] | null>(null);
   const loadingNotifications = isNotificationsOpen && notificationRequests === null;
   const notificationsInFlight = useRef(false);
-  // const location = useLocation();
-  // const hideUI = location.pathname === "/login";
 
   const fetchNotifications = useCallback(() => {
     if (notificationsInFlight.current) return;
@@ -112,7 +110,6 @@ export default function Layout() {
         <Outlet />
       </div>
 
-      {/* {!hideUI && <Footer />} */}
       <Footer />
 
       {isSearchOpen && (

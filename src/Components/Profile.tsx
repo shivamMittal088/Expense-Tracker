@@ -9,12 +9,6 @@ import {
   Loader2,
   Check,
   X,
-  Monitor,
-  Smartphone,
-  Tablet,
-  Globe,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
@@ -26,7 +20,6 @@ interface ProfileData {
   emailId: string;
   photoURL?: string;
   statusMessage?: string;
-  currency: "INR" | "USD" | "EUR";
   followersCount?: number;
   followingCount?: number;
   preferences?: {
@@ -35,16 +28,6 @@ interface ProfileData {
   };
   createdAt: string;
   updatedAt: string;
-}
-
-interface LoginHistoryItem {
-  _id: string;
-  ipAddress: string;
-  browser: string;
-  os: string;
-  device: "Desktop" | "Mobile" | "Tablet" | "Unknown";
-  loginAt: string;
-  isSuccessful: boolean;
 }
 
 interface ApiErrorResponse {
@@ -59,8 +42,6 @@ export default function Profile() {
   const [nameValue, setNameValue] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const [saving, setSaving] = useState(false);
-  const [loginHistory, setLoginHistory] = useState<LoginHistoryItem[]>([]);
-  const [showAllHistory, setShowAllHistory] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -94,14 +75,6 @@ export default function Profile() {
       })
       .finally(() => setLoading(false));
 
-    // Fetch login history separately (optional, don't block profile)
-    Api.get<LoginHistoryItem[]>("/api/profile/login-history")
-      .then(({ data }) => {
-        setLoginHistory(data);
-      })
-      .catch(() => {
-        // Silently fail - login history is optional
-      });
   }, []);
 
   const handleSaveName = async () => {
@@ -192,36 +165,6 @@ export default function Profile() {
     });
   };
 
-  const formatLoginTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-    });
-  };
-
-  const getDeviceIcon = (device: string) => {
-    switch (device) {
-      case "Mobile":
-        return <Smartphone className="w-4 h-4" />;
-      case "Tablet":
-        return <Tablet className="w-4 h-4" />;
-      case "Desktop":
-        return <Monitor className="w-4 h-4" />;
-      default:
-        return <Globe className="w-4 h-4" />;
-    }
-  };
 
   if (loading) {
     return (
@@ -463,73 +406,6 @@ export default function Profile() {
         </div>
       </section>
 
-      {/* Login History */}
-      <section className="mb-6">
-        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
-          Login History
-        </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] border border-white/10 overflow-hidden">
-          {loginHistory.length === 0 ? (
-            <div className="px-4 py-8 text-center text-white/30 text-sm">
-              No login history available
-            </div>
-          ) : (
-            <>
-              {(showAllHistory ? loginHistory : loginHistory.slice(0, 3)).map(
-                (item, index) => (
-                  <div key={item._id}>
-                    {index > 0 && <div className="h-px bg-white/5 mx-4" />}
-                    <div className="flex items-center gap-3 px-4 py-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50 border border-white/10">
-                        {getDeviceIcon(item.device)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm text-white truncate">
-                            {item.browser}
-                          </p>
-                          {index === 0 && (
-                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-medium">
-                              Current
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-white/30 truncate">
-                          {item.os} • {item.ipAddress}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-white/40">
-                          {formatLoginTime(item.loginAt)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              )}
-              {loginHistory.length > 3 && (
-                <>
-                  <div className="h-px bg-white/5" />
-                  <button
-                    onClick={() => setShowAllHistory(!showAllHistory)}
-                    className="w-full px-4 py-3 text-xs text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors flex items-center justify-center gap-1"
-                  >
-                    {showAllHistory ? (
-                      <>
-                        Show Less <ChevronUp className="w-3 h-3" />
-                      </>
-                    ) : (
-                      <>
-                        Show {loginHistory.length - 3} More <ChevronDown className="w-3 h-3" />
-                      </>
-                    )}
-                  </button>
-                </>
-              )}
-            </>
-          )}
-        </div>
-      </section>
         </div>
       </div>
     </div>

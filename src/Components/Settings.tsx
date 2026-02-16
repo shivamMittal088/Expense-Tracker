@@ -20,7 +20,6 @@ import { updateDailyBudget } from "../store/slices/budgetSlice";
 
 interface UserSettings {
   soundEnabled: boolean;
-  currency: "INR" | "USD" | "EUR";
 }
 
 export default function Settings() {
@@ -30,10 +29,8 @@ export default function Settings() {
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: true,
-    currency: "INR",
   });
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   
@@ -56,10 +53,6 @@ export default function Settings() {
 
     Api.get("/api/profile/view")
       .then(({ data }) => {
-        setSettings((prev) => ({
-          ...prev,
-          currency: data.currency || "INR",
-        }));
         if (typeof data.dailyBudget === 'number') {
           setDailyBudget(data.dailyBudget);
         }
@@ -72,7 +65,6 @@ export default function Settings() {
     key: K,
     value: UserSettings[K]
   ) => {
-    const oldValue = settings[key];
     setSettings((prev) => ({ ...prev, [key]: value }));
 
     // Handle local-only settings
@@ -82,22 +74,7 @@ export default function Settings() {
       return;
     }
 
-    // Sync with API for profile-related settings
-    setSaving(true);
-    try {
-      const payload: Record<string, unknown> = {};
-      if (key === "currency") {
-        payload.currency = value;
-      }
-
-      await Api.patch("/api/profile/update", payload);
-      showTopToast("Settings saved", { duration: 1500 });
-    } catch {
-      setSettings((prev) => ({ ...prev, [key]: oldValue }));
-      showTopToast("Failed to save setting", { tone: "error", duration: 2000 });
-    } finally {
-      setSaving(false);
-    }
+    return;
   };
 
   const handleLogout = async () => {
@@ -284,14 +261,6 @@ export default function Settings() {
       <p className="text-center text-[11px] text-white/30 mt-8">
         Expense Tracker v1.0.0
       </p>
-
-      {/* Saving indicator */}
-      {saving && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 border border-white/10">
-          <Loader2 className="w-3 h-3 text-white animate-spin" />
-          <span className="text-xs text-white">Saving...</span>
-        </div>
-      )}
 
       {/* Logout Confirmation */}
       {showLogoutConfirm && (

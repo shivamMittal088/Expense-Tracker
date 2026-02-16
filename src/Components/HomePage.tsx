@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
-import EditExpenseModal from "./EditExpenseModal";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { fetchBudgetAndStreak, refreshStreak } from "../store/slices/budgetSlice";
 import Heatmap from "../utils/UI/Heatmap";
@@ -20,7 +19,6 @@ type Expense = {
   occurredAt: string;
   payment_mode: string;
   deleted?: boolean;
-  currency?: string;
 };
 
 interface RawExpense {
@@ -39,7 +37,6 @@ interface RawExpense {
   updatedAt?: string;
   payment_mode: string;
   deleted?: boolean;
-  currency?: string;
 }
 
 export default function ExpenseTrackerHome() {
@@ -52,7 +49,6 @@ export default function ExpenseTrackerHome() {
   const [showHidden, setShowHidden] = useState(false);
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [hiddenCount, setHiddenCount] = useState(0);
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   
   const dummyStories = [
     { id: "story-1", name: "Aman", color: "#ff2d55" },
@@ -185,11 +181,6 @@ export default function ExpenseTrackerHome() {
       // Keep silent for now since the expenses section is hidden on the home page.
     }
   }, [apiDate]);
-
-  const handleEditUpdate = () => {
-    fetchExpenses(showHidden);
-    setEditingExpense(null);
-  };
 
   // Debounce API calls when date changes rapidly
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -641,12 +632,6 @@ export default function ExpenseTrackerHome() {
         maxDate={today}
       />
 
-      <EditExpenseModal
-        open={!!editingExpense}
-        onClose={() => setEditingExpense(null)}
-        expense={editingExpense}
-        onUpdate={handleEditUpdate}
-      />
     </div>
   );
 }

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
-import AddExpenseModal from "./AddExpenseModal";
 import api from "../routeWrapper/Api";
 
 interface SidebarProps {
@@ -13,7 +12,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [isCalculatorOpen, setIsCalculatorOpen] = React.useState(false);
-  const [isAddExpenseOpen, setIsAddExpenseOpen] = React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -47,8 +45,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       alert("Excel export coming soon!");
     } else if (item.action === "settings") {
       navigate("/settings");
-    } else if (item.action === "logout") {
-      handleLogout();
     }
   };
 
@@ -245,8 +241,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Calculator Modal */}
       <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
 
-      {/* Add Expense Modal */}
-      <AddExpenseModal open={isAddExpenseOpen} onClose={() => setIsAddExpenseOpen(false)} />
     </>
   );
 };

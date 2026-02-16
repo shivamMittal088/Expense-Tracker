@@ -33,7 +33,6 @@ type Expense = {
   occurredAt: string;
   payment_mode: string;
   deleted?: boolean;
-  currency?: string;
 };
 
 type RecurringPayment = {
