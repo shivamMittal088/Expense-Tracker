@@ -39,6 +39,7 @@ export default function Profile() {
   const [statusValue, setStatusValue] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to get full photo URL
@@ -136,8 +137,7 @@ export default function Profile() {
       });
 
       // Build full URL for the photo
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const fullPhotoURL = `${baseUrl}${res.data.photoURL}`;
+      const fullPhotoURL = getFullPhotoURL(res.data.photoURL);
       
       setProfile((prev) => prev ? { ...prev, photoURL: fullPhotoURL } : null);
       showTopToast("Photo updated!", { duration: 1500 });
@@ -197,7 +197,8 @@ export default function Profile() {
                   <img
                     src={profile.photoURL}
                     alt={profile.name}
-                    className="w-20 h-20 rounded-full object-cover border border-white/20 shadow-xl shadow-black"
+                    className="w-20 h-20 rounded-full object-cover border border-white/20 shadow-xl shadow-black cursor-pointer"
+                    onClick={() => setIsPhotoOpen(true)}
                   />
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
@@ -337,6 +338,24 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {isPhotoOpen && profile.photoURL && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <button
+            type="button"
+            onClick={() => setIsPhotoOpen(false)}
+            className="absolute top-4 right-4 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-xs text-white/80 hover:text-white"
+          >
+            Close
+          </button>
+          <img
+            src={profile.photoURL}
+            alt={profile.name}
+            className="max-h-[80vh] max-w-[90vw] rounded-2xl border border-white/20 shadow-2xl"
+            onClick={() => setIsPhotoOpen(false)}
+          />
+        </div>
+      )}
 
       {/* Profile Details */}
       <section className="mb-6">

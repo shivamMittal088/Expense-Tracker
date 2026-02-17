@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.2",
+    "cloudinary": "^2.9.0",
     "dayjs": "^1.11.19",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.562.0",
