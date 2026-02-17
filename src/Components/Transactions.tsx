@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Wallet } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
+import { useAppSelector } from "../store/hooks";
 
 type Expense = {
   _id: string;
@@ -19,6 +20,7 @@ type Expense = {
 const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const rupeeSymbol = String.fromCharCode(0x20B9);
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const [transactions, setTransactions] = useState<Expense[]>([]);
   const [transactionsCursor, setTransactionsCursor] = useState<string | null>(null);
   const [transactionsHasMore, setTransactionsHasMore] = useState(true);
@@ -196,7 +198,14 @@ const Transactions = () => {
                     </div>
                     <div className="text-right">
                         <p className="text-white font-semibold">
-                          <span className="text-emerald-300">{rupeeSymbol}</span>{expense.amount.toLocaleString()}
+                          {hideAmounts ? (
+                            `${rupeeSymbol}****`
+                          ) : (
+                            <>
+                              <span className="text-emerald-300">{rupeeSymbol}</span>
+                              {expense.amount.toLocaleString()}
+                            </>
+                          )}
                         </p>
                       <p className="text-[11px] text-zinc-500">
                         {occurredAt.toLocaleDateString("en-IN", {

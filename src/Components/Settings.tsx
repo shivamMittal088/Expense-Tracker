@@ -12,6 +12,7 @@ import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
+import { setIsPublic as setIsPublicAction } from "../store/slices/privacySlice";
 
 interface ProfileView {
   isPublic?: boolean;
@@ -21,7 +22,7 @@ export default function Settings() {
   const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
-  const [isPublic, setIsPublic] = useState(true);
+  const isPublic = useAppSelector((state) => state.privacy.isPublic);
   const [privacyUpdating, setPrivacyUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -30,7 +31,7 @@ export default function Settings() {
   useEffect(() => {
     Api.get<ProfileView>("/api/profile/view")
       .then(({ data }) => {
-        setIsPublic(data.isPublic ?? true);
+        dispatch(setIsPublicAction(data.isPublic ?? true));
       })
       .catch(() => {
         showTopToast("Failed to load privacy setting", { tone: "error" });
@@ -54,7 +55,7 @@ export default function Settings() {
     setPrivacyUpdating(true);
     try {
       await Api.patch("/api/profile/privacy", { isPublic: nextIsPublic });
-      setIsPublic(nextIsPublic);
+      dispatch(setIsPublicAction(nextIsPublic));
       showTopToast(nextIsPublic ? "Account is now public" : "Account is now private", {
         duration: 1500,
       });
