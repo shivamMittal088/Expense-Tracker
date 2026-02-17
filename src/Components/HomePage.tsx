@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
-import Heatmap from "../utils/UI/Heatmap";
+import ExpenseHeatmap from "./ExpenseHeatmap";
+import ExpenseDay from "./ExpenseDay";
 
 type Expense = {
   _id: string;
@@ -45,6 +46,11 @@ export default function ExpenseTrackerHome() {
   const [showHidden, setShowHidden] = useState(false);
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [hiddenCount, setHiddenCount] = useState(0);
+  const [dayExpenses, setDayExpenses] = useState<Expense[]>([]);
+  const [dayPage, setDayPage] = useState(1);
+  const [dayTotalCount, setDayTotalCount] = useState(0);
+  const [dayTotalAmount, setDayTotalAmount] = useState(0);
+  const dayLimit = 8;
   
   const dummyStories = [
     { id: "story-1", name: "Aman", color: "#ff2d55" },
@@ -88,11 +94,13 @@ export default function ExpenseTrackerHome() {
   const displayLabel = isToday ? "Today" : formattedDate;
 
   const handleDateSelect = (date: Date) => {
+    setDayPage(1);
     setSelectedDate(date);
     setIsCalendarOpen(false);
   };
 
   const changeDateBy = (days: number) => {
+    setDayPage(1);
     setSelectedDate((prev) => {
       const next = new Date(prev);
       next.setDate(prev.getDate() + days);
@@ -138,25 +146,27 @@ export default function ExpenseTrackerHome() {
         params: {
           tzOffsetMinutes: new Date().getTimezoneOffset(),
           ...(hidden ? { onlyHidden: true } : {}),
-          includeHidden: true,
+          page: dayPage,
+          limit: dayLimit,
         },
         signal: abortControllerRef.current.signal,
       });
 
       const normalized = normalizeExpenses(res.data.data || []);
-      const filtered = hidden
-        ? normalized.filter((e) => e.deleted)
-        : normalized.filter((e) => !e.deleted);
+      const meta = res.data?.meta || {};
+      const totalCount = Number(meta.totalCount || 0);
+      const totalAmount = Number(meta.totalAmount || 0);
+      const hiddenCountValue = Number(meta.hiddenCount || 0);
 
-      if (!hidden && Array.isArray(res.data?.data)) {
-        const hiddenInResponse = normalized.filter(e => e.deleted).length;
-        setHiddenCount(hiddenInResponse);
-      }
+      setHiddenCount(hiddenCountValue);
 
       if (!hidden) {
-        const total = filtered.reduce((sum, e) => sum + e.amount, 0);
-        setVisibleTotal(total);
+        setVisibleTotal(totalAmount);
       }
+
+      setDayExpenses(normalized);
+      setDayTotalCount(totalCount);
+      setDayTotalAmount(totalAmount);
     } catch (err: unknown) {
       // Ignore aborted requests
       if (err instanceof Error && err.name === 'AbortError') {
@@ -164,10 +174,13 @@ export default function ExpenseTrackerHome() {
       }
       console.error("Failed to load expenses", err);
       if (!hidden) setVisibleTotal(0);
+      setDayExpenses([]);
+      setDayTotalCount(0);
+      setDayTotalAmount(0);
     } finally {
       // Keep silent for now since the expenses section is hidden on the home page.
     }
-  }, [apiDate]);
+  }, [apiDate, dayLimit, dayPage]);
 
   // Debounce API calls when date changes rapidly
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -191,18 +204,25 @@ export default function ExpenseTrackerHome() {
   const totalForDay = visibleTotal;
 
   return (
-    <div className="min-h-screen bg-black text-white pb-28">
-      <main className="max-w-6xl mx-auto px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-6 space-y-8 lg:space-y-10">
+    <div className="relative min-h-screen bg-black text-white pb-28 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 -left-32 h-96 w-96 rounded-full bg-emerald-500/10 blur-[140px]" />
+        <div className="absolute top-24 right-[-10%] h-[28rem] w-[28rem] rounded-full bg-sky-500/10 blur-[160px]" />
+        <div className="absolute bottom-[-15%] left-[10%] h-[26rem] w-[26rem] rounded-full bg-amber-500/8 blur-[160px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.04),transparent_35%)]" />
+      </div>
+
+      <main className="relative max-w-6xl mx-auto px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-6 space-y-10 lg:space-y-12">
 
         {/* Top Bar - Premium Glass Card - Compact & Centered */}
-        <section className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.04)]">
+        <section className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.08)]">
           {/* Solid dark background with subtle gradient */}
           <div className="absolute inset-0 bg-[#0a0a0a]" />
-          <div className="absolute inset-0 bg-linear-to-br from-white/6 via-transparent to-white/2" />
+          <div className="absolute inset-0 bg-linear-to-br from-white/8 via-transparent to-white/2" />
           {/* Visible border */}
-          <div className="absolute inset-0 border border-white/20 rounded-2xl" />
+          <div className="absolute inset-0 border border-white/15 rounded-2xl" />
           {/* Top accent line */}
-          <div className="absolute top-0 left-[20%] right-[20%] h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
+          <div className="absolute top-0 left-[18%] right-[18%] h-px bg-linear-to-r from-transparent via-emerald-400/40 to-transparent" />
           {/* Corner accents */}
           <div className="absolute top-0 left-0 w-12 h-12 bg-linear-to-br from-white/8 to-transparent" />
           <div className="absolute bottom-0 right-0 w-12 h-12 bg-linear-to-tl from-white/5 to-transparent" />
@@ -250,8 +270,8 @@ export default function ExpenseTrackerHome() {
 
               {/* Center - Total */}
               <div className="flex-1 text-center">
-                <p className="text-xs text-white/40">Today's Spending</p>
-                <p className="text-2xl font-bold">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">Today's Spending</p>
+                <p className="text-2xl font-bold font-brand tracking-wide">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                 </p>
               </div>
@@ -260,7 +280,10 @@ export default function ExpenseTrackerHome() {
               <div className="flex items-center gap-2">
                 {(showHidden || hiddenCount > 0) && (
                   <button
-                    onClick={() => setShowHidden(prev => !prev)}
+                    onClick={() => {
+                      setDayPage(1);
+                      setShowHidden(prev => !prev);
+                    }}
                     className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       showHidden ? "bg-amber-500/20 text-amber-400" : "bg-white/5 hover:bg-white/10 text-white/50"
                     }`}
@@ -400,8 +423,8 @@ export default function ExpenseTrackerHome() {
               
               {/* Spending Amount - Centered */}
               <div className="mb-3">
-                <p className="text-[9px] text-white/40 uppercase tracking-wider mb-0.5">Today's Spending</p>
-                <p className="text-2xl font-bold">
+                <p className="text-[9px] text-white/40 uppercase tracking-[0.18em] mb-0.5">Today's Spending</p>
+                <p className="text-2xl font-bold font-brand tracking-wide">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                 </p>
               </div>
@@ -410,7 +433,10 @@ export default function ExpenseTrackerHome() {
               <div className="flex items-center justify-center gap-2">
                 {(showHidden || hiddenCount > 0) && (
                   <button
-                    onClick={() => setShowHidden(prev => !prev)}
+                    onClick={() => {
+                      setDayPage(1);
+                      setShowHidden(prev => !prev);
+                    }}
                     className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors touch-manipulation ${
                       showHidden ? "bg-amber-500/20 text-amber-400" : "bg-white/5 text-white/50"
                     }`}
@@ -487,8 +513,16 @@ export default function ExpenseTrackerHome() {
           </div>
         </section>
 
+
         {/* Stories - Dummy Avatars */}
         <section className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Stories</p>
+              <p className="text-xs text-white/60">Tap to see daily highlights</p>
+            </div>
+            <span className="text-[10px] text-white/30 border border-white/10 px-2 py-1 rounded-full">NEW</span>
+          </div>
           <div className="relative rounded-lg overflow-hidden">
             <div className="absolute inset-0 bg-[#0a0a0a]" />
             <div className="absolute inset-0 bg-linear-to-br from-white/6 via-transparent to-white/3" />
@@ -535,10 +569,23 @@ export default function ExpenseTrackerHome() {
           </div>
         </section>
 
+
         {/* Transaction Activity Heatmap */}
-        <section className="max-w-3xl mx-auto">
-          <Heatmap />
-        </section>
+        <ExpenseHeatmap />
+
+
+        {/* Day Transactions */}
+        <ExpenseDay
+          dayExpenses={dayExpenses}
+          displayLabel={displayLabel}
+          isToday={isToday}
+          hideAmounts={hideAmounts}
+          page={dayPage}
+          totalCount={dayTotalCount}
+          totalAmount={dayTotalAmount}
+          totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
+          onPageChange={setDayPage}
+        />
 
         <style>{`
           @keyframes slideUp {
