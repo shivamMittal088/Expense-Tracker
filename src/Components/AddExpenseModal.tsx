@@ -52,6 +52,13 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [deletingTileId, setDeletingTileId] = useState<string | null>(null);
   const [tileToDelete, setTileToDelete] = useState<Tile | null>(null);
 
+  const glassCardStyle = {
+    background: "rgba(15, 15, 15, 0.55)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+    backdropFilter: "blur(10px)",
+  } as const;
+
   const getLocalISOString = () => {
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, "0");
@@ -178,7 +185,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
       {/* Floating Card Modal */}
       <div
-        className={`fixed left-1/2 top-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-full ${
+        className={`fixed left-1/2 top-[52%] -translate-x-1/2 z-50 transition-all duration-300 w-full ${
           open 
             ? "-translate-y-1/2 opacity-100 scale-100 pointer-events-auto" 
             : "-translate-y-[60%] opacity-0 scale-95 pointer-events-none"
@@ -192,160 +199,182 @@ export default function AddExpenseModal({ open, onClose }: Props) {
         <div 
           className="relative overflow-hidden"
           style={{
-            background: "#0a0a0a",
+            background: "rgba(10, 10, 10, 0.75)",
             borderRadius: "1.5rem",
-            border: "1px solid rgba(255, 255, 255, 0.25)",
-            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.22)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+            backdropFilter: "blur(14px)",
           }}
         >
           {/* Header - Compact */}
           <div 
-            className="relative px-5 py-4 flex items-center justify-between"
+            className="relative px-4 py-3 flex items-center justify-between"
             style={{ 
               borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
-              background: "#0a0a0a",
+              background: "transparent",
             }}
           >
-            <h2 className="text-base font-semibold text-white">Add Expense</h2>
+            <h2 className="text-sm font-semibold text-white">Add Expense</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
             >
-              <X className="w-5 h-5 text-white/50" />
+              <X className="w-4 h-4 text-white/50" />
             </button>
           </div>
 
           {/* Content - Compact */}
-          <div 
-            className="px-5 pb-5 space-y-4 max-h-[65vh] overflow-y-auto" 
-            style={{ 
-              paddingTop: "1rem",
+          <div
+            className="px-4 pb-4 max-h-[62vh] overflow-y-auto"
+            style={{
+              paddingTop: "0.75rem",
               scrollbarWidth: "thin",
               scrollbarColor: "rgba(255, 255, 255, 0.1) transparent",
-              background: "#0a0a0a",
+              background: "transparent",
             }}
           >
-            {/* Amount */}
-            <div 
-              className="p-4 transition-all duration-200"
-              style={{
-                background: amountFocused ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.03)",
-                borderRadius: "1rem",
-                border: amountFocused ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.2)",
-              }}
-            >
-              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Amount</label>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-bold text-white/50">₹</span>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  onFocus={() => setAmountFocused(true)}
-                  onBlur={() => setAmountFocused(false)}
-                  className="flex-1 text-2xl font-bold border-0 outline-none bg-transparent text-white placeholder-white/25"
-                />
-              </div>
-            </div>
-
-            {/* Category Grid - Compact */}
-            <div>
-              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Category</label>
-              {loadingTiles ? (
-                <div className="flex items-center justify-center py-6">
-                  <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+            <div className="space-y-3">
+              {/* Amount */}
+              <div
+                className="px-3 py-2 transition-all duration-200"
+                style={{
+                  ...glassCardStyle,
+                  borderRadius: "0.9rem",
+                  border: amountFocused ? "1px solid rgba(255, 255, 255, 0.3)" : glassCardStyle.border,
+                }}
+              >
+                <label className="text-[9px] font-semibold text-white/50 uppercase tracking-wide block mb-0.5">Amount</label>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-base font-semibold text-white/50">₹</span>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    onFocus={() => setAmountFocused(true)}
+                    onBlur={() => setAmountFocused(false)}
+                    className="flex-1 text-lg font-semibold border-0 outline-none bg-transparent text-white placeholder-white/25"
+                  />
                 </div>
-              ) : (
-                <div className="grid grid-cols-4 gap-2">
-                  {tiles.map((tile) => {
-                    const isSelected = category === tile.name;
-                    const isDeleting = deletingTileId === tile._id;
+              </div>
+
+              {/* Category Grid */}
+              <div className="p-2.5 rounded-xl" style={glassCardStyle}>
+                <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Category</label>
+                {loadingTiles ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {tiles.map((tile) => {
+                      const isSelected = category === tile.name;
+                      const isDeleting = deletingTileId === tile._id;
+                      return (
+                        <button
+                          key={tile._id}
+                          onClick={() => setCategory(tile.name)}
+                          className="group relative p-2 flex flex-col items-center gap-1 rounded-xl transition-all"
+                          style={{
+                            background: isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)",
+                            border: isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)",
+                            opacity: isDeleting ? 0.5 : 1,
+                          }}
+                          disabled={isDeleting}
+                        >
+                          {!tile.isBuiltIn && (
+                            <button
+                              onClick={(e) => handleDeleteTile(tile, e)}
+                              className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/90 flex items-center justify-center transition-opacity hover:bg-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                              title="Delete tile"
+                            >
+                              <Trash2 className="w-2.5 h-2.5 text-white" />
+                            </button>
+                          )}
+                          <span className="text-[13px]">{tile.emoji || "✨"}</span>
+                          <span className={`text-[8px] font-medium leading-tight ${isSelected ? "text-white" : "text-white/50"}`}>
+                            {tile.name}
+                          </span>
+                        </button>
+                      );
+                    })}
+                    <button
+                      onClick={() => setAddTileOpen(true)}
+                      className="p-2 flex flex-col items-center gap-1 rounded-xl border border-dashed border-white/20 hover:border-white/30 transition-colors"
+                    >
+                      <span className="text-white/40 text-sm">+</span>
+                      <span className="text-[9px] text-white/40">Add</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Payment Mode */}
+              <div className="p-2.5 rounded-xl" style={glassCardStyle}>
+                <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Payment</label>
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                  {paymentModes.map((mode) => {
+                    const Icon = mode.icon;
+                    const isSelected = paymentMode === mode.id;
                     return (
                       <button
-                        key={tile._id}
-                        onClick={() => setCategory(tile.name)}
-                        className="group relative p-3 flex flex-col items-center gap-1.5 rounded-xl transition-all"
+                        key={mode.id}
+                        onClick={() => setPaymentMode(mode.id)}
+                        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all min-w-0"
                         style={{
-                          background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
-                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.15)",
-                          opacity: isDeleting ? 0.5 : 1,
+                          background: isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)",
+                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)",
                         }}
-                        disabled={isDeleting}
                       >
-                        {/* Delete button for user tiles - always visible on mobile, hover on desktop */}
-                        {!tile.isBuiltIn && (
-                          <button
-                            onClick={(e) => handleDeleteTile(tile, e)}
-                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500/90 flex items-center justify-center transition-opacity hover:bg-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                            title="Delete tile"
-                          >
-                            <Trash2 className="w-2.5 h-2.5 text-white" />
-                          </button>
-                        )}
-                        <span className="text-sm">{tile.emoji || "✨"}</span>
-                        <span className={`text-[8px] font-medium leading-tight ${isSelected ? 'text-white' : 'text-white/50'}`}>
-                          {tile.name}
-                        </span>
+                        <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-white/50"}`} />
+                        <span className={`text-[9px] font-medium truncate ${isSelected ? "text-white" : "text-white/50"}`}>{mode.label}</span>
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Date & Time */}
+              <div className="p-2.5 rounded-xl" style={glassCardStyle}>
+                <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">When</label>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => setAddTileOpen(true)}
-                    className="p-3 flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-white/15 hover:border-white/25 transition-colors"
+                    type="button"
+                    onClick={() => setCalendarOpen(true)}
+                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 transition-colors bg-white/[0.04] border border-white/15 hover:bg-white/[0.08]"
                   >
-                    <span className="text-white/40 text-base">+</span>
-                    <span className="text-[9px] text-white/40">Add</span>
+                    <span className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-white/50" />
+                      {selectedDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                    </span>
+                    <span className="text-[10px] text-white/40">Date</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTimePickerOpen(true)}
+                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 font-mono transition-colors bg-white/[0.04] border border-white/15 hover:bg-white/[0.08]"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-white/50" />
+                      {String(selectedTime.hours).padStart(2, "0")}:{String(selectedTime.minutes).padStart(2, "0")}
+                    </span>
+                    <span className="text-[10px] text-white/40">Time</span>
                   </button>
                 </div>
-              )}
-            </div>
-
-            {/* Payment Mode - Compact */}
-            <div>
-              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Payment</label>
-              <div className="grid grid-cols-5 gap-1.5">
-                {paymentModes.map((mode) => {
-                  const Icon = mode.icon;
-                  const isSelected = paymentMode === mode.id;
-                  return (
-                    <button
-                      key={mode.id}
-                      onClick={() => setPaymentMode(mode.id)}
-                      className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all"
-                      style={{
-                        background: isSelected ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.03)",
-                        border: isSelected ? "1px solid rgba(255, 255, 255, 0.3)" : "1px solid rgba(255, 255, 255, 0.15)",
-                      }}
-                    >
-                      <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-white/50'}`} />
-                      <span className={`text-[9px] font-medium ${isSelected ? 'text-white' : 'text-white/50'}`}>{mode.label}</span>
-                    </button>
-                  );
-                })}
               </div>
-            </div>
 
-            {/* Date & Time - Compact */}
-            <div>
-              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">When</label>
-              <div className="flex gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setCalendarOpen(true)}
-                  className="flex-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 transition-colors bg-white/[0.03] border border-white/20 hover:bg-white/[0.06]"
-                >
-                  <Calendar className="w-4 h-4 text-white/50" />
-                  {selectedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTimePickerOpen(true)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/70 font-mono transition-colors bg-white/[0.03] border border-white/20 hover:bg-white/[0.06]"
-                >
-                  <Clock className="w-4 h-4 text-white/50" />
-                  {String(selectedTime.hours).padStart(2, '0')}:{String(selectedTime.minutes).padStart(2, '0')}
-                </button>
+              {/* Notes */}
+              <div className="p-2.5 rounded-xl" style={glassCardStyle}>
+                <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-1.5">Notes</label>
+                <textarea
+                  placeholder="Optional note..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  onFocus={() => setNotesFocused(true)}
+                  onBlur={() => setNotesFocused(false)}
+                  rows={2}
+                  className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? "border-white/30" : "border-white/20"}`}
+                />
               </div>
             </div>
 
@@ -380,32 +409,18 @@ export default function AddExpenseModal({ open, onClose }: Props) {
               closeOnClickOutside={true}
             />
 
-            {/* Notes - Compact */}
-            <div>
-              <label className="text-[10px] font-semibold text-white/50 uppercase tracking-wide block mb-2.5">Notes</label>
-              <textarea
-                placeholder="Optional note..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                onFocus={() => setNotesFocused(true)}
-                onBlur={() => setNotesFocused(false)}
-                rows={2}
-                className={`w-full px-3 py-2.5 rounded-xl text-xs outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? 'border-white/30' : 'border-white/20'}`}
-              />
-            </div>
-
             {/* Buttons - Compact */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2 pt-3">
               <button
                 onClick={onClose}
-                className="flex-1 py-3 text-xs font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/20"
+                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/20"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-1 py-3 text-xs font-semibold rounded-xl disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
+                className="flex-1 py-2 text-[11px] font-semibold rounded-xl disabled:opacity-50 transition-colors bg-white text-black hover:bg-white/90"
               >
                 {loading ? "..." : "Save"}
               </button>

@@ -18,6 +18,13 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
   const [activeEmojiCategory, setActiveEmojiCategory] = useState<EmojiCategoryName>("Food & Drink");
   const [loading, setLoading] = useState(false);
 
+  const panelStyle = {
+    background: "rgba(15, 15, 15, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.18)",
+    boxShadow: "0 10px 24px rgba(0, 0, 0, 0.4)",
+    backdropFilter: "blur(10px)",
+  } as const;
+
   useEffect(() => {
     if (!open) {
       setName("");
@@ -58,55 +65,59 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
-      <div className="w-full max-w-[340px] rounded-2xl border border-white/20 bg-[#1a1a1a] text-white shadow-2xl overflow-hidden">
+      <div
+        className="w-full max-w-[330px] rounded-2xl text-white shadow-2xl overflow-hidden"
+        style={{
+          background: "rgba(10, 10, 10, 0.75)",
+          border: "1px solid rgba(255, 255, 255, 0.22)",
+          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75)",
+          backdropFilter: "blur(14px)",
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/20">
-          <h2 className="text-lg font-semibold">New Tile</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/15">
+          <h2 className="text-sm font-semibold">New Tile</h2>
           <button
             onClick={onClose}
             className="text-white/50 hover:text-white transition-colors p-1"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="px-5 py-5 space-y-5 max-h-[65vh] overflow-y-auto">
-          {/* Preview + Name Row */}
-          <div className="flex gap-4 items-start">
-            {/* Live Preview Tile */}
-            <div
-              className="w-16 h-16 rounded-xl flex flex-col items-center justify-center shrink-0 shadow-lg"
-              style={{ backgroundColor: selectedColor }}
-            >
-              <span className="text-xl">{selectedEmoji}</span>
-              <span className="text-[9px] font-medium text-white/90 truncate max-w-full px-1">
-                {name || "Name"}
-              </span>
-            </div>
-
-            {/* Name Input */}
-            <div className="flex-1">
-              <label className="block text-[11px] font-medium text-white/50 uppercase tracking-wide mb-1.5">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value.slice(0, 20))}
-                placeholder="Enter name..."
-                maxLength={20}
-                className="w-full rounded-lg bg-black/50 border border-white/20 px-3 py-2.5 text-sm text-white placeholder-white/30 focus:border-white/40 focus:outline-none"
-                autoFocus
-              />
-              <div className="text-right text-[10px] text-white/40 mt-1">{name.length}/20</div>
+        <div className="px-4 py-4 space-y-3 max-h-[60vh] overflow-y-auto">
+          <div className="p-3 rounded-xl" style={panelStyle}>
+            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-wide mb-2">Preview</label>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0"
+                style={{ backgroundColor: selectedColor, boxShadow: "0 8px 20px rgba(0, 0, 0, 0.35)" }}
+              >
+                <span className="text-base">{selectedEmoji}</span>
+                <span className="text-[9px] font-medium text-white/90 truncate max-w-full px-1">
+                  {name || "Name"}
+                </span>
+              </div>
+              <div className="flex-1">
+                <label className="block text-[9px] font-semibold text-white/50 uppercase tracking-wide mb-1">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value.slice(0, 20))}
+                  placeholder="Enter name..."
+                  maxLength={20}
+                  className="w-full rounded-lg bg-black/40 border border-white/20 px-2.5 py-2 text-sm text-white placeholder-white/30 focus:border-white/40 focus:outline-none"
+                  autoFocus
+                />
+                <div className="text-right text-[10px] text-white/40 mt-1">{name.length}/20</div>
+              </div>
             </div>
           </div>
 
-          {/* Icon Section */}
-          <div>
-            <label className="block text-[11px] font-medium text-white/50 uppercase tracking-wide mb-2">Icon</label>
-            
-            {/* Category Tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-2">
+          <div className="p-3 rounded-xl" style={panelStyle}>
+            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-wide mb-2">Icon</label>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-3">
               {categoryKeys.map((cat) => (
                 <button
                   key={cat}
@@ -122,13 +133,12 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
               ))}
             </div>
 
-            {/* Emoji Grid */}
-            <div className="grid grid-cols-8 gap-1.5 p-3 rounded-xl bg-black/40 border border-white/20 max-h-32 overflow-y-auto">
+            <div className="grid grid-cols-8 gap-1.5 p-2.5 rounded-xl bg-black/40 border border-white/20 max-h-36 overflow-y-auto">
               {currentEmojis.map((emoji, idx) => (
                 <button
                   key={`${emoji}-${idx}`}
                   onClick={() => setSelectedEmoji(emoji)}
-                  className={`p-2 text-lg rounded-lg hover:bg-white/10 transition-colors ${
+                  className={`p-2 text-base rounded-lg hover:bg-white/10 transition-colors ${
                     selectedEmoji === emoji ? "bg-white/20 ring-1 ring-white/30" : ""
                   }`}
                 >
@@ -138,23 +148,20 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
             </div>
           </div>
 
-          {/* Color Section */}
-          <div>
-            <label className="block text-[11px] font-medium text-white/50 uppercase tracking-wide mb-2">Color</label>
-            
-            {/* Color Grid */}
-            <div className="grid grid-cols-9 gap-2.5">
+          <div className="p-3 rounded-xl" style={panelStyle}>
+            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-wide mb-2">Color</label>
+            <div className="grid grid-cols-9 gap-2">
               {colorPalette.slice(0, 27).map((color) => (
                 <button
                   key={color.hex}
                   onClick={() => setSelectedColor(color.hex)}
-                  className={`w-7 h-7 rounded-full transition-transform hover:scale-110 flex items-center justify-center ${
+                  className={`w-6 h-6 rounded-full transition-transform hover:scale-110 flex items-center justify-center ${
                     selectedColor === color.hex ? "ring-2 ring-white ring-offset-2 ring-offset-[#1a1a1a]" : ""
                   }`}
                   style={{ backgroundColor: color.hex }}
                   title={color.name}
                 >
-                  {selectedColor === color.hex && <Check size={12} className="text-white drop-shadow-md" />}
+                  {selectedColor === color.hex && <Check size={10} className="text-white drop-shadow-md" />}
                 </button>
               ))}
             </div>
@@ -162,17 +169,17 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 flex gap-3 border-t border-white/20">
+        <div className="px-4 py-3 flex gap-2 border-t border-white/15">
           <button
             onClick={onClose}
-            className="flex-1 py-3 text-sm font-medium text-white/70 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
+            className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={loading || !name.trim()}
-            className="flex-1 py-3 text-sm font-semibold rounded-xl bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 py-2 text-[11px] font-semibold rounded-xl bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? "..." : "Create"}
           </button>
