@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Volume2,
-  VolumeX,
   Shield,
   LogOut,
   ChevronRight,
@@ -15,10 +13,6 @@ import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 
-interface UserSettings {
-  soundEnabled: boolean;
-}
-
 interface ProfileView {
   isPublic?: boolean;
 }
@@ -27,9 +21,6 @@ export default function Settings() {
   const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
-  const [settings, setSettings] = useState<UserSettings>({
-    soundEnabled: true,
-  });
   const [isPublic, setIsPublic] = useState(true);
   const [privacyUpdating, setPrivacyUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -37,11 +28,6 @@ export default function Settings() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   
   useEffect(() => {
-    const savedSound = localStorage.getItem("soundEnabled");
-    if (savedSound !== null) {
-      setSettings((prev) => ({ ...prev, soundEnabled: savedSound === "true" }));
-    }
-
     Api.get<ProfileView>("/api/profile/view")
       .then(({ data }) => {
         setIsPublic(data.isPublic ?? true);
@@ -51,22 +37,6 @@ export default function Settings() {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  const updateSetting = async <K extends keyof UserSettings>(
-    key: K,
-    value: UserSettings[K]
-  ) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-
-    // Handle local-only settings
-    if (key === "soundEnabled") {
-      localStorage.setItem("soundEnabled", String(value));
-      showTopToast(value ? "Sound enabled" : "Sound disabled", { duration: 1500 });
-      return;
-    }
-
-    return;
-  };
 
   const handleLogout = async () => {
     try {
@@ -111,22 +81,6 @@ export default function Settings() {
         <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
         <p className="text-sm text-white/40 mt-1">Personalize your experience and privacy.</p>
       </div>
-
-      {/* Sound & Notifications */}
-      <section className="mb-6">
-        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
-          Sound & Notifications
-        </h2>
-        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
-          <SettingToggle
-            icon={settings.soundEnabled ? Volume2 : VolumeX}
-            label="Toast Sounds"
-            description="Play sound when notifications appear"
-            enabled={settings.soundEnabled}
-            onChange={(v) => updateSetting("soundEnabled", v)}
-          />
-        </div>
-      </section>
 
       {/* Privacy */}
       <section className="mb-6">
@@ -175,11 +129,6 @@ export default function Settings() {
           />
         </div>
       </section>
-
-      {/* Version */}
-      <p className="text-center text-[11px] text-white/30 mt-8">
-        Expense Tracker v1.0.0
-      </p>
 
       {/* Logout Confirmation */}
       {showLogoutConfirm && (

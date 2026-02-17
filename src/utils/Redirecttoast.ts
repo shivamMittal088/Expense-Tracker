@@ -1,7 +1,5 @@
 /* ---------- Types ---------- */
 
-import { playToastSound } from "./ToastSound";
-
 interface ToastOverlay extends HTMLDivElement {
   _timeoutId?: number;
 }
@@ -9,13 +7,11 @@ interface ToastOverlay extends HTMLDivElement {
 type ToastOptions = {
   title?: string;
   duration?: number;
-  sound?: boolean;
 };
 
 type TopToastOptions = {
   duration?: number;
   tone?: "success" | "error" | "info";
-  sound?: boolean;
 };
 
 /* ---------- Toast API ---------- */
@@ -26,10 +22,7 @@ export const showToast = (
 ) => {
   if (typeof document === "undefined") return;
 
-  const { title = "Attention needed", duration = 4500, sound = true } = options;
-
-  // Play notification sound
-  if (sound) playToastSound("info");
+  const { title = "Attention needed", duration = 4500 } = options;
 
   // Remove any existing toast
   const existing = document.getElementById("global-toast-overlay");
@@ -150,10 +143,7 @@ export const showTopToast = (
 ) => {
   if (typeof document === "undefined") return;
 
-  const { duration = 2000, tone = "success", sound = true } = options;
-
-  // Play notification sound based on tone
-  if (sound) playToastSound(tone);
+  const { duration = 2000, tone = "success" } = options;
 
   const existing = document.getElementById("inline-toast");
   existing?.remove();

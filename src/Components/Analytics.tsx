@@ -33,7 +33,6 @@ type Expense = {
   notes?: string;
   occurredAt: string;
   payment_mode: string;
-  deleted?: boolean;
 };
 
 type RecurringPayment = {
@@ -397,8 +396,7 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
         });
         
         const allData = response.data?.data || [];
-        const activeExpenses = allData.filter((e: Expense) => !e.deleted);
-        setAllExpenses(activeExpenses);
+        setAllExpenses(allData);
       } catch (error) {
         console.error("Failed to fetch expenses:", error);
       } finally {

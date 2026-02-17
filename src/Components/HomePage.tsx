@@ -17,7 +17,6 @@ type Expense = {
   notes?: string;
   occurredAt: string;
   payment_mode: string;
-  deleted?: boolean;
 };
 
 interface RawExpense {
@@ -35,7 +34,6 @@ interface RawExpense {
   createdAt?: string;
   updatedAt?: string;
   payment_mode: string;
-  deleted?: boolean;
 }
 
 export default function ExpenseTrackerHome() {
@@ -43,44 +41,12 @@ export default function ExpenseTrackerHome() {
   
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [showHidden, setShowHidden] = useState(false);
   const [visibleTotal, setVisibleTotal] = useState(0);
-  const [hiddenCount, setHiddenCount] = useState(0);
   const [dayExpenses, setDayExpenses] = useState<Expense[]>([]);
   const [dayPage, setDayPage] = useState(1);
   const [dayTotalCount, setDayTotalCount] = useState(0);
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
   const dayLimit = 8;
-  
-  const dummyStories = [
-    { id: "story-1", name: "Aman", color: "#ff2d55" },
-    { id: "story-2", name: "Nia", color: "#34d399" },
-    { id: "story-3", name: "Ravi", color: "#60a5fa" },
-    { id: "story-4", name: "Zara", color: "#f97316" },
-    { id: "story-5", name: "Leo", color: "#a855f7" },
-    { id: "story-6", name: "Mia", color: "#facc15" },
-  ];
-
-  // Income tracking
-  const [monthlyIncome, setMonthlyIncome] = useState<number>(0);
-  const [isEditingIncome, setIsEditingIncome] = useState(false);
-  const [incomeInput, setIncomeInput] = useState("");
-
-  // Fetch monthly income from profile on mount
-  useEffect(() => {
-    const fetchIncome = async () => {
-      try {
-        const res = await api.get('/api/profile/view');
-        // Use typeof check to handle 0 as a valid value (0 is falsy but valid)
-        if (typeof res.data?.monthlyIncome === 'number') {
-          setMonthlyIncome(res.data.monthlyIncome);
-        }
-      } catch (err) {
-        console.error('Failed to fetch income:', err);
-      }
-    };
-    fetchIncome();
-  }, []);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -132,7 +98,7 @@ export default function ExpenseTrackerHome() {
   // Abort controller ref for cancelling in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchExpenses = useCallback(async (hidden = false) => {
+  const fetchExpenses = useCallback(async () => {
     // Cancel any previous in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -145,7 +111,6 @@ export default function ExpenseTrackerHome() {
       const res = await api.get(`/api/expense/${apiDate}`, {
         params: {
           tzOffsetMinutes: new Date().getTimezoneOffset(),
-          ...(hidden ? { onlyHidden: true } : {}),
           page: dayPage,
           limit: dayLimit,
         },
@@ -156,13 +121,8 @@ export default function ExpenseTrackerHome() {
       const meta = res.data?.meta || {};
       const totalCount = Number(meta.totalCount || 0);
       const totalAmount = Number(meta.totalAmount || 0);
-      const hiddenCountValue = Number(meta.hiddenCount || 0);
 
-      setHiddenCount(hiddenCountValue);
-
-      if (!hidden) {
-        setVisibleTotal(totalAmount);
-      }
+      setVisibleTotal(totalAmount);
 
       setDayExpenses(normalized);
       setDayTotalCount(totalCount);
@@ -173,7 +133,7 @@ export default function ExpenseTrackerHome() {
         return;
       }
       console.error("Failed to load expenses", err);
-      if (!hidden) setVisibleTotal(0);
+      setVisibleTotal(0);
       setDayExpenses([]);
       setDayTotalCount(0);
       setDayTotalAmount(0);
@@ -191,7 +151,7 @@ export default function ExpenseTrackerHome() {
     }
 
     debounceRef.current = setTimeout(() => {
-      fetchExpenses(showHidden);
+      fetchExpenses();
     }, 250);
 
     return () => {
@@ -199,7 +159,7 @@ export default function ExpenseTrackerHome() {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [fetchExpenses, showHidden]);
+  }, [fetchExpenses]);
 
   const totalForDay = visibleTotal;
 
@@ -271,114 +231,12 @@ export default function ExpenseTrackerHome() {
               {/* Center - Total */}
               <div className="flex-1 text-center">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">Today's Spending</p>
-                <p className="text-2xl font-bold font-brand tracking-wide">
+                <p className="text-2xl font-bold tracking-wide">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                 </p>
               </div>
 
-              {/* Right Actions */}
-              <div className="flex items-center gap-2">
-                {(showHidden || hiddenCount > 0) && (
-                  <button
-                    onClick={() => {
-                      setDayPage(1);
-                      setShowHidden(prev => !prev);
-                    }}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      showHidden ? "bg-amber-500/20 text-amber-400" : "bg-white/5 hover:bg-white/10 text-white/50"
-                    }`}
-                  >
-                    {showHidden ? "👁 Visible" : `🙈 ${hiddenCount}`}
-                  </button>
-                )}
-                
-                {/* Income Input/Display */}
-                {isEditingIncome ? (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-emerald-500/50">
-                    <span className="text-white/60">₹</span>
-                    <input
-                      type="number"
-                      value={incomeInput}
-                      onChange={(e) => setIncomeInput(e.target.value)}
-                      placeholder="Monthly income"
-                      className="w-28 bg-transparent text-white text-sm font-medium focus:outline-none"
-                      autoFocus
-                      onKeyDown={async (e) => {
-                        if (e.key === 'Enter') {
-                          const value = parseFloat(incomeInput) || 0;
-                          setMonthlyIncome(value);
-                          setIsEditingIncome(false);
-                          try {
-                            await api.patch('/api/profile/update', { monthlyIncome: value });
-                          } catch (err) {
-                            console.error('Failed to save income:', err);
-                          }
-                        } else if (e.key === 'Escape') {
-                          setIsEditingIncome(false);
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={async () => {
-                        const value = parseFloat(incomeInput) || 0;
-                        setMonthlyIncome(value);
-                        setIsEditingIncome(false);
-                        try {
-                          await api.patch('/api/profile/update', { monthlyIncome: value });
-                        } catch (err) {
-                          console.error('Failed to save income:', err);
-                        }
-                      }}
-                      className="text-emerald-400 hover:text-emerald-300 text-sm font-medium"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditingIncome(false)}
-                      className="text-white/40 hover:text-white/60 text-sm"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setIncomeInput(monthlyIncome > 0 ? monthlyIncome.toString() : "");
-                      setIsEditingIncome(true);
-                    }}
-                    className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
-                  >
-                    {monthlyIncome > 0 ? (
-                      <>
-                        <div className="text-left">
-                          <p className="text-[10px] text-white/40">Monthly Income</p>
-                          <p className="text-sm font-medium text-white">
-                            {hideAmounts ? "₹•••••" : `₹${monthlyIncome.toLocaleString()}`}
-                          </p>
-                        </div>
-                        <div className={`px-2 py-1 rounded-lg ${
-                          (totalForDay / monthlyIncome) * 100 > 3 ? 'bg-red-500/20' : 'bg-emerald-500/20'
-                        }`}>
-                          <p className={`text-sm font-bold ${
-                            (totalForDay / monthlyIncome) * 100 > 3 ? 'text-red-400' : 'text-emerald-400'
-                          }`}>
-                            {hideAmounts ? "••%" : `${((totalForDay / monthlyIncome) * 100).toFixed(1)}%`}
-                          </p>
-                        </div>
-                        <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-white/50">💰</span>
-                        <span className="text-sm text-white/50 group-hover:text-white/70">Set monthly income</span>
-                      </>
-                    )}
-                  </button>
-                )}
-
-              </div>
+              <div className="flex items-center gap-2" />
             </div>
 
             {/* Mobile Layout - Compact & Centered */}
@@ -424,147 +282,12 @@ export default function ExpenseTrackerHome() {
               {/* Spending Amount - Centered */}
               <div className="mb-3">
                 <p className="text-[9px] text-white/40 uppercase tracking-[0.18em] mb-0.5">Today's Spending</p>
-                <p className="text-2xl font-bold font-brand tracking-wide">
+                <p className="text-2xl font-bold tracking-wide">
                   {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
                 </p>
               </div>
               
-              {/* Action Buttons - Centered Row */}
-              <div className="flex items-center justify-center gap-2">
-                {(showHidden || hiddenCount > 0) && (
-                  <button
-                    onClick={() => {
-                      setDayPage(1);
-                      setShowHidden(prev => !prev);
-                    }}
-                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors touch-manipulation ${
-                      showHidden ? "bg-amber-500/20 text-amber-400" : "bg-white/5 text-white/50"
-                    }`}
-                  >
-                    {showHidden ? "👁 Visible" : `🙈 ${hiddenCount}`}
-                  </button>
-                )}
-                
-                {/* Mobile Income Button */}
-                <button
-                  onClick={() => {
-                    setIncomeInput(monthlyIncome > 0 ? monthlyIncome.toString() : "");
-                    setIsEditingIncome(true);
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg bg-white/5 active:bg-white/10 transition-colors touch-manipulation"
-                >
-                  {monthlyIncome > 0 ? (
-                    <div className="flex items-center gap-1.5">
-                      <p className={`text-[10px] font-bold ${
-                        (totalForDay / monthlyIncome) * 100 > 3 ? 'text-red-400' : 'text-emerald-400'
-                      }`}>
-                        {hideAmounts ? "••%" : `${((totalForDay / monthlyIncome) * 100).toFixed(1)}%`}
-                      </p>
-                      <p className="text-[9px] text-white/30">of income</p>
-                    </div>
-                  ) : (
-                    <p className="text-[10px] text-white/50">💰 Set income</p>
-                  )}
-                </button>
-
-              </div>
-              
-              {/* Mobile Income Input Modal */}
-              {isEditingIncome && (
-                <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/20">
-                  <p className="text-xs text-white/50 mb-2">Enter your monthly income</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white/60">₹</span>
-                    <input
-                      type="number"
-                      value={incomeInput}
-                      onChange={(e) => setIncomeInput(e.target.value)}
-                      placeholder="e.g. 50000"
-                      className="flex-1 bg-black/50 text-white text-base font-medium px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={async () => {
-                        const value = parseFloat(incomeInput) || 0;
-                        setMonthlyIncome(value);
-                        setIsEditingIncome(false);
-                        try {
-                          await api.patch('/api/profile/update', { monthlyIncome: value });
-                        } catch (err) {
-                          console.error('Failed to save income:', err);
-                        }
-                      }}
-                      className="flex-1 py-2 rounded-lg bg-emerald-500 text-white text-sm font-medium active:bg-emerald-600 transition-colors"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditingIncome(false)}
-                      className="px-4 py-2 rounded-lg bg-white/10 text-white/70 text-sm font-medium active:bg-white/20 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-
-        {/* Stories - Dummy Avatars */}
-        <section className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Stories</p>
-              <p className="text-xs text-white/60">Tap to see daily highlights</p>
-            </div>
-            <span className="text-[10px] text-white/30 border border-white/10 px-2 py-1 rounded-full">NEW</span>
-          </div>
-          <div className="relative rounded-lg overflow-hidden">
-            <div className="absolute inset-0 bg-[#0a0a0a]" />
-            <div className="absolute inset-0 bg-linear-to-br from-white/6 via-transparent to-white/3" />
-            <div className="absolute inset-0 border border-white/15 rounded-lg" />
-            <div className="relative px-3 py-2.5">
-              <div className="mb-2" />
-
-              <div className="flex gap-3 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory">
-                <div className="flex flex-col items-center gap-1 min-w-14 snap-start">
-                  <button
-                    type="button"
-                    className="relative w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center"
-                    aria-label="Create story"
-                  >
-                    <span className="text-base text-white/60">+</span>
-                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#ff2d55] text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-black">
-                      +
-                    </span>
-                  </button>
-                  <span className="text-[9px] text-white/50 truncate w-14 text-center">
-                    Your Story
-                  </span>
-                </div>
-
-                {dummyStories.map((story) => (
-                  <div key={story.id} className="flex flex-col items-center gap-1 min-w-14 snap-start">
-                    <div
-                      className="w-12 h-12 rounded-full p-0.5"
-                      style={{ background: `conic-gradient(from 180deg, ${story.color}, #ffffff33)` }}
-                    >
-                      <div className="w-full h-full rounded-full bg-[#0a0a0a] flex items-center justify-center">
-                        <span className="text-[11px] font-semibold text-white/90">
-                          {story.name.slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-[9px] text-white/50 truncate w-14 text-center">
-                      {story.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <div className="flex items-center justify-center gap-2" />
             </div>
           </div>
         </section>

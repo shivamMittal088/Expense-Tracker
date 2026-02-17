@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Users } from "lucide-react";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
@@ -40,6 +40,7 @@ const getFullPhotoURL = (photoURL?: string) => {
 };
 
 export default function FollowListPage({ mode }: FollowListPageProps) {
+  const navigate = useNavigate();
   const [items, setItems] = useState<FollowItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -156,13 +157,14 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
     <div className="min-h-screen bg-black text-white">
       <div className="px-8 pt-6 pb-2">
         <div className="relative flex items-center">
-          <Link
-            to="/profile"
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Back</span>
-          </Link>
+          </button>
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
             <Users className="w-4 h-4 text-white/60" />
             <h1 className="text-lg font-semibold text-white">{title}</h1>

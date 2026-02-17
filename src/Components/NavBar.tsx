@@ -75,7 +75,7 @@ const NavBar: React.FC<NavBarProps> = ({ onSearchClick, onNotificationClick, not
               />
               
               {/* Brand Name */}
-              <span className="font-brand text-[15px] font-semibold tracking-wide text-white/90">
+              <span className="text-[15px] font-semibold tracking-wide text-white/90">
                 Track<span className="text-white/50">Expense</span>
               </span>
             </a>

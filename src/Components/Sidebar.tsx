@@ -203,23 +203,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Pro Badge Card - Inside scrollable area, below buttons */}
-            <div className="mt-4">
-              <div className="relative overflow-hidden rounded-xl bg-white/[0.03] border border-white/20 p-3">
-                <div className="relative flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black text-xs font-bold shadow-lg shadow-white/10">
-                    U
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-white/90">Premium User</p>
-                    <p className="text-[9px] text-white/40">Version 1.0.0</p>
-                  </div>
-                  <div className="px-2 py-1 rounded-full bg-white shadow-lg">
-                    <span className="text-[8px] font-bold text-black uppercase tracking-wider">Pro</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

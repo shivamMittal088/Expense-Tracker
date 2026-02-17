@@ -14,7 +14,6 @@ type Expense = {
   notes?: string;
   occurredAt: string;
   payment_mode: string;
-  deleted?: boolean;
 };
 
 const Transactions = () => {
@@ -162,7 +161,7 @@ const Transactions = () => {
           <>
             <div
               ref={transactionsListRef}
-              className="relative divide-y divide-white/5 max-h-140 overflow-y-auto"
+              className="relative divide-y divide-white/5 max-h-[70vh] overflow-y-auto overscroll-contain"
             >
               {transactions.map((expense, index) => {
                 const occurredAt = new Date(expense.occurredAt);
