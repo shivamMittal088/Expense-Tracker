@@ -174,17 +174,21 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
   };
 
   return (
-    <section className="max-w-3xl mx-auto">
-      <div className="bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 rounded-2xl p-5 backdrop-blur-xl">
+    <section className="max-w-5xl mx-auto">
+      <div className="relative overflow-hidden rounded-2xl border border-white/12 bg-white/[0.03] p-5 backdrop-blur-xl">
+        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+        <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/10 blur-[90px]" />
+        <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-white/5 blur-[90px]" />
+
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="relative flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-emerald-500/20">
-              <Calendar size={18} className="text-emerald-400" />
+            <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/20">
+              <Calendar size={18} className="text-emerald-300" />
             </div>
             <div>
               <h3 className="text-white font-semibold text-sm">Transaction Activity</h3>
-              <p className="text-zinc-500 text-xs">{stats.totalTransactions} transactions in {stats.totalDays} days</p>
+              <p className="text-white/50 text-xs">{stats.totalTransactions} transactions in {stats.totalDays} days</p>
             </div>
           </div>
 
@@ -208,17 +212,17 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-            <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Total Spent</p>
+        <div className="relative grid grid-cols-3 gap-3 mb-5">
+          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+            <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Total Spent</p>
             <p className="text-white font-bold text-sm">{rupeeSymbol}{stats.totalAmount.toLocaleString()}</p>
           </div>
-          <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-            <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Transactions</p>
+          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+            <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Transactions</p>
             <p className="text-white font-bold text-sm">{stats.totalTransactions}</p>
           </div>
-          <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-            <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Active Days</p>
+          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+            <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Active Days</p>
             <p className="text-white font-bold text-sm">{stats.totalDays}</p>
           </div>
         </div>
@@ -236,7 +240,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                 {monthLabels.map((label, idx) => (
                   <span
                     key={idx}
-                    className="text-zinc-500 text-[10px] absolute"
+                    className="text-white/35 text-[10px] absolute"
                     style={{
                       left: `${label.position * 13}px`
                     }}
@@ -252,7 +256,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                   {dayLabels.map((day, idx) => (
                     <span
                       key={idx}
-                      className="text-zinc-600 text-[9px] h-[11px] leading-[11px]"
+                      className="text-white/30 text-[9px] h-[11px] leading-[11px]"
                       style={{ visibility: idx % 2 === 0 ? "hidden" : "visible" }}
                     >
                       {day}
@@ -276,10 +280,10 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                         return (
                           <div
                             key={dayIdx}
-                            className={`w-[11px] h-[11px] rounded-[2px] transition-all duration-200 cursor-pointer
+                            className={`w-[11px] h-[11px] rounded-[3px] transition-all duration-200 cursor-pointer
                               ${isCurrentYear && !isFuture ? getColorClass(count) : "bg-white/[0.02]"}
-                              ${isToday ? "ring-1 ring-white/40" : ""}
-                              ${!isFuture ? "hover:ring-1 hover:ring-white/30 hover:scale-125" : "opacity-30"}
+                              ${isToday ? "ring-1 ring-white/50 shadow-[0_0_10px_rgba(255,255,255,0.2)]" : ""}
+                              ${!isFuture ? "hover:ring-1 hover:ring-white/40 hover:scale-[1.28] hover:shadow-[0_0_12px_rgba(16,185,129,0.35)]" : "opacity-30"}
                             `}
                             onMouseEnter={(e) => {
                               if (!isFuture && isCurrentYear) {
@@ -305,7 +309,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
 
               {/* Legend */}
               <div className="flex items-center justify-end gap-2 mt-4">
-                <span className="text-zinc-500 text-[10px]">Less</span>
+                <span className="text-white/40 text-[10px]">Less</span>
                 <div className="flex gap-[2px]">
                   <div className="w-[11px] h-[11px] rounded-[2px] bg-zinc-800/80 border border-zinc-700/50" />
                   <div className="w-[11px] h-[11px] rounded-[2px] bg-emerald-900" />
@@ -314,7 +318,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                   <div className="w-[11px] h-[11px] rounded-[2px] bg-emerald-500" />
                   <div className="w-[11px] h-[11px] rounded-[2px] bg-emerald-400" />
                 </div>
-                <span className="text-zinc-500 text-[10px]">More</span>
+                <span className="text-white/40 text-[10px]">More</span>
               </div>
             </div>
           )}

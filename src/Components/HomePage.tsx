@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
+import AddExpenseModal from "./AddExpenseModal";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
 import ExpenseHeatmap from "./ExpenseHeatmap";
@@ -36,16 +37,25 @@ interface RawExpense {
   payment_mode: string;
 }
 
+type RibbonDay = {
+  date: string;
+  count: number;
+  totalAmount: number;
+};
+
 export default function ExpenseTrackerHome() {
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [showAddExpense, setShowAddExpense] = useState(false);
   const [visibleTotal, setVisibleTotal] = useState(0);
   const [dayExpenses, setDayExpenses] = useState<Expense[]>([]);
   const [dayPage, setDayPage] = useState(1);
   const [dayTotalCount, setDayTotalCount] = useState(0);
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
+  const [ribbonData, setRibbonData] = useState<RibbonDay[]>([]);
+  const [ribbonLoading, setRibbonLoading] = useState(false);
   const dayLimit = 8;
 
   const today = new Date();
@@ -83,6 +93,11 @@ export default function ExpenseTrackerHome() {
   };
 
   const apiDate = getFormattedDate(selectedDate);
+
+  const handleRibbonSelect = (date: Date) => {
+    setDayPage(1);
+    setSelectedDate(date);
+  };
 
   /* ---------------- Fetch expenses when date changes ---------------- */
 
@@ -161,6 +176,41 @@ export default function ExpenseTrackerHome() {
     };
   }, [fetchExpenses]);
 
+  useEffect(() => {
+    const fetchRibbonData = async () => {
+      setRibbonLoading(true);
+      try {
+        const year = selectedDate.getFullYear();
+        const tzOffsetMinutes = new Date().getTimezoneOffset();
+        const res = await api.get(`/api/expenses/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
+        setRibbonData(res.data.data || []);
+      } catch (err) {
+        console.error("Failed to load ribbon data", err);
+        setRibbonData([]);
+      } finally {
+        setRibbonLoading(false);
+      }
+    };
+
+    fetchRibbonData();
+  }, [selectedDate]);
+
+  const ribbonMap = useMemo(() => {
+    const map = new Map<string, RibbonDay>();
+    ribbonData.forEach((d) => map.set(d.date, d));
+    return map;
+  }, [ribbonData]);
+
+  const ribbonDays = useMemo(() => {
+    const days: Date[] = [];
+    for (let i = 6; i >= 0; i -= 1) {
+      const d = new Date(selectedDate);
+      d.setDate(selectedDate.getDate() - i);
+      days.push(d);
+    }
+    return days;
+  }, [selectedDate]);
+
   const totalForDay = visibleTotal;
 
   return (
@@ -172,10 +222,10 @@ export default function ExpenseTrackerHome() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.04),transparent_35%)]" />
       </div>
 
-      <main className="relative max-w-6xl mx-auto px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-6 space-y-10 lg:space-y-12">
+      <main className="relative max-w-5xl mx-auto px-4 lg:px-8 pt-8 lg:pt-12 pb-4 lg:pb-6 space-y-10 lg:space-y-12">
 
         {/* Top Bar - Premium Glass Card - Compact & Centered */}
-        <section className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.08)]">
+        <section className="relative max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.08)]">
           {/* Solid dark background with subtle gradient */}
           <div className="absolute inset-0 bg-[#0a0a0a]" />
           <div className="absolute inset-0 bg-linear-to-br from-white/8 via-transparent to-white/2" />
@@ -239,6 +289,54 @@ export default function ExpenseTrackerHome() {
               <div className="flex items-center gap-2" />
             </div>
 
+            {/* Compact Week Grid - Desktop */}
+            <div className="hidden lg:block mt-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-white/40">Last 7 Days</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Tap a day</p>
+              </div>
+              <div className="mt-2 grid grid-cols-7 gap-1.5">
+                {ribbonLoading ? (
+                  Array.from({ length: 7 }).map((_, idx) => (
+                    <div key={idx} className="h-10 rounded-lg border border-white/10 bg-white/[0.03]" />
+                  ))
+                ) : (
+                  ribbonDays.map((day) => {
+                    const dateKey = getFormattedDate(day);
+                    const data = ribbonMap.get(dateKey);
+                    const count = data?.count || 0;
+                    const isSelected = dateKey === apiDate;
+                    const isCurrentDay = day.toDateString() === today.toDateString();
+                    const level = Math.min(4, count);
+                    const tone = [
+                      "bg-white/[0.04]",
+                      "bg-white/[0.08]",
+                      "bg-white/[0.14]",
+                      "bg-white/[0.22]",
+                      "bg-white/[0.32]",
+                    ][level];
+
+                    return (
+                      <button
+                        key={dateKey}
+                        onClick={() => handleRibbonSelect(day)}
+                        className={`rounded-lg border px-1.5 py-1.5 text-center transition-all ${
+                          isSelected ? "border-white/50" : "border-white/10 hover:border-white/30"
+                        } ${tone}`}
+                      >
+                        <div className={`text-[9px] uppercase ${isCurrentDay ? "text-white" : "text-white/50"}`}>
+                          {day.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2)}
+                        </div>
+                        <div className={`text-[12px] font-semibold ${isCurrentDay ? "text-white" : "text-white/70"}`}>
+                          {day.getDate()}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
             {/* Mobile Layout - Compact & Centered */}
             <div className="lg:hidden flex flex-col items-center text-center">
               {/* Date Navigation Row - Centered */}
@@ -289,6 +387,71 @@ export default function ExpenseTrackerHome() {
               
               <div className="flex items-center justify-center gap-2" />
             </div>
+
+            {/* Compact Week Grid - Mobile */}
+            <div className="lg:hidden mt-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[9px] uppercase tracking-[0.24em] text-white/40">Last 7 Days</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-white/30">Tap a day</p>
+              </div>
+              <div className="mt-2 grid grid-cols-7 gap-1">
+                {ribbonLoading ? (
+                  Array.from({ length: 7 }).map((_, idx) => (
+                    <div key={idx} className="h-9 rounded-lg border border-white/10 bg-white/[0.03]" />
+                  ))
+                ) : (
+                  ribbonDays.map((day) => {
+                    const dateKey = getFormattedDate(day);
+                    const data = ribbonMap.get(dateKey);
+                    const count = data?.count || 0;
+                    const isSelected = dateKey === apiDate;
+                    const isCurrentDay = day.toDateString() === today.toDateString();
+                    const level = Math.min(4, count);
+                    const tone = [
+                      "bg-white/[0.04]",
+                      "bg-white/[0.08]",
+                      "bg-white/[0.14]",
+                      "bg-white/[0.22]",
+                      "bg-white/[0.32]",
+                    ][level];
+
+                    return (
+                      <button
+                        key={dateKey}
+                        onClick={() => handleRibbonSelect(day)}
+                        className={`rounded-lg border px-1 py-1.5 text-center transition-all ${
+                          isSelected ? "border-white/50" : "border-white/10"
+                        } ${tone}`}
+                      >
+                        <div className={`text-[8px] uppercase ${isCurrentDay ? "text-white" : "text-white/50"}`}>
+                          {day.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2)}
+                        </div>
+                        <div className={`text-[11px] font-semibold ${isCurrentDay ? "text-white" : "text-white/70"}`}>
+                          {day.getDate()}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Add Expense Card */}
+        <section className="max-w-5xl mx-auto">
+          <div className="rounded-2xl border border-white/12 bg-white/[0.03] backdrop-blur-xl px-4 py-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/40">Quick Add</p>
+              <p className="text-sm font-semibold text-white">Add Expense</p>
+            </div>
+            <button
+              onClick={() => setShowAddExpense(true)}
+              className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center text-lg font-semibold hover:bg-white/90 transition-colors"
+              aria-label="Add expense"
+            >
+              +
+            </button>
           </div>
         </section>
 
@@ -350,6 +513,11 @@ export default function ExpenseTrackerHome() {
         selectedDate={selectedDate}
         onDateSelect={handleDateSelect}
         maxDate={today}
+      />
+
+      <AddExpenseModal
+        open={showAddExpense}
+        onClose={() => setShowAddExpense(false)}
       />
 
     </div>

@@ -78,10 +78,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Sidebar Menu */}
       <div 
         ref={menuRef}
-        className={`fixed top-0 left-0 h-[100dvh] w-64 max-w-[85vw] z-50 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`fixed top-0 left-0 h-[100dvh] w-[72vw] max-w-[240px] z-50 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isOpen 
-            ? 'translate-x-0' 
-            : '-translate-x-full'
+            ? 'translate-x-0 opacity-100 pointer-events-auto' 
+            : '-translate-x-full opacity-0 pointer-events-none'
         }`}
       >
         {/* Pure black background */}

@@ -1,15 +1,20 @@
 import type { FC } from "react";
-import { NavLink } from "react-router-dom";
-import { Home, BarChart3, User, List, Plus } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Home, BarChart3, User, List, Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 import Api from "../routeWrapper/Api";
+import { Calculator } from "../utils/UI/Calculator";
 
 const Footer: FC = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const getFullPhotoURL = (photoURL?: string) => {
     if (!photoURL) return null;
@@ -53,8 +58,29 @@ const Footer: FC = () => {
       });
   }, []);
 
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await Api.post("/api/auth/logout");
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
+      navigate("/login");
+    } catch {
+      alert("Failed to logout. Please try again.");
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <>
+      {isToolsOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsToolsOpen(false)}
+        />
+      )}
+
       {/* Floating Pill Navigation */}
       <nav className={`fixed bottom-3 left-3 right-3 z-50 transition-all duration-300 ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'
@@ -89,10 +115,11 @@ const Footer: FC = () => {
 
             {/* Floating Add Button */}
             <button
-              onClick={() => setShowAddExpense(true)}
-              className="bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white rounded-xl w-10 h-10 flex items-center justify-center shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95"
+              onClick={() => setIsToolsOpen((prev) => !prev)}
+              className="bg-white text-black rounded-xl w-10 h-10 flex items-center justify-center shadow-lg shadow-black/60 transition-all hover:scale-105 active:scale-95"
+              aria-label="Open tools"
             >
-              <Plus size={20} strokeWidth={2.5} />
+              <Plus size={20} strokeWidth={2.5} className={`transition-transform ${isToolsOpen ? "rotate-45" : "rotate-0"}`} />
             </button>
 
             <NavLink 
@@ -131,10 +158,93 @@ const Footer: FC = () => {
         </div>
       </nav>
 
+      {isToolsOpen && (
+        <div className="fixed bottom-[5.5rem] left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm">
+          <div className="rounded-2xl border border-white/15 bg-white/[0.06] backdrop-blur-xl p-3 shadow-2xl">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  setShowAddExpense(true);
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <Plus size={14} className="text-white/80" />
+                </span>
+                Add Expense
+              </button>
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  setIsCalculatorOpen(true);
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <CalculatorIcon size={14} className="text-white/80" />
+                </span>
+                Calculator
+              </button>
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  alert("PDF download coming soon!");
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <FileDown size={14} className="text-white/80" />
+                </span>
+                PDF Report
+              </button>
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  alert("Excel export coming soon!");
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <FileSpreadsheet size={14} className="text-white/80" />
+                </span>
+                Export Excel
+              </button>
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  navigate("/settings");
+                }}
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+                  <Settings size={14} className="text-white/80" />
+                </span>
+                Settings
+              </button>
+              <button
+                onClick={() => {
+                  setIsToolsOpen(false);
+                  handleLogout();
+                }}
+                className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-300 hover:bg-red-500/20 transition-colors"
+              >
+                <span className="w-7 h-7 rounded-lg bg-red-500/20 flex items-center justify-center">
+                  <LogOut size={14} className="text-red-300" />
+                </span>
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AddExpenseModal
         open={showAddExpense}
         onClose={() => setShowAddExpense(false)}
       />
+
+      <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
     </>
   );
 };

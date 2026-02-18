@@ -47,10 +47,10 @@
   position: relative;
   background: #000000;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
-  padding: 14px;
+  border-radius: 18px;
+  padding: 12px;
   width: 100%;
-  max-width: 280px;
+  max-width: 252px;
   animation: calcSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   box-shadow: 
@@ -96,7 +96,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   position: relative;
   z-index: 1;
 }
@@ -108,8 +108,8 @@
 }
 
 .calc-logo {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 8px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -119,12 +119,12 @@
 }
 
 .calc-logo-icon {
-  font-size: 13px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .calc-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   letter-spacing: 0.02em;
@@ -136,8 +136,8 @@
 }
 
 .calc-header-btn {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -164,9 +164,9 @@
 .calc-display-container {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 10px 14px;
-  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
   position: relative;
   overflow: hidden;
 }
@@ -182,12 +182,12 @@
 }
 
 .calc-equation-row {
-  min-height: 16px;
-  margin-bottom: 2px;
+  min-height: 14px;
+  margin-bottom: 1px;
 }
 
 .calc-equation {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.35);
   font-family: 'SF Mono', ui-monospace, monospace;
@@ -202,7 +202,7 @@
 }
 
 .calc-result {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 300;
   color: #ffffff;
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -212,13 +212,13 @@
 }
 
 .calc-result.small {
-  font-size: 22px;
+  font-size: 19px;
 }
 
 .calc-copy-btn {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -249,8 +249,8 @@
 }
 
 .calc-history-panel.open {
-  max-height: 140px;
-  margin-bottom: 10px;
+  max-height: 110px;
+  margin-bottom: 8px;
 }
 
 .calc-history-header {
@@ -284,7 +284,7 @@
 }
 
 .calc-history-list {
-  max-height: 100px;
+  max-height: 80px;
   overflow-y: auto;
   padding: 4px 0;
 }
@@ -313,7 +313,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 10px;
+  padding: 4px 8px;
   cursor: pointer;
   transition: all 0.15s ease;
   border-radius: 6px;
@@ -325,13 +325,13 @@
 }
 
 .calc-history-eq {
-  font-size: 10px;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.4);
   font-family: 'SF Mono', ui-monospace, monospace;
 }
 
 .calc-history-res {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -340,7 +340,7 @@
 .calc-button-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 5px;
   position: relative;
   z-index: 1;
 }
@@ -348,9 +348,9 @@
 /* ========== Buttons ========== */
 .calc-btn {
   position: relative;
-  height: 44px;
-  border-radius: 10px;
-  font-size: 16px;
+  height: 38px;
+  border-radius: 9px;
+  font-size: 14px;
   font-weight: 400;
   display: flex;
   align-items: center;
@@ -400,7 +400,7 @@
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -420,7 +420,7 @@
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 300;
 }
 
@@ -439,7 +439,7 @@
   background: #ffffff;
   border-color: transparent;
   color: #000000;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   box-shadow: 0 3px 15px rgba(255, 255, 255, 0.12);
 }
@@ -457,7 +457,7 @@
 
 /* ========== Keyboard Hint ========== */
 .calc-keyboard-hint {
-  margin-top: 10px;
+  margin-top: 8px;
   text-align: center;
   opacity: 0.3;
   transition: opacity 0.15s ease;
@@ -468,7 +468,7 @@
 }
 
 .calc-keyboard-hint span {
-  font-size: 8px;
+  font-size: 7px;
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -478,33 +478,33 @@
 /* ========== Responsive ========== */
 @media (min-width: 400px) {
   .calc-premium-modal {
-    max-width: 300px;
-    padding: 16px;
+    max-width: 270px;
+    padding: 12px;
   }
   
   .calc-btn {
-    height: 48px;
-    font-size: 18px;
-    border-radius: 12px;
+    height: 42px;
+    font-size: 16px;
+    border-radius: 10px;
   }
   
   .calc-result {
-    font-size: 32px;
+    font-size: 26px;
   }
 }
 
 @media (min-width: 768px) {
   .calc-premium-modal {
-    max-width: 320px;
+    max-width: 290px;
   }
   
   .calc-btn {
-    height: 52px;
-    font-size: 20px;
+    height: 46px;
+    font-size: 18px;
   }
   
   .calc-result {
-    font-size: 36px;
+    font-size: 30px;
   }
 }
 
@@ -522,15 +522,15 @@
 /* ========== Previous Calculations Preview ========== */
 .calc-prev-calculations {
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
 }
 
 .calc-prev-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
+  padding: 3px 0;
   cursor: pointer;
   transition: opacity 0.15s ease;
   opacity: 0.5;
@@ -549,14 +549,14 @@
 }
 
 .calc-prev-eq {
-  font-size: 10px;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.5);
   font-family: 'SF Mono', ui-monospace, monospace;
   letter-spacing: 0.01em;
 }
 
 .calc-prev-res {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
 }

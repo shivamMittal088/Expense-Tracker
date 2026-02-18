@@ -41,7 +41,7 @@ const ExpenseDay = ({
   const safeTotalAmount = useMemo(() => totalAmount || 0, [totalAmount]);
 
   return (
-    <section className="max-w-3xl mx-auto">
+    <section className="max-w-5xl mx-auto">
       <div
         key={`expense-day-${dayExpenses.length}`}
         className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a]"
