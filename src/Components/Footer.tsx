@@ -244,28 +244,32 @@ const Footer: FC = () => {
         </div>
       )}
 
-      <Suspense
-        fallback={(
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
-          </div>
-        )}
-      >
-        <AddExpenseModal
-          open={showAddExpense}
-          onClose={() => setShowAddExpense(false)}
-        />
-      </Suspense>
+      {showAddExpense && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <AddExpenseModal
+            open={showAddExpense}
+            onClose={() => setShowAddExpense(false)}
+          />
+        </Suspense>
+      )}
 
-      <Suspense
-        fallback={(
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
-          </div>
-        )}
-      >
-        <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
-      </Suspense>
+      {isCalculatorOpen && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+        </Suspense>
+      )}
     </>
   );
 };
