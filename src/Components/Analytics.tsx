@@ -620,43 +620,6 @@ const Analytics = () => {
           </div>
         </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-7">
-        <StatCard
-          icon={Wallet}
-          label="Total Spent"
-          value={`₹${stats.total.toLocaleString()}`}
-          subValue={`${stats.count} transactions`}
-          color="emerald"
-          delay={0}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Average"
-          value={`₹${Math.round(stats.avg).toLocaleString()}`}
-          subValue="per transaction"
-          trend={{ value: 12, isPositive: false }}
-          color="violet"
-          delay={100}
-        />
-        <StatCard
-          icon={TrendingDown}
-          label="Highest"
-          value={`₹${stats.highest.toLocaleString()}`}
-          subValue="single expense"
-          color="amber"
-          delay={200}
-        />
-        <StatCard
-          icon={Sparkles}
-          label="Categories"
-          value={categories.length.toString()}
-          subValue="spending areas"
-          color="rose"
-          delay={300}
-        />
-      </div>
-
       {/* Spending Trends Chart */}
       <div className="relative rounded-2xl p-5 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />

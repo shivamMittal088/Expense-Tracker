@@ -151,18 +151,18 @@ const Footer: FC = () => {
       )}
 
       {/* Floating Pill Navigation */}
-      <nav className={`fixed bottom-3 left-3 right-3 z-50 transition-all duration-300 ${
+      <nav className={`fixed bottom-2 left-3 right-3 z-50 transition-all duration-300 pb-[max(env(safe-area-inset-bottom),0.25rem)] ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'
       }`}>
         <div className="max-w-sm mx-auto">
-          <div className="bg-[#0a0a0a] border border-white/20 rounded-2xl px-1.5 py-1.5 flex items-center justify-between shadow-2xl shadow-black/80 backdrop-blur-xl">
+          <div className="bg-zinc-950/95 border border-zinc-700 rounded-2xl px-1.5 py-1.5 flex items-center justify-between shadow-2xl shadow-black/80 backdrop-blur-xl">
             
             <NavLink 
               to="/" 
               end 
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all ${
-                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 ${
+                  isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >
@@ -173,8 +173,8 @@ const Footer: FC = () => {
             <NavLink 
               to="/analytics" 
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all ${
-                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 ${
+                  isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >
@@ -185,7 +185,7 @@ const Footer: FC = () => {
             {/* Floating Add Button */}
             <button
               onClick={() => setIsToolsOpen((prev) => !prev)}
-              className="bg-white text-black rounded-xl w-10 h-10 flex items-center justify-center shadow-lg shadow-black/60 transition-all hover:scale-105 active:scale-95"
+              className="bg-white text-black rounded-xl w-11 h-11 flex items-center justify-center shadow-lg shadow-black/60 transition-all hover:scale-105 active:scale-92"
               aria-label="Open tools"
             >
               <Plus size={20} strokeWidth={2.5} className={`transition-transform ${isToolsOpen ? "rotate-45" : "rotate-0"}`} />
@@ -194,8 +194,8 @@ const Footer: FC = () => {
             <NavLink 
               to="/profile" 
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all ${
-                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 ${
+                  isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >
@@ -218,8 +218,8 @@ const Footer: FC = () => {
             <NavLink 
               to="/transactions" 
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all ${
-                  isActive ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+                `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 ${
+                  isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >

@@ -47,7 +47,7 @@ const ExpenseDay = ({
         className="rounded-2xl border border-zinc-800 bg-zinc-950"
       >
         <div className="px-5 py-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 mb-4">
             <div>
               <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400">Daily Ledger</p>
               <h2 className="text-sm font-semibold text-white mt-1">
@@ -55,7 +55,7 @@ const ExpenseDay = ({
               </h2>
               <p className="text-[11px] text-zinc-500">{displayLabel}</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1">
                 <span className="text-[11px] text-zinc-300">
                   Showing {dayExpenses.length} of {totalCount}
@@ -81,7 +81,7 @@ const ExpenseDay = ({
                 return (
                   <div
                     key={expense._id}
-                    className="group flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-3.5 py-3 transition-all hover:border-zinc-700 hover:bg-zinc-900"
+                    className="group flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-3.5 py-3.5 transition-all hover:border-zinc-700 hover:bg-zinc-900 active:scale-[0.995]"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-white truncate">
@@ -107,14 +107,14 @@ const ExpenseDay = ({
         </div>
         {totalPages > 1 && (
           <div className="px-5 pb-5">
-            <div className="flex items-center justify-between text-[11px] text-zinc-500">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[11px] text-zinc-500">
               <span>Page {page} of {totalPages}</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => onPageChange(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="rounded-full border border-zinc-700 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+                  className="h-8 min-w-18 rounded-full border border-zinc-700 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-all active:scale-95 disabled:opacity-50"
                 >
                   Prev
                 </button>
@@ -122,7 +122,7 @@ const ExpenseDay = ({
                   type="button"
                   onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
-                  className="rounded-full border border-zinc-700 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+                  className="h-8 min-w-18 rounded-full border border-zinc-700 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-all active:scale-95 disabled:opacity-50"
                 >
                   Next
                 </button>

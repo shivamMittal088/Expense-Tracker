@@ -302,7 +302,7 @@ export default function ExpenseTrackerHome() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-28">
-      <main className="max-w-5xl mx-auto px-4 lg:px-8 pt-4 pb-4 lg:pb-6 space-y-8 lg:space-y-12">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 pt-3 pb-4 lg:pb-6 space-y-6 lg:space-y-12">
 
         <HomeTopBar
           displayLabel={displayLabel}
@@ -321,9 +321,9 @@ export default function ExpenseTrackerHome() {
         />
 
         <section className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-2">
-            <ul className="space-y-2">
-              <li className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-3 flex items-center justify-between">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-2.5">
+            <ul className="space-y-2.5">
+              <li className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3.5 flex items-center justify-between gap-2 transition-colors hover:border-zinc-700">
                 <div className="flex items-center gap-3">
                   <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
                     {showIdleIcons ? (
@@ -335,20 +335,20 @@ export default function ExpenseTrackerHome() {
                     )}
                   </span>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">Quick Add</p>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">Quick Add</p>
                     <p className="text-sm font-semibold text-white">Add Expense</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowAddExpense(true)}
-                  className="h-8 rounded-lg bg-white text-black px-3 text-[11px] font-semibold hover:bg-white/90 transition-colors"
+                  className="h-9 min-w-16 rounded-lg bg-white text-black px-3 text-[11px] font-semibold hover:bg-white/90 transition-all active:scale-95"
                   aria-label="Add expense"
                 >
                   Open
                 </button>
               </li>
 
-              <li className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-3 flex items-center justify-between">
+              <li className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3.5 flex items-center justify-between gap-2 transition-colors hover:border-zinc-700">
                 <div className="flex items-center gap-3">
                   <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
                     {showIdleIcons ? (
@@ -360,7 +360,7 @@ export default function ExpenseTrackerHome() {
                     )}
                   </span>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">Activity</p>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">Activity</p>
                     <p className="text-sm font-semibold text-white">Expense Heatmap</p>
                   </div>
                 </div>
@@ -374,7 +374,7 @@ export default function ExpenseTrackerHome() {
                     });
                   }}
                   className={
-                    "h-8 rounded-lg border px-3 text-[11px] font-semibold transition-colors " +
+                    "h-9 min-w-16 rounded-lg border px-3 text-[11px] font-semibold transition-all active:scale-95 " +
                     (showActivity
                       ? "border-zinc-500 bg-zinc-800 text-white hover:bg-zinc-700"
                       : "border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500")

@@ -96,7 +96,7 @@ const Transactions = () => {
 
   if (loading) {
     return (
-      <div className="p-4 pb-28 max-w-2xl mx-auto">
+      <div className="px-3 sm:px-4 pt-3 pb-28 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="h-7 w-36 bg-zinc-800 rounded-lg animate-pulse" />
@@ -109,11 +109,11 @@ const Transactions = () => {
   }
 
   return (
-    <div className="p-4 pb-28 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-3 sm:px-4 pt-3 pb-28 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Wallet className="text-zinc-300" size={24} />
+          <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+            <Wallet className="text-zinc-300" size={22} />
             Transactions
           </h1>
           <p className="text-zinc-500 text-sm mt-0.5">All expenses, newest first</p>
@@ -140,7 +140,7 @@ const Transactions = () => {
                 return (
                   <div
                     key={expense._id}
-                    className="group flex items-center gap-3 px-4 py-4 transition-all hover:bg-zinc-900"
+                    className="group flex items-center gap-3 px-3.5 sm:px-4 py-3.5 transition-all hover:bg-zinc-900 active:scale-[0.995]"
                     style={{ animationDelay: `${index * 20}ms` }}
                   >
                     <div
@@ -167,7 +167,7 @@ const Transactions = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-white font-semibold">
+                        <p className="text-white font-semibold text-sm sm:text-base">
                           {hideAmounts ? (
                             `${rupeeSymbol}****`
                           ) : (
@@ -177,7 +177,7 @@ const Transactions = () => {
                             </>
                           )}
                         </p>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="text-[10px] sm:text-[11px] text-zinc-500">
                         {occurredAt.toLocaleDateString("en-IN", {
                           day: "2-digit",
                           month: "short",
