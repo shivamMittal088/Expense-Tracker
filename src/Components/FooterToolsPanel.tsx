@@ -6,6 +6,7 @@ const FooterSettingsIcon = lazy(() =>
 );
 
 interface FooterToolsPanelProps {
+  isOpen: boolean;
   isLoggingOut: boolean;
   onAddExpense: () => void;
   onCalculator: () => void;
@@ -15,6 +16,7 @@ interface FooterToolsPanelProps {
 }
 
 export default function FooterToolsPanel({
+  isOpen,
   isLoggingOut,
   onAddExpense,
   onCalculator,
@@ -23,7 +25,11 @@ export default function FooterToolsPanel({
   onLogout,
 }: FooterToolsPanelProps) {
   return (
-    <div className="fixed bottom-22 left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm pb-[max(env(safe-area-inset-bottom),0.25rem)]">
+    <div
+      className={`fixed bottom-22 left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm pb-[max(env(safe-area-inset-bottom),0.25rem)] transition-all duration-200 ease-out ${
+        isOpen ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-[0.985] pointer-events-none"
+      }`}
+    >
       <div className="rounded-2xl border border-zinc-600/70 bg-zinc-950/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-black/80 ring-1 ring-white/10">
         <div className="grid grid-cols-2 gap-2">
           <button

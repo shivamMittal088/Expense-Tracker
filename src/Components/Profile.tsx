@@ -180,15 +180,10 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="relative">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_10%_-20%,#1f2937_0%,transparent_55%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_circle_at_90%_0%,#0f172a_0%,transparent_60%)]" />
-        <div className="relative max-w-xl mx-auto px-4 py-8 pb-28">
+      <div className="max-w-xl mx-auto px-4 py-8 pb-28">
         {/* Profile Header */}
-        <div className="relative rounded-3xl overflow-hidden mb-6 border border-white/10 bg-[#0a0a0a]">
-          <div className="absolute inset-0 bg-linear-to-br from-white/6 via-transparent to-white/3" />
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(16,185,129,0.08),transparent_40%)]" />
-          <div className="relative p-5">
+        <div className="rounded-3xl overflow-hidden mb-6 border border-zinc-800 bg-zinc-950">
+          <div className="p-5">
             <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             {/* Avatar */}
             <div className="relative shrink-0 self-center sm:self-auto">
@@ -197,12 +192,12 @@ export default function Profile() {
                   <img
                     src={profile.photoURL}
                     alt={profile.name}
-                    className="w-20 h-20 rounded-full object-cover border border-white/20 shadow-xl shadow-black cursor-pointer"
+                    className="w-20 h-20 rounded-full object-cover border border-zinc-700 cursor-pointer"
                     onClick={() => setIsPhotoOpen(true)}
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/20 shadow-xl shadow-black">
-                    <User className="w-7 h-7 text-white/30" />
+                  <div className="w-20 h-20 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-700">
+                    <User className="w-7 h-7 text-zinc-500" />
                   </div>
                 )}
               </div>
@@ -217,12 +212,12 @@ export default function Profile() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center hover:bg-emerald-400 transition-all disabled:opacity-50 shadow-lg border-2 border-black"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors disabled:opacity-50 border-2 border-black"
               >
                 {uploadingPhoto ? (
-                  <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-black animate-spin" />
                 ) : (
-                  <Camera className="w-3.5 h-3.5 text-white" />
+                  <Camera className="w-3.5 h-3.5 text-black" />
                 )}
               </button>
             </div>
@@ -236,14 +231,14 @@ export default function Profile() {
                 type="text"
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
-                className="bg-white/5 border border-white/20 rounded-xl px-3 py-2 text-base font-semibold text-white focus:border-white/40 focus:outline-none w-full"
+                className="bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-base font-semibold text-white focus:border-zinc-500 focus:outline-none w-full"
                 autoFocus
                 maxLength={30}
               />
               <button
                 onClick={handleSaveName}
                 disabled={saving}
-                className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 transition-colors"
+                className="p-2 rounded-xl bg-zinc-800 text-zinc-100 hover:bg-zinc-700 transition-colors"
               >
                 <Check className="w-4 h-4" />
               </button>
@@ -252,7 +247,7 @@ export default function Profile() {
                   setEditingName(false);
                   setNameValue(profile.name);
                 }}
-                className="p-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-zinc-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -262,7 +257,7 @@ export default function Profile() {
               <h1 className="text-lg font-semibold text-white truncate">{profile.name}</h1>
               <button
                 onClick={() => setEditingName(true)}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors shrink-0"
+                className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-zinc-200 transition-colors shrink-0"
               >
                 <Edit3 className="w-3.5 h-3.5" />
               </button>
@@ -278,16 +273,16 @@ export default function Profile() {
                   value={statusValue}
                   onChange={(e) => setStatusValue(e.target.value)}
                   placeholder="What's on your mind?"
-                  className="w-full bg-white/3 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:border-blue-500/50 focus:bg-white/5 focus:outline-none transition-all"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white focus:border-zinc-500 focus:outline-none transition-colors"
                   autoFocus
                   maxLength={50}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-white/20">{statusValue.length}/50</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500">{statusValue.length}/50</span>
               </div>
               <button
                 onClick={handleSaveStatus}
                 disabled={saving}
-                className="p-2 rounded-xl bg-blue-500 text-white hover:bg-blue-400 transition-colors shadow-lg shadow-blue-500/20"
+                className="p-2 rounded-xl bg-zinc-100 text-black hover:bg-zinc-200 transition-colors"
               >
                 <Check className="w-4 h-4" />
               </button>
@@ -296,7 +291,7 @@ export default function Profile() {
                   setEditingStatus(false);
                   setStatusValue(profile.statusMessage || "");
                 }}
-                className="p-2 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 transition-colors"
+                className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-zinc-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -304,31 +299,31 @@ export default function Profile() {
           ) : (
             <button
               onClick={() => setEditingStatus(true)}
-              className="group flex items-center gap-2 mt-3 px-3 py-2 rounded-2xl bg-white/2 border border-white/15 hover:border-white/25 hover:bg-white/4 transition-all"
+              className="group flex items-center gap-2 mt-3 px-3 py-2 rounded-2xl bg-zinc-900 border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800 transition-colors"
             >
               <span className="text-lg">💭</span>
-              <span className={`text-sm ${profile.statusMessage ? "text-white/60" : "text-white/30 italic"}`}>
+              <span className={`text-sm ${profile.statusMessage ? "text-zinc-300" : "text-zinc-500 italic"}`}>
                 {profile.statusMessage || "Share what's on your mind..."}
               </span>
-              <Edit3 className="w-3 h-3 text-white/20 group-hover:text-white/40 transition-colors ml-auto" />
+              <Edit3 className="w-3 h-3 text-zinc-500 group-hover:text-zinc-300 transition-colors ml-auto" />
             </button>
           )}
 
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <Link
                   to="/profile/followers"
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 hover:bg-white/10 transition-colors"
+                  className="rounded-2xl border border-zinc-700 bg-zinc-900 px-3 py-2.5 hover:bg-zinc-800 transition-colors"
                 >
-                  <p className="text-[11px] uppercase tracking-wide text-white/40">Followers</p>
+                  <p className="text-[11px] uppercase tracking-wide text-zinc-500">Followers</p>
                   <p className="text-lg font-semibold text-white">
                     {profile.followersCount ?? 0}
                   </p>
                 </Link>
                 <Link
                   to="/profile/following"
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 hover:bg-white/10 transition-colors"
+                  className="rounded-2xl border border-zinc-700 bg-zinc-900 px-3 py-2.5 hover:bg-zinc-800 transition-colors"
                 >
-                  <p className="text-[11px] uppercase tracking-wide text-white/40">Following</p>
+                  <p className="text-[11px] uppercase tracking-wide text-zinc-500">Following</p>
                   <p className="text-lg font-semibold text-white">
                     {profile.followingCount ?? 0}
                   </p>
@@ -344,14 +339,14 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => setIsPhotoOpen(false)}
-            className="absolute top-4 right-4 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-xs text-white/80 hover:text-white"
+            className="absolute top-4 right-4 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-200 hover:text-white"
           >
             Close
           </button>
           <img
             src={profile.photoURL}
             alt={profile.name}
-            className="max-h-[80vh] max-w-[90vw] rounded-2xl border border-white/20 shadow-2xl"
+            className="max-h-[80vh] max-w-[90vw] rounded-2xl border border-zinc-700"
             onClick={() => setIsPhotoOpen(false)}
           />
         </div>
@@ -359,31 +354,31 @@ export default function Profile() {
 
       {/* Profile Details */}
       <section className="mb-6">
-        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
+        <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-[0.2em] mb-3 px-1">
           Account Info
         </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-zinc-950 border border-zinc-800 overflow-hidden">
           {/* Email */}
           <div className="flex items-center gap-3 px-4 py-4">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-              <Mail className="w-5 h-5 text-white/50" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-700">
+              <Mail className="w-5 h-5 text-zinc-400" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-white/40 uppercase tracking-wide">Email</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Email</p>
               <p className="text-sm text-white">{profile.emailId}</p>
             </div>
           </div>
 
-          <div className="h-px bg-white/5 mx-4" />
+          <div className="h-px bg-zinc-800 mx-4" />
 
           {/* User ID */}
           <div className="flex items-center gap-3 px-4 py-4">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-              <User className="w-5 h-5 text-white/50" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-700">
+              <User className="w-5 h-5 text-zinc-400" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-white/40 uppercase tracking-wide">User ID</p>
-              <p className="text-xs text-white/70 font-mono">{profile._id}</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wide">User ID</p>
+              <p className="text-xs text-zinc-300 font-mono">{profile._id}</p>
             </div>
           </div>
         </div>
@@ -391,30 +386,30 @@ export default function Profile() {
 
       {/* Dates */}
       <section className="mb-6">
-        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
+        <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-[0.2em] mb-3 px-1">
           Activity
         </h2>
-        <div className="rounded-2xl bg-[#0a0a0a] border border-white/10 overflow-hidden">
+        <div className="rounded-2xl bg-zinc-950 border border-zinc-800 overflow-hidden">
           {/* Member Since */}
           <div className="flex items-center gap-3 px-4 py-4">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-              <Calendar className="w-5 h-5 text-white/50" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-700">
+              <Calendar className="w-5 h-5 text-zinc-400" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-white/40 uppercase tracking-wide">Member Since</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Member Since</p>
               <p className="text-sm text-white">{formatDate(profile.createdAt)}</p>
             </div>
           </div>
 
-          <div className="h-px bg-white/5 mx-4" />
+          <div className="h-px bg-zinc-800 mx-4" />
 
           {/* Last Updated */}
           <div className="flex items-center gap-3 px-4 py-4">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-              <Calendar className="w-5 h-5 text-white/50" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-700">
+              <Calendar className="w-5 h-5 text-zinc-400" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] text-white/40 uppercase tracking-wide">Last Updated</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Last Updated</p>
               <p className="text-sm text-white">{formatDate(profile.updatedAt)}</p>
             </div>
           </div>
@@ -422,7 +417,6 @@ export default function Profile() {
       </section>
 
         </div>
-      </div>
     </div>
   );
 }

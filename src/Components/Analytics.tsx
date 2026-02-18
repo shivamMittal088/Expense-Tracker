@@ -261,14 +261,14 @@ const FilterChip = ({
 }) => (
   <button
     onClick={onClick}
-    className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-xs whitespace-nowrap transition-all duration-300 ${
+    className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-xs whitespace-nowrap transition-colors ${
       isActive
-        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-lg shadow-emerald-500/10"
-        : "bg-zinc-800/80 text-zinc-300 border border-zinc-700/50 hover:bg-zinc-700/80 hover:border-zinc-600"
-    } ${isOpen ? "ring-2 ring-emerald-500/40 ring-offset-1 ring-offset-black" : ""}`}
+        ? "bg-zinc-800 text-zinc-100 border border-zinc-600"
+        : "bg-zinc-900 text-zinc-300 border border-zinc-700 hover:bg-zinc-800"
+    } ${isOpen ? "border-zinc-500" : ""}`}
   >
-    <Icon size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-12" : "group-hover:scale-110"}`} />
-    <span className="text-zinc-500">{label}</span>
+    <Icon size={14} className="text-zinc-300" />
+    <span className="text-zinc-400">{label}</span>
     <span className="font-semibold">{value}</span>
   </button>
 );
@@ -531,28 +531,21 @@ const Analytics = () => {
   }
 
   return (
-    <div className="relative p-4 pb-28 max-w-5xl mx-auto">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 -left-20 h-72 w-72 rounded-full bg-emerald-500/8 blur-[140px]" />
-        <div className="absolute top-20 right-[-10%] h-80 w-80 rounded-full bg-white/4 blur-[160px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(255,255,255,0.05),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.04),transparent_35%)]" />
-      </div>
-
-      <div className="relative">
+    <div className="p-4 pb-28 max-w-5xl mx-auto">
+      <div>
         {/* Header */}
-        <div className="relative mb-6 rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-3 backdrop-blur-xl">
-          <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-white/[0.08] via-transparent to-white/[0.03]" />
-          <div className="relative flex items-center justify-between">
+        <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                <BarChart3 className="text-emerald-300" size={22} />
+                <BarChart3 className="text-zinc-200" size={22} />
                 Analytics
               </h1>
-              <p className="text-white/50 text-sm mt-0.5">Track your spending patterns</p>
+              <p className="text-zinc-400 text-sm mt-0.5">Track your spending patterns</p>
             </div>
             <button 
               onClick={() => window.location.reload()}
-              className="p-2 rounded-xl bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/15 transition-all"
+              className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 border border-zinc-700 transition-colors"
             >
               <RefreshCw size={18} />
             </button>
@@ -560,12 +553,11 @@ const Analytics = () => {
         </div>
 
       {/* Spending Trends Chart */}
-      <div className="relative rounded-2xl p-5 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
-        <div className="relative">
+      <div className="rounded-2xl p-5 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
+        <div>
           <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <BarChart3 size={18} className="text-emerald-400" />
+            <BarChart3 size={18} className="text-zinc-200" />
             <div>
               <h3 className="text-sm font-semibold text-white">Spending Trends</h3>
               <p className="text-[10px] text-zinc-500">
@@ -575,15 +567,15 @@ const Analytics = () => {
           </div>
           
           {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-zinc-800/70 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-zinc-900 rounded-lg p-1 border border-zinc-700">
             {(["daily", "monthly", "yearly"] as const).map((view) => (
               <button
                 key={view}
                 onClick={() => setTrendsView(view)}
-                className={`px-2.5 py-1 text-[10px] font-medium rounded-md transition-all ${
+                className={`px-2.5 py-1 text-[10px] font-medium rounded-md transition-colors ${
                   trendsView === view
-                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+                    ? "bg-zinc-100 text-black"
+                    : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
                 }`}
               >
                 {view === "daily" ? "Days" : view === "monthly" ? "Months" : "Years"}
@@ -605,9 +597,9 @@ const Analytics = () => {
 
           {/* Summary Stats */}
           {spendingTrendsSummary && !trendsLoading && (
-            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-800">
               <div className="text-center">
-                <p className="text-[10px] text-white/40 mb-0.5">Total</p>
+                <p className="text-[10px] text-zinc-500 mb-0.5">Total</p>
                 <p className="text-white text-sm font-bold">
                   ₹{spendingTrendsSummary.totalSpent >= 100000 
                     ? `${(spendingTrendsSummary.totalSpent / 100000).toFixed(1)}L` 
@@ -615,7 +607,7 @@ const Analytics = () => {
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] text-white/40 mb-0.5">
+                <p className="text-[10px] text-zinc-500 mb-0.5">
                   Avg/{trendsView === "daily" ? "Day" : trendsView === "monthly" ? "Month" : "Year"}
                 </p>
                 <p className="text-white text-sm font-bold">
@@ -625,7 +617,7 @@ const Analytics = () => {
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] text-white/40 mb-0.5">Trend</p>
+                <p className="text-[10px] text-zinc-500 mb-0.5">Trend</p>
                 <p className={`text-sm font-bold flex items-center justify-center gap-1 ${
                   spendingTrendsSummary.trendDirection === "up" 
                     ? "text-rose-400" 
@@ -689,7 +681,7 @@ const Analytics = () => {
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 rounded-xl border border-rose-500/20 transition-all hover:bg-rose-500/20"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs text-zinc-300 hover:text-zinc-100 bg-zinc-900 rounded-xl border border-zinc-700 transition-colors hover:bg-zinc-800"
             >
               <X size={14} />
               Clear
@@ -699,7 +691,7 @@ const Analytics = () => {
 
         {/* Dropdown Panels */}
         {openDropdown === "date" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-2 shadow-2xl z-50 min-w-45">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-950 border border-zinc-700 rounded-2xl p-2 shadow-xl z-50 min-w-45">
             {(["week", "month", "year", "all"] as const).map((range) => (
               <button
                 key={range}
@@ -707,9 +699,9 @@ const Analytics = () => {
                   setDateRange(range);
                   setOpenDropdown(null);
                 }}
-                className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   dateRange === range
-                    ? "bg-emerald-500/20 text-emerald-400"
+                    ? "bg-zinc-800 text-zinc-100"
                     : "text-zinc-300 hover:bg-zinc-800"
                 }`}
               >
@@ -720,7 +712,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "payment" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-60">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-950 border border-zinc-700 rounded-2xl p-4 shadow-xl z-50 min-w-60">
             <p className="text-xs font-medium text-zinc-500 mb-3 uppercase tracking-wider">Payment Methods</p>
             <div className="flex flex-wrap gap-2">
               {paymentModes.map((mode) => (
@@ -731,10 +723,10 @@ const Analytics = () => {
                       prev.includes(mode) ? prev.filter((m) => m !== mode) : [...prev, mode]
                     );
                   }}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                     selectedPayments.includes(mode)
-                      ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                      ? "bg-zinc-100 text-black"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   }`}
                 >
                   {mode === "bank_transfer" ? "Bank" : mode.toUpperCase()}
@@ -753,7 +745,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "category" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-4 shadow-2xl z-50 min-w-65">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-950 border border-zinc-700 rounded-2xl p-4 shadow-xl z-50 min-w-65">
             <p className="text-xs font-medium text-zinc-500 mb-3 uppercase tracking-wider">Categories</p>
             {categories.length === 0 ? (
               <p className="text-zinc-500 text-sm">No categories found</p>
@@ -768,10 +760,10 @@ const Analytics = () => {
                           prev.includes(cat.name) ? prev.filter((c) => c !== cat.name) : [...prev, cat.name]
                         );
                       }}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                         selectedCategories.includes(cat.name)
-                          ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
-                          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                          ? "bg-zinc-100 text-black"
+                          : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                       }`}
                     >
                       <span>{cat.emoji || "📁"}</span>
@@ -793,7 +785,7 @@ const Analytics = () => {
         )}
 
         {openDropdown === "amount" && (
-          <div className="absolute top-full left-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-2xl p-5 shadow-2xl z-50 min-w-70">
+          <div className="absolute top-full left-0 mt-2 bg-zinc-950 border border-zinc-700 rounded-2xl p-5 shadow-xl z-50 min-w-70">
             <p className="text-xs font-medium text-zinc-500 mb-4 uppercase tracking-wider">Amount Range</p>
             <div className="flex items-center gap-4">
               <div className="flex-1">
@@ -805,7 +797,7 @@ const Analytics = () => {
                     placeholder="0"
                     value={minAmount}
                     onChange={(e) => setMinAmount(e.target.value)}
-                    className="w-full bg-zinc-800 text-white rounded-xl pl-8 pr-3 py-2.5 text-sm border border-zinc-700 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="w-full bg-zinc-900 text-white rounded-xl pl-8 pr-3 py-2.5 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-500 transition-colors"
                   />
                 </div>
               </div>
@@ -819,14 +811,14 @@ const Analytics = () => {
                     placeholder="Any"
                     value={maxAmount}
                     onChange={(e) => setMaxAmount(e.target.value)}
-                    className="w-full bg-zinc-800 text-white rounded-xl pl-8 pr-3 py-2.5 text-sm border border-zinc-700 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="w-full bg-zinc-900 text-white rounded-xl pl-8 pr-3 py-2.5 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-500 transition-colors"
                   />
                 </div>
               </div>
             </div>
             <button
               onClick={() => setOpenDropdown(null)}
-              className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-white py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-emerald-500/25"
+              className="w-full mt-4 bg-zinc-100 hover:bg-zinc-200 text-black py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
               Apply Filter
             </button>
@@ -837,12 +829,11 @@ const Analytics = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {/* Category Breakdown */}
-        <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl overflow-hidden">
-          <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
-          <div className="relative">
+        <div className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 overflow-hidden">
+          <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <PieChart size={16} className="text-violet-400" />
+              <PieChart size={16} className="text-zinc-200" />
               <h3 className="text-sm font-semibold text-white">By Category</h3>
             </div>
           </div>
@@ -877,22 +868,21 @@ const Analytics = () => {
       </div>
 
       {/* Payment Mode Breakdown - Compact Premium */}
-      <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
-        <div className="relative">
+      <div className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
+        <div>
           <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <CreditCard size={14} className="text-blue-400" />
+            <CreditCard size={14} className="text-zinc-200" />
             <h2 className="text-xs font-semibold text-white">Payment Methods</h2>
           </div>
-          <div className="flex items-center gap-0.5 bg-zinc-800/70 rounded-md p-0.5">
+          <div className="flex items-center gap-0.5 bg-zinc-900 rounded-md p-0.5 border border-zinc-700">
             {(["week", "month", "3month", "6month", "year"] as const).map((period) => (
               <button
                 key={period}
                 onClick={() => setPaymentPeriod(period)}
-                className={`px-1.5 py-0.5 text-[9px] font-medium rounded transition-all ${
+                className={`px-1.5 py-0.5 text-[9px] font-medium rounded transition-colors ${
                   paymentPeriod === period
-                    ? "bg-blue-500/90 text-white shadow-sm"
+                    ? "bg-zinc-100 text-black"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
@@ -934,7 +924,7 @@ const Analytics = () => {
               {paymentBreakdown.map((item) => (
                 <div
                   key={item.mode}
-                  className="group relative bg-zinc-800/30 hover:bg-zinc-800/50 rounded-xl p-2 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
+                  className="group relative bg-zinc-900 hover:bg-zinc-800 rounded-xl p-2 transition-colors cursor-pointer border border-zinc-800"
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <div
@@ -954,15 +944,14 @@ const Analytics = () => {
       </div>
 
       {/* Recurring Payments Section */}
-      <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
-        <div className="relative">
+      <div className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
+        <div>
           <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <RefreshCw size={16} className="text-amber-400" />
+            <RefreshCw size={16} className="text-zinc-200" />
             <h2 className="text-sm font-semibold text-white">Recurring Payments</h2>
           </div>
-          <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+          <span className="text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded-full flex items-center gap-1">
             <Sparkles size={10} />
             Auto-detected
           </span>
@@ -988,7 +977,7 @@ const Analytics = () => {
               {recurringPayments.slice(0, 6).map((item) => (
                 <div
                   key={item.name}
-                  className="group flex items-center gap-2 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-lg sm:rounded-2xl px-2 py-2 sm:px-3 sm:py-3 transition-all cursor-pointer border border-transparent hover:border-zinc-700/50"
+                  className="group flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 rounded-lg sm:rounded-2xl px-2 py-2 sm:px-3 sm:py-3 transition-colors cursor-pointer border border-zinc-800"
                 >
                   <div 
                     className="w-7 h-7 sm:w-10 sm:h-10 rounded-md sm:rounded-xl flex items-center justify-center text-[13px]"
@@ -1005,7 +994,7 @@ const Analytics = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-emerald-400 text-[12px] sm:text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
+                    <p className="text-zinc-100 text-[12px] sm:text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
                     <p className="text-[8px] text-zinc-500 sm:hidden">~₹{item.estimatedMonthlyAmount.toLocaleString()}/mo</p>
                     {item.nextExpectedDate && (
                       <p className={`hidden sm:block text-[10px] ${item.nextExpectedDate.includes('Overdue') ? 'text-rose-400' : 'text-amber-400'}`}>

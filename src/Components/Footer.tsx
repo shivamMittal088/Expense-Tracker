@@ -18,6 +18,7 @@ const Calculator = lazy(() =>
 const Footer: FC = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [isToolsVisible, setIsToolsVisible] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -127,6 +128,19 @@ const Footer: FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isToolsOpen) {
+      setIsToolsVisible(true);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setIsToolsVisible(false);
+    }, 180);
+
+    return () => clearTimeout(timeoutId);
+  }, [isToolsOpen]);
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
@@ -143,9 +157,11 @@ const Footer: FC = () => {
 
   return (
     <>
-      {isToolsOpen && (
+      {isToolsVisible && (
         <div
-          className="fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px]"
+          className={`fixed inset-0 z-40 backdrop-blur-[2px] transition-all duration-200 ${
+            isToolsOpen ? "bg-black/55 opacity-100" : "bg-black/0 opacity-0"
+          }`}
           onClick={() => setIsToolsOpen(false)}
         />
       )}
@@ -235,9 +251,10 @@ const Footer: FC = () => {
         </div>
       </nav>
 
-      {isToolsOpen && (
+      {isToolsVisible && (
         <Suspense fallback={null}>
           <FooterToolsPanel
+            isOpen={isToolsOpen}
             isLoggingOut={isLoggingOut}
             onAddExpense={() => {
               setIsToolsOpen(false);
