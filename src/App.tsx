@@ -4,8 +4,8 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
-import Analytics from "./Components/Analytics";
 const AnalyticsLazy = lazy(() => import("./Components/Analytics"));
+import Transactions from "./Components/Transactions";
 import Profile from "./Components/Profile";
 const Settings = lazy(() => import("./Components/Settings"));
 import Login from "./Components/Login";
@@ -41,7 +41,7 @@ const App: React.FC = () => {
               />
               <Route
                 path="transactions"
-                element={<Analytics mode="transactions" />}
+                element={<Transactions />}
               />
               <Route path="profile" element={<Profile />} />
               <Route path="profile/followers" element={<FollowListPage mode="followers" />} />
