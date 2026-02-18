@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
-import { Calculator } from "../utils/UI/Calculator";
+const Calculator = lazy(() =>
+  import("../utils/UI/Calculator").then((module) => ({
+    default: module.Calculator,
+  }))
+);
 import api from "../routeWrapper/Api";
 
 const FloatingActionMenu = () => {
@@ -119,7 +123,15 @@ const FloatingActionMenu = () => {
         </div>
       </div>
 
-      <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      <Suspense
+        fallback={(
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+          </div>
+        )}
+      >
+        <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      </Suspense>
     </>
   );
 };

@@ -1,11 +1,16 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { CalendarPicker } from "../utils/UI/CalendarPicker";
+import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
 import ExpenseHeatmap from "./ExpenseHeatmap";
 import ExpenseDay from "./ExpenseDay";
 import HomeTopBar from "./HomeTopBar.tsx";
+
+const CalendarPicker = lazy(() =>
+  import("../utils/UI/CalendarPicker").then((module) => ({
+    default: module.CalendarPicker,
+  }))
+);
 
 type Expense = {
   _id: string;
@@ -310,13 +315,21 @@ export default function ExpenseTrackerHome() {
         `}</style>
       </main>
 
-      <CalendarPicker
-        isOpen={isCalendarOpen}
-        onClose={() => setIsCalendarOpen(false)}
-        selectedDate={selectedDate}
-        onDateSelect={handleDateSelect}
-        maxDate={today}
-      />
+      <Suspense
+        fallback={(
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+          </div>
+        )}
+      >
+        <CalendarPicker
+          isOpen={isCalendarOpen}
+          onClose={() => setIsCalendarOpen(false)}
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+          maxDate={today}
+        />
+      </Suspense>
 
       <AddExpenseModal
         open={showAddExpense}

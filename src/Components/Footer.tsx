@@ -1,10 +1,15 @@
 import type { FC } from "react";
+import { lazy, Suspense } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, BarChart3, User, List, Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 import Api from "../routeWrapper/Api";
-import { Calculator } from "../utils/UI/Calculator";
+const Calculator = lazy(() =>
+  import("../utils/UI/Calculator").then((module) => ({
+    default: module.Calculator,
+  }))
+);
 
 const Footer: FC = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
@@ -159,15 +164,15 @@ const Footer: FC = () => {
       </nav>
 
       {isToolsOpen && (
-        <div className="fixed bottom-[5.5rem] left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm">
-          <div className="rounded-2xl border border-white/15 bg-white/[0.06] backdrop-blur-xl p-3 shadow-2xl">
+        <div className="fixed bottom-22 left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm">
+          <div className="rounded-2xl border border-white/15 bg-white/6 backdrop-blur-xl p-3 shadow-2xl">
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => {
                   setIsToolsOpen(false);
                   setShowAddExpense(true);
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
               >
                 <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
                   <Plus size={14} className="text-white/80" />
@@ -179,7 +184,7 @@ const Footer: FC = () => {
                   setIsToolsOpen(false);
                   setIsCalculatorOpen(true);
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
               >
                 <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
                   <CalculatorIcon size={14} className="text-white/80" />
@@ -191,7 +196,7 @@ const Footer: FC = () => {
                   setIsToolsOpen(false);
                   alert("PDF download coming soon!");
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
               >
                 <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
                   <FileDown size={14} className="text-white/80" />
@@ -203,7 +208,7 @@ const Footer: FC = () => {
                   setIsToolsOpen(false);
                   alert("Excel export coming soon!");
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
               >
                 <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
                   <FileSpreadsheet size={14} className="text-white/80" />
@@ -215,7 +220,7 @@ const Footer: FC = () => {
                   setIsToolsOpen(false);
                   navigate("/settings");
                 }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] text-white/80 hover:bg-white/[0.08] transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
               >
                 <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
                   <Settings size={14} className="text-white/80" />
@@ -244,7 +249,15 @@ const Footer: FC = () => {
         onClose={() => setShowAddExpense(false)}
       />
 
-      <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      <Suspense
+        fallback={(
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+          </div>
+        )}
+      >
+        <Calculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      </Suspense>
     </>
   );
 };

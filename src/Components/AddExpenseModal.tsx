@@ -1,9 +1,13 @@
 import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
 import { CalendarPicker } from "../utils/UI/CalendarPicker";
-import { TimePicker } from "../utils/UI/TimePicker";
+const TimePicker = lazy(() =>
+  import("../utils/UI/TimePicker").then((module) => ({
+    default: module.TimePicker,
+  }))
+);
 import AddTileModal from "./AddTileModal";
 import { AxiosError } from "axios";
 
@@ -396,18 +400,28 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             />
 
             {/* Time Picker Modal */}
-            <TimePicker
-              isOpen={timePickerOpen}
-              onClose={() => setTimePickerOpen(false)}
-              selectedTime={selectedTime}
-              onTimeSelect={(hours, minutes) => {
-                setSelectedTime({ hours, minutes });
-                const pad = (n: number) => String(n).padStart(2, "0");
-                const dateStr = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}`;
-                setOccurredAt(`${dateStr}T${pad(hours)}:${pad(minutes)}:00`);
-              }}
-              closeOnClickOutside={true}
-            />
+            {timePickerOpen && (
+              <Suspense
+                fallback={(
+                  <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+                  </div>
+                )}
+              >
+                <TimePicker
+                  isOpen={timePickerOpen}
+                  onClose={() => setTimePickerOpen(false)}
+                  selectedTime={selectedTime}
+                  onTimeSelect={(hours, minutes) => {
+                    setSelectedTime({ hours, minutes });
+                    const pad = (n: number) => String(n).padStart(2, "0");
+                    const dateStr = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}`;
+                    setOccurredAt(`${dateStr}T${pad(hours)}:${pad(minutes)}:00`);
+                  }}
+                  closeOnClickOutside={true}
+                />
+              </Suspense>
+            )}
 
             {/* Buttons - Compact */}
             <div className="flex gap-2 pt-3">
