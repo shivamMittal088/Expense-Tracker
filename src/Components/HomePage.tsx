@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from "react";
+import { Activity, Plus } from "lucide-react";
 const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
@@ -274,48 +275,58 @@ export default function ExpenseTrackerHome() {
           getFormattedDate={getFormattedDate}
         />
 
-        {/* Add Expense Card */}
         <section className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-white/12 bg-white/3 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/40">Quick Add</p>
-              <p className="text-sm font-semibold text-white">Add Expense</p>
-            </div>
-            <button
-              onClick={() => setShowAddExpense(true)}
-              className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center text-lg font-semibold hover:bg-white/90 transition-colors"
-              aria-label="Add expense"
-            >
-              +
-            </button>
-          </div>
-        </section>
+          <div className="rounded-2xl border border-white/12 bg-[#0b0b0b] backdrop-blur-xl p-2">
+            <ul className="space-y-2">
+              <li className="rounded-xl border border-white/10 bg-white/2 px-3 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 flex items-center justify-center">
+                    <Plus size={16} />
+                  </span>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">Quick Add</p>
+                    <p className="text-sm font-semibold text-white">Add Expense</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAddExpense(true)}
+                  className="h-8 rounded-lg bg-white text-black px-3 text-[11px] font-semibold hover:bg-white/90 transition-colors"
+                  aria-label="Add expense"
+                >
+                  Open
+                </button>
+              </li>
 
-
-        <section className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-white/12 bg-white/3 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/40">Activity</p>
-              <p className="text-sm font-semibold text-white">Expense Heatmap</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowActivity((prev) => {
-                  const next = !prev;
-                  localStorage.setItem("showActivity", String(next));
-                  return next;
-                });
-              }}
-              className={
-                "rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors " +
-                (showActivity
-                  ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-200 hover:bg-emerald-500/25"
-                  : "border-white/15 text-white/70 hover:text-white hover:border-white/30")
-              }
-            >
-              {showActivity ? "Hide" : "Show"}
-            </button>
+              <li className="rounded-xl border border-white/10 bg-white/2 px-3 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-400/30 text-sky-200 flex items-center justify-center">
+                    <Activity size={16} />
+                  </span>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">Activity</p>
+                    <p className="text-sm font-semibold text-white">Expense Heatmap</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowActivity((prev) => {
+                      const next = !prev;
+                      localStorage.setItem("showActivity", String(next));
+                      return next;
+                    });
+                  }}
+                  className={
+                    "h-8 rounded-lg border px-3 text-[11px] font-semibold transition-colors " +
+                    (showActivity
+                      ? "border-sky-300/60 bg-sky-400/20 text-sky-200 hover:bg-sky-400/30"
+                      : "border-white/15 text-white/70 hover:text-white hover:border-white/30")
+                  }
+                >
+                  {showActivity ? "Hide" : "Show"}
+                </button>
+              </li>
+            </ul>
           </div>
         </section>
 
