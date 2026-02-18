@@ -24,6 +24,15 @@ export type FollowRequest = {
   createdAt?: string;
 };
 
+const getFullPhotoURL = (photoURL?: string) => {
+  if (!photoURL) return undefined;
+  if (photoURL.startsWith("http://") || photoURL.startsWith("https://")) {
+    return photoURL;
+  }
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  return `${baseUrl}${photoURL}`;
+};
+
 const formatTimeAgo = (value?: string) => {
   if (!value) return "";
   const created = new Date(value).getTime();
@@ -111,12 +120,28 @@ export default function NotificationsModal({
                   className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2"
                 >
                   <div className="flex items-start gap-2">
-                    <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/70">
-                      {request.follower?.name
-                        .split(" ")
-                        .map((part) => part.charAt(0).toUpperCase())
-                        .slice(0, 2)
-                        .join("")}
+                    <div className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-xs text-white/70 overflow-hidden">
+                      {(() => {
+                        const followerName = request.follower?.name || "Unknown";
+                        const followerPhoto = getFullPhotoURL(request.follower?.photoURL);
+                        const initials = followerName
+                          .split(" ")
+                          .map((part) => part.charAt(0).toUpperCase())
+                          .slice(0, 2)
+                          .join("") || "U";
+
+                        if (followerPhoto) {
+                          return (
+                            <img
+                              src={followerPhoto}
+                              alt={followerName}
+                              className="w-full h-full object-cover"
+                            />
+                          );
+                        }
+
+                        return initials;
+                      })()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
