@@ -113,20 +113,17 @@ const Transactions = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Wallet className="text-emerald-400" size={24} />
+            <Wallet className="text-zinc-300" size={24} />
             Transactions
           </h1>
           <p className="text-zinc-500 text-sm mt-0.5">All expenses, newest first</p>
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a]">
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_20%_-20%,#1f2937_0%,transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_90%_10%,#0f172a_0%,transparent_60%)]" />
-        <div className="absolute inset-0 bg-linear-to-b from-white/4 via-transparent to-white/2" />
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-950 overflow-hidden">
         {transactions.length === 0 ? (
-          <div className="relative text-center py-14">
-            <div className="w-16 h-16 rounded-full bg-zinc-800/50 flex items-center justify-center mx-auto mb-4">
+          <div className="text-center py-14">
+            <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mx-auto mb-4 border border-zinc-800">
               <Wallet className="text-zinc-600" size={28} />
             </div>
             <p className="text-zinc-400 text-sm font-medium">No transactions yet</p>
@@ -136,14 +133,14 @@ const Transactions = () => {
           <>
             <div
               ref={transactionsListRef}
-              className="relative divide-y divide-white/5 max-h-[70vh] overflow-y-auto overscroll-contain"
+              className="divide-y divide-zinc-800 max-h-[70vh] overflow-y-auto overscroll-contain"
             >
               {transactions.map((expense, index) => {
                 const occurredAt = new Date(expense.occurredAt);
                 return (
                   <div
                     key={expense._id}
-                    className="group flex items-center gap-3 px-4 py-4 transition-all hover:bg-white/5"
+                    className="group flex items-center gap-3 px-4 py-4 transition-all hover:bg-zinc-900"
                     style={{ animationDelay: `${index * 20}ms` }}
                   >
                     <div
@@ -161,7 +158,7 @@ const Transactions = () => {
                         {expense.category.name}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] uppercase tracking-wide text-emerald-300/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                        <span className="text-[11px] uppercase tracking-wide text-zinc-300 bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded-full">
                           {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
                         </span>
                         {expense.notes && (
@@ -175,7 +172,7 @@ const Transactions = () => {
                             `${rupeeSymbol}****`
                           ) : (
                             <>
-                              <span className="text-emerald-300">{rupeeSymbol}</span>
+                                <span className="text-zinc-300">{rupeeSymbol}</span>
                               {expense.amount.toLocaleString()}
                             </>
                           )}
