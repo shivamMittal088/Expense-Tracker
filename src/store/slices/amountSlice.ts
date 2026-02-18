@@ -6,7 +6,7 @@ interface AmountState {
 }
 
 const initialState: AmountState = {
-  hideAmounts: localStorage.getItem("hideAmounts") === "true",
+  hideAmounts: false,
 };
 
 const amountSlice = createSlice({

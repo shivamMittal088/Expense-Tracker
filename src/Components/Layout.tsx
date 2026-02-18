@@ -33,36 +33,6 @@ export default function Layout() {
   }, [fetchNotifications]);
 
   useEffect(() => {
-    const seedKey = "seedFollowersOnce";
-    if (localStorage.getItem(seedKey) === "true") {
-      return;
-    }
-
-    api.post("/api/seed/followers")
-      .then(() => {
-        localStorage.setItem(seedKey, "true");
-      })
-      .catch(() => {
-        // Ignore failures to avoid blocking app load.
-      });
-  }, []);
-
-  useEffect(() => {
-    const seedKey = "seedTransactionsOnce";
-    if (localStorage.getItem(seedKey) === "true") {
-      return;
-    }
-
-    api.post("/api/seed/transactions")
-      .then(() => {
-        localStorage.setItem(seedKey, "true");
-      })
-      .catch(() => {
-        // Ignore failures to avoid blocking app load.
-      });
-  }, []);
-
-  useEffect(() => {
     const seedKey = "seedTilesOnce";
     if (localStorage.getItem(seedKey) === "true") {
       return;

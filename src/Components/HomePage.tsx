@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } fro
 const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
-import ExpenseHeatmap from "./ExpenseHeatmap";
 import ExpenseDay from "./ExpenseDay";
 import HomeTopBar from "./HomeTopBar.tsx";
 
@@ -11,6 +10,7 @@ const CalendarPicker = lazy(() =>
     default: module.CalendarPicker,
   }))
 );
+const ExpenseHeatmap = lazy(() => import("./ExpenseHeatmap"));
 
 type Expense = {
   _id: string;
@@ -62,6 +62,10 @@ export default function ExpenseTrackerHome() {
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
   const [ribbonData, setRibbonData] = useState<RibbonDay[]>([]);
   const [ribbonLoading, setRibbonLoading] = useState(false);
+  const [showActivity, setShowActivity] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("showActivity") === "true";
+  });
   const dayLimit = 8;
 
   const today = new Date();
@@ -103,6 +107,19 @@ export default function ExpenseTrackerHome() {
   const handleRibbonSelect = (date: Date) => {
     setDayPage(1);
     setSelectedDate(date);
+  };
+
+  const parseLocalDate = (value: string) => {
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) {
+      return new Date();
+    }
+    return new Date(year, month - 1, day);
+  };
+
+  const handleHeatmapSelect = (dateStr: string) => {
+    setDayPage(1);
+    setSelectedDate(parseLocalDate(dateStr));
   };
 
   /* ---------------- Fetch expenses when date changes ---------------- */
@@ -179,6 +196,17 @@ export default function ExpenseTrackerHome() {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
+    };
+  }, [fetchExpenses]);
+
+  useEffect(() => {
+    const handleExpenseAdded = () => {
+      fetchExpenses();
+    };
+
+    window.addEventListener("expense:added", handleExpenseAdded as EventListener);
+    return () => {
+      window.removeEventListener("expense:added", handleExpenseAdded as EventListener);
     };
   }, [fetchExpenses]);
 
@@ -264,8 +292,44 @@ export default function ExpenseTrackerHome() {
         </section>
 
 
-        {/* Transaction Activity Heatmap */}
-        <ExpenseHeatmap />
+        <section className="max-w-5xl mx-auto">
+          <div className="rounded-2xl border border-white/12 bg-white/3 backdrop-blur-xl px-4 py-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/40">Activity</p>
+              <p className="text-sm font-semibold text-white">Expense Heatmap</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowActivity((prev) => {
+                  const next = !prev;
+                  localStorage.setItem("showActivity", String(next));
+                  return next;
+                });
+              }}
+              className={
+                "rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors " +
+                (showActivity
+                  ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-200 hover:bg-emerald-500/25"
+                  : "border-white/15 text-white/70 hover:text-white hover:border-white/30")
+              }
+            >
+              {showActivity ? "Hide" : "Show"}
+            </button>
+          </div>
+        </section>
+
+        {showActivity && (
+          <Suspense
+            fallback={(
+              <div className="max-w-5xl mx-auto rounded-2xl border border-white/10 bg-white/3 px-4 py-6 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin" />
+              </div>
+            )}
+          >
+            <ExpenseHeatmap onDateClick={(dateStr) => handleHeatmapSelect(dateStr)} />
+          </Suspense>
+        )}
 
 
         {/* Day Transactions */}

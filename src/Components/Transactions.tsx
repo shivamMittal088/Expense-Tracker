@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Wallet } from "lucide-react";
 import api from "../routeWrapper/Api";
-import { showTopToast } from "../utils/Redirecttoast";
 import { useAppSelector } from "../store/hooks";
 
 type Expense = {
@@ -25,7 +24,6 @@ const Transactions = () => {
   const [transactionsCursor, setTransactionsCursor] = useState<string | null>(null);
   const [transactionsHasMore, setTransactionsHasMore] = useState(true);
   const [transactionsLoadingMore, setTransactionsLoadingMore] = useState(false);
-  const [transactionsSeeding, setTransactionsSeeding] = useState(false);
   const transactionsInFlight = useRef(false);
   const transactionsListRef = useRef<HTMLDivElement | null>(null);
   const transactionsSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -64,23 +62,6 @@ const Transactions = () => {
       setTransactionsLoadingMore(false);
     }
   }, []);
-
-  const handleSeedTransactions = useCallback(async () => {
-    if (transactionsSeeding) return;
-    setTransactionsSeeding(true);
-    try {
-      await api.post("/api/seed/transactions");
-      showTopToast("Seeded 200 transactions", { tone: "success" });
-      setTransactions([]);
-      setTransactionsCursor(null);
-      setTransactionsHasMore(true);
-      fetchTransactionsPage(null, false);
-    } catch {
-      showTopToast("Failed to seed transactions", { tone: "error" });
-    } finally {
-      setTransactionsSeeding(false);
-    }
-  }, [fetchTransactionsPage, transactionsSeeding]);
 
   useEffect(() => {
     setTransactions([]);
@@ -137,14 +118,6 @@ const Transactions = () => {
           </h1>
           <p className="text-zinc-500 text-sm mt-0.5">All expenses, newest first</p>
         </div>
-        <button
-          type="button"
-          onClick={handleSeedTransactions}
-          disabled={transactionsSeeding}
-          className="rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 hover:text-white hover:border-white/30 transition-colors disabled:opacity-50"
-        >
-          {transactionsSeeding ? "Seeding..." : "Seed 200"}
-        </button>
       </div>
 
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a]">

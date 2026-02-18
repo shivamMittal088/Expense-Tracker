@@ -45,7 +45,6 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [unfollowId, setUnfollowId] = useState<string | null>(null);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -110,23 +109,6 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
     }
   }, [unfollowId]);
 
-  const handleSeedFollowers = useCallback(async () => {
-    if (isSeeding) return;
-    setIsSeeding(true);
-    try {
-      await Api.post("/api/seed/followers");
-      showTopToast("Seeded 200 followers", { tone: "success" });
-      setItems([]);
-      setNextCursor(null);
-      setHasMore(true);
-      fetchPage(null, false);
-    } catch {
-      showTopToast("Failed to seed followers", { tone: "error" });
-    } finally {
-      setIsSeeding(false);
-    }
-  }, [fetchPage, isSeeding]);
-
   useEffect(() => {
     setItems([]);
     setNextCursor(null);
@@ -169,18 +151,6 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
             <Users className="w-4 h-4 text-white/60" />
             <h1 className="text-lg font-semibold text-white">{title}</h1>
           </div>
-          {mode === "followers" && (
-            <div className="ml-auto">
-              <button
-                type="button"
-                onClick={handleSeedFollowers}
-                disabled={isSeeding}
-                className="rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 hover:text-white hover:border-white/30 transition-colors disabled:opacity-50"
-              >
-                {isSeeding ? "Seeding..." : "Seed 200"}
-              </button>
-            </div>
-          )}
         </div>
       </div>
       <div className="max-w-lg mx-auto px-4 pb-28 pt-2">
