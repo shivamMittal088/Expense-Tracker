@@ -11,7 +11,7 @@ const HomeActivityIcon = lazy(() =>
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
 import { useIdlePrefetch } from "../hooks/useIdlePrefetch";
-import ExpenseDay from "./ExpenseDay";
+const ExpenseDay = lazy(() => import("./ExpenseDay"));
 import HomeTopBar from "./HomeTopBar.tsx";
 
 const CalendarPicker = lazy(() =>
@@ -301,15 +301,8 @@ export default function ExpenseTrackerHome() {
   const totalForDay = visibleTotal;
 
   return (
-    <div className="relative min-h-screen bg-black text-white pb-28 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-32 h-96 w-96 rounded-full bg-emerald-500/10 blur-[140px]" />
-        <div className="absolute top-24 right-[-10%] h-112 w-md rounded-full bg-sky-500/10 blur-[160px]" />
-        <div className="absolute bottom-[-15%] left-[10%] h-104 w-104 rounded-full bg-amber-500/8 blur-[160px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.04),transparent_35%)]" />
-      </div>
-
-      <main className="relative max-w-5xl mx-auto px-4 lg:px-8 pt-4 pb-4 lg:pb-6 space-y-10 lg:space-y-12">
+    <div className="min-h-screen bg-black text-white pb-28">
+      <main className="max-w-5xl mx-auto px-4 lg:px-8 pt-4 pb-4 lg:pb-6 space-y-8 lg:space-y-12">
 
         <HomeTopBar
           displayLabel={displayLabel}
@@ -328,11 +321,11 @@ export default function ExpenseTrackerHome() {
         />
 
         <section className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-white/12 bg-[#0b0b0b] backdrop-blur-xl p-2">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-2">
             <ul className="space-y-2">
-              <li className="rounded-xl border border-white/10 bg-white/2 px-3 py-3 flex items-center justify-between">
+              <li className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 flex items-center justify-center">
+                  <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
                     {showIdleIcons ? (
                       <Suspense fallback={<span className="w-4 h-4" aria-hidden="true" />}>
                         <HomeQuickAddIcon />
@@ -355,9 +348,9 @@ export default function ExpenseTrackerHome() {
                 </button>
               </li>
 
-              <li className="rounded-xl border border-white/10 bg-white/2 px-3 py-3 flex items-center justify-between">
+              <li className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-400/30 text-sky-200 flex items-center justify-center">
+                  <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
                     {showIdleIcons ? (
                       <Suspense fallback={<span className="w-4 h-4" aria-hidden="true" />}>
                         <HomeActivityIcon />
@@ -383,8 +376,8 @@ export default function ExpenseTrackerHome() {
                   className={
                     "h-8 rounded-lg border px-3 text-[11px] font-semibold transition-colors " +
                     (showActivity
-                      ? "border-sky-300/60 bg-sky-400/20 text-sky-200 hover:bg-sky-400/30"
-                      : "border-white/15 text-white/70 hover:text-white hover:border-white/30")
+                      ? "border-zinc-500 bg-zinc-800 text-white hover:bg-zinc-700"
+                      : "border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500")
                   }
                 >
                   {showActivity ? "Hide" : "Show"}
@@ -397,7 +390,7 @@ export default function ExpenseTrackerHome() {
         {showActivity && (
           <Suspense
             fallback={(
-              <div className="max-w-5xl mx-auto rounded-2xl border border-white/10 bg-white/3 px-4 py-6 flex items-center justify-center">
+              <div className="max-w-5xl mx-auto rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-6 flex items-center justify-center">
                 <div className="w-6 h-6 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin" />
               </div>
             )}
@@ -408,17 +401,28 @@ export default function ExpenseTrackerHome() {
 
 
         {/* Day Transactions */}
-        <ExpenseDay
-          dayExpenses={dayExpenses}
-          displayLabel={displayLabel}
-          isToday={isToday}
-          hideAmounts={hideAmounts}
-          page={dayPage}
-          totalCount={dayTotalCount}
-          totalAmount={dayTotalAmount}
-          totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
-          onPageChange={setDayPage}
-        />
+        <Suspense
+          fallback={(
+            <section className="max-w-5xl mx-auto">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+                <div className="h-5 w-32 rounded bg-white/10 animate-pulse mb-3" />
+                <div className="h-20 rounded-xl bg-white/6 animate-pulse" />
+              </div>
+            </section>
+          )}
+        >
+          <ExpenseDay
+            dayExpenses={dayExpenses}
+            displayLabel={displayLabel}
+            isToday={isToday}
+            hideAmounts={hideAmounts}
+            page={dayPage}
+            totalCount={dayTotalCount}
+            totalAmount={dayTotalAmount}
+            totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
+            onPageChange={setDayPage}
+          />
+        </Suspense>
 
         <style>{`
           @keyframes slideUp {
