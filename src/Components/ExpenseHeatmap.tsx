@@ -175,6 +175,18 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
 
   return (
     <section className="max-w-5xl mx-auto">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/20">
+            <Calendar size={18} className="text-emerald-300" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold text-sm">Transaction Activity</h3>
+            <p className="text-white/50 text-xs">{stats.totalTransactions} transactions in {stats.totalDays} days</p>
+          </div>
+        </div>
+      </div>
+
       <div className="relative overflow-hidden rounded-2xl border border-white/12 bg-white/[0.03] p-5 backdrop-blur-xl">
         <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
         <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/10 blur-[90px]" />
@@ -182,16 +194,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
 
         {/* Header */}
         <div className="relative flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/20">
-              <Calendar size={18} className="text-emerald-300" />
-            </div>
-            <div>
-              <h3 className="text-white font-semibold text-sm">Transaction Activity</h3>
-              <p className="text-white/50 text-xs">{stats.totalTransactions} transactions in {stats.totalDays} days</p>
-            </div>
-          </div>
-
+          <div />
           {/* Year Navigation */}
           <div className="flex items-center gap-2">
             <button
@@ -228,19 +231,19 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="relative overflow-x-auto">
+        <div className="relative overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           {loading ? (
             <div className="flex items-center justify-center h-32">
               <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="min-w-[750px]">
+            <div className="min-w-[620px] sm:min-w-[750px]">
               {/* Month Labels */}
-              <div className="flex mb-2 ml-8 relative h-4">
+              <div className="flex mb-1.5 ml-1 sm:ml-8 relative h-3.5">
                 {monthLabels.map((label, idx) => (
                   <span
                     key={idx}
-                    className="text-white/35 text-[10px] absolute"
+                    className="text-white/35 text-[8px] sm:text-[9px] absolute"
                     style={{
                       left: `${label.position * 13}px`
                     }}
@@ -252,11 +255,11 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
 
               <div className="flex">
                 {/* Day Labels */}
-                <div className="flex flex-col gap-[2px] mr-2">
+                <div className="hidden sm:flex flex-col gap-[2px] mr-2">
                   {dayLabels.map((day, idx) => (
                     <span
                       key={idx}
-                      className="text-white/30 text-[9px] h-[11px] leading-[11px]"
+                      className="text-white/30 text-[8px] h-[10px] leading-[10px]"
                       style={{ visibility: idx % 2 === 0 ? "hidden" : "visible" }}
                     >
                       {day}
@@ -265,9 +268,9 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                 </div>
 
                 {/* Weeks Grid */}
-                <div className="flex gap-[2px]">
+                <div className="flex gap-[1px] sm:gap-[1px]">
                   {weeks.map((week, weekIdx) => (
-                    <div key={weekIdx} className="flex flex-col gap-[2px]">
+                    <div key={weekIdx} className="flex flex-col gap-[1px] sm:gap-[1px]">
                       {week.map((day, dayIdx) => {
                         const dateStr = formatDate(day);
                         const data = dataMap.get(dateStr);
@@ -280,7 +283,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                         return (
                           <div
                             key={dayIdx}
-                            className={`w-[11px] h-[11px] rounded-[3px] transition-all duration-200 cursor-pointer
+                            className={`w-[9px] h-[9px] sm:w-[10px] sm:h-[10px] rounded-[3px] transition-all duration-200 cursor-pointer
                               ${isCurrentYear && !isFuture ? getColorClass(count) : "bg-white/[0.02]"}
                               ${isToday ? "ring-1 ring-white/50 shadow-[0_0_10px_rgba(255,255,255,0.2)]" : ""}
                               ${!isFuture ? "hover:ring-1 hover:ring-white/40 hover:scale-[1.28] hover:shadow-[0_0_12px_rgba(16,185,129,0.35)]" : "opacity-30"}
@@ -292,6 +295,14 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                             }}
                             onMouseLeave={() => setHoveredDay(null)}
                             onClick={(e) => {
+                              if (!isFuture && isCurrentYear) {
+                                showHover(e.currentTarget.getBoundingClientRect(), dateStr, count, amount, true);
+                                if (onDateClick) {
+                                  onDateClick(dateStr, count, amount);
+                                }
+                              }
+                            }}
+                            onTouchStart={(e) => {
                               if (!isFuture && isCurrentYear) {
                                 showHover(e.currentTarget.getBoundingClientRect(), dateStr, count, amount, true);
                                 if (onDateClick) {

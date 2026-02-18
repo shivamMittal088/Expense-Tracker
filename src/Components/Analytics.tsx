@@ -591,7 +591,7 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
   // Loading skeleton
   if (loading) {
     return (
-      <div className="p-4 pb-28 max-w-3xl mx-auto">
+      <div className="p-4 pb-28 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="h-8 w-32 bg-zinc-800 rounded-lg animate-pulse" />
           <div className="h-8 w-8 bg-zinc-800 rounded-lg animate-pulse" />
@@ -607,26 +607,36 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
   }
 
   return (
-    <div className="p-4 pb-28 max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <BarChart3 className="text-emerald-400" size={24} />
-            Analytics
-          </h1>
-          <p className="text-zinc-500 text-sm mt-0.5">Track your spending patterns</p>
-        </div>
-        <button 
-          onClick={() => window.location.reload()}
-          className="p-2 rounded-xl bg-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all"
-        >
-          <RefreshCw size={18} />
-        </button>
+    <div className="relative p-4 pb-28 max-w-5xl mx-auto">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 -left-20 h-72 w-72 rounded-full bg-emerald-500/8 blur-[140px]" />
+        <div className="absolute top-20 right-[-10%] h-80 w-80 rounded-full bg-white/4 blur-[160px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(255,255,255,0.05),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.04),transparent_35%)]" />
       </div>
 
+      <div className="relative">
+        {/* Header */}
+        <div className="relative mb-6 rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-3 backdrop-blur-xl">
+          <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-white/[0.08] via-transparent to-white/[0.03]" />
+          <div className="relative flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                <BarChart3 className="text-emerald-300" size={22} />
+                Analytics
+              </h1>
+              <p className="text-white/50 text-sm mt-0.5">Track your spending patterns</p>
+            </div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="p-2 rounded-xl bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/15 transition-all"
+            >
+              <RefreshCw size={18} />
+            </button>
+          </div>
+        </div>
+
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-7">
         <StatCard
           icon={Wallet}
           label="Total Spent"
@@ -663,8 +673,10 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
       </div>
 
       {/* Spending Trends Chart */}
-      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-5 border border-zinc-800/50 backdrop-blur-xl mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="relative rounded-2xl p-5 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+        <div className="relative">
+          <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} className="text-emerald-400" />
             <div>
@@ -693,57 +705,58 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
           </div>
         </div>
 
-        {/* Chart */}
-        {trendsLoading ? (
-          <div className="h-40 bg-zinc-800/30 rounded-xl animate-pulse" />
-        ) : spendingTrends.length === 0 ? (
-          <div className="h-40 flex items-center justify-center text-zinc-500 text-sm">
-            No data available
-          </div>
-        ) : (
-          <SpendingTrendsChart data={spendingTrends} view={trendsView} />
-        )}
+          {/* Chart */}
+          {trendsLoading ? (
+            <div className="h-40 bg-white/[0.04] rounded-xl animate-pulse" />
+          ) : spendingTrends.length === 0 ? (
+            <div className="h-40 flex items-center justify-center text-white/50 text-sm">
+              No data available
+            </div>
+          ) : (
+            <SpendingTrendsChart data={spendingTrends} view={trendsView} />
+          )}
 
-        {/* Summary Stats */}
-        {spendingTrendsSummary && !trendsLoading && (
-          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-800/50">
-            <div className="text-center">
-              <p className="text-[10px] text-zinc-500 mb-0.5">Total</p>
-              <p className="text-white text-sm font-bold">
-                ₹{spendingTrendsSummary.totalSpent >= 100000 
-                  ? `${(spendingTrendsSummary.totalSpent / 100000).toFixed(1)}L` 
-                  : spendingTrendsSummary.totalSpent.toLocaleString()}
-              </p>
+          {/* Summary Stats */}
+          {spendingTrendsSummary && !trendsLoading && (
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10">
+              <div className="text-center">
+                <p className="text-[10px] text-white/40 mb-0.5">Total</p>
+                <p className="text-white text-sm font-bold">
+                  ₹{spendingTrendsSummary.totalSpent >= 100000 
+                    ? `${(spendingTrendsSummary.totalSpent / 100000).toFixed(1)}L` 
+                    : spendingTrendsSummary.totalSpent.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] text-white/40 mb-0.5">
+                  Avg/{trendsView === "daily" ? "Day" : trendsView === "monthly" ? "Month" : "Year"}
+                </p>
+                <p className="text-white text-sm font-bold">
+                  ₹{spendingTrendsSummary.avgPerPeriod >= 1000 
+                    ? `${(spendingTrendsSummary.avgPerPeriod / 1000).toFixed(1)}K` 
+                    : spendingTrendsSummary.avgPerPeriod.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] text-white/40 mb-0.5">Trend</p>
+                <p className={`text-sm font-bold flex items-center justify-center gap-1 ${
+                  spendingTrendsSummary.trendDirection === "up" 
+                    ? "text-rose-400" 
+                    : spendingTrendsSummary.trendDirection === "down" 
+                      ? "text-emerald-400" 
+                      : "text-white/40"
+                }`}>
+                  {spendingTrendsSummary.trendDirection === "up" ? (
+                    <ArrowUpRight size={14} />
+                  ) : spendingTrendsSummary.trendDirection === "down" ? (
+                    <ArrowDownRight size={14} />
+                  ) : null}
+                  {Math.abs(spendingTrendsSummary.trendPercentage)}%
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-[10px] text-zinc-500 mb-0.5">
-                Avg/{trendsView === "daily" ? "Day" : trendsView === "monthly" ? "Month" : "Year"}
-              </p>
-              <p className="text-white text-sm font-bold">
-                ₹{spendingTrendsSummary.avgPerPeriod >= 1000 
-                  ? `${(spendingTrendsSummary.avgPerPeriod / 1000).toFixed(1)}K` 
-                  : spendingTrendsSummary.avgPerPeriod.toLocaleString()}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-[10px] text-zinc-500 mb-0.5">Trend</p>
-              <p className={`text-sm font-bold flex items-center justify-center gap-1 ${
-                spendingTrendsSummary.trendDirection === "up" 
-                  ? "text-rose-400" 
-                  : spendingTrendsSummary.trendDirection === "down" 
-                    ? "text-emerald-400" 
-                    : "text-zinc-400"
-              }`}>
-                {spendingTrendsSummary.trendDirection === "up" ? (
-                  <ArrowUpRight size={14} />
-                ) : spendingTrendsSummary.trendDirection === "down" ? (
-                  <ArrowDownRight size={14} />
-                ) : null}
-                {Math.abs(spendingTrendsSummary.trendPercentage)}%
-              </p>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -937,7 +950,9 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
       {/* Charts Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {/* Category Breakdown */}
-        <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl">
+        <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+          <div className="relative">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <PieChart size={16} className="text-violet-400" />
@@ -969,13 +984,16 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
               No data available
             </div>
           )}
+          </div>
         </div>
 
       </div>
 
       {/* Payment Mode Breakdown - Compact Premium */}
-      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
-        <div className="flex items-center justify-between mb-3">
+      <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+        <div className="relative">
+          <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <CreditCard size={14} className="text-blue-400" />
             <h2 className="text-xs font-semibold text-white">Payment Methods</h2>
@@ -1045,11 +1063,14 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
             </div>
           </>
         )}
+        </div>
       </div>
 
       {/* Recurring Payments Section */}
-      <div className="bg-linear-to-br from-zinc-900 to-zinc-900/50 rounded-2xl p-4 border border-zinc-800/50 backdrop-blur-xl mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="relative rounded-2xl p-4 border border-white/12 bg-white/[0.03] backdrop-blur-xl mb-6 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
+        <div className="relative">
+          <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <RefreshCw size={16} className="text-amber-400" />
             <h2 className="text-sm font-semibold text-white">Recurring Payments</h2>
@@ -1115,8 +1136,9 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
             </div>
           </>
         )}
+        </div>
       </div>
-
+      </div>
     </div>
   );
 };
