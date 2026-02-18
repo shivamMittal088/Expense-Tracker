@@ -3,7 +3,7 @@ import { lazy, Suspense } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, BarChart3, User, List, Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
-import AddExpenseModal from "./AddExpenseModal";
+const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
 import Api from "../routeWrapper/Api";
 const Calculator = lazy(() =>
   import("../utils/UI/Calculator").then((module) => ({
@@ -244,10 +244,18 @@ const Footer: FC = () => {
         </div>
       )}
 
-      <AddExpenseModal
-        open={showAddExpense}
-        onClose={() => setShowAddExpense(false)}
-      />
+      <Suspense
+        fallback={(
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+          </div>
+        )}
+      >
+        <AddExpenseModal
+          open={showAddExpense}
+          onClose={() => setShowAddExpense(false)}
+        />
+      </Suspense>
 
       <Suspense
         fallback={(

@@ -2,7 +2,11 @@ import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock
 import { useEffect, useState, lazy, Suspense } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
-import { CalendarPicker } from "../utils/UI/CalendarPicker";
+const CalendarPicker = lazy(() =>
+  import("../utils/UI/CalendarPicker").then((module) => ({
+    default: module.CalendarPicker,
+  }))
+);
 const TimePicker = lazy(() =>
   import("../utils/UI/TimePicker").then((module) => ({
     default: module.TimePicker,
@@ -345,7 +349,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   <button
                     type="button"
                     onClick={() => setCalendarOpen(true)}
-                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 transition-colors bg-white/[0.04] border border-white/15 hover:bg-white/[0.08]"
+                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 transition-colors bg-white/4 border border-white/15 hover:bg-white/8"
                   >
                     <span className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-white/50" />
@@ -356,7 +360,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   <button
                     type="button"
                     onClick={() => setTimePickerOpen(true)}
-                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 font-mono transition-colors bg-white/[0.04] border border-white/15 hover:bg-white/[0.08]"
+                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[11px] text-white/70 font-mono transition-colors bg-white/4 border border-white/15 hover:bg-white/8"
                   >
                     <span className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-white/50" />
@@ -377,27 +381,37 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   onFocus={() => setNotesFocused(true)}
                   onBlur={() => setNotesFocused(false)}
                   rows={2}
-                  className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/[0.03] border ${notesFocused ? "border-white/30" : "border-white/20"}`}
+                  className={`w-full px-2.5 py-2 rounded-lg text-[11px] outline-none resize-none text-white placeholder-white/30 bg-white/3 border ${notesFocused ? "border-white/30" : "border-white/20"}`}
                 />
               </div>
             </div>
 
             {/* Calendar Picker Modal */}
-            <CalendarPicker
-              isOpen={calendarOpen}
-              onClose={() => setCalendarOpen(false)}
-              selectedDate={selectedDate}
-              onDateSelect={(date) => {
-                setSelectedDate(date);
-                const pad = (n: number) => String(n).padStart(2, "0");
-                const dateStr = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-                const timeStr = `${pad(selectedTime.hours)}:${pad(selectedTime.minutes)}:00`;
-                setOccurredAt(`${dateStr}T${timeStr}`);
-                setCalendarOpen(false);
-              }}
-              maxDate={new Date()}
-              closeOnClickOutside={true}
-            />
+            {calendarOpen && (
+              <Suspense
+                fallback={(
+                  <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+                  </div>
+                )}
+              >
+                <CalendarPicker
+                  isOpen={calendarOpen}
+                  onClose={() => setCalendarOpen(false)}
+                  selectedDate={selectedDate}
+                  onDateSelect={(date) => {
+                    setSelectedDate(date);
+                    const pad = (n: number) => String(n).padStart(2, "0");
+                    const dateStr = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+                    const timeStr = `${pad(selectedTime.hours)}:${pad(selectedTime.minutes)}:00`;
+                    setOccurredAt(`${dateStr}T${timeStr}`);
+                    setCalendarOpen(false);
+                  }}
+                  maxDate={new Date()}
+                  closeOnClickOutside={true}
+                />
+              </Suspense>
+            )}
 
             {/* Time Picker Modal */}
             {timePickerOpen && (
@@ -427,7 +441,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             <div className="flex gap-2 pt-3">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-xl transition-colors hover:bg-white/[0.06] bg-white/[0.03] border border-white/20"
+                className="flex-1 py-2 text-[11px] font-medium text-white/70 rounded-xl transition-colors hover:bg-white/6 bg-white/3 border border-white/20"
               >
                 Cancel
               </button>
@@ -457,8 +471,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
       {/* Delete Confirmation Modal */}
       {tileToDelete && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[240px] rounded-xl border border-white/20 p-4 text-center bg-black">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+          <div className="w-full max-w-60 rounded-xl border border-white/20 p-4 text-center bg-black">
             <div
               className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: tileToDelete.color }}
