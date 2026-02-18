@@ -1,9 +1,13 @@
 import type { FC } from "react";
 import { lazy, Suspense } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, BarChart3, User, List, Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
+import { Home, BarChart3, List, Plus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
+const FooterToolsPanel = lazy(() => import("./FooterToolsPanel"));
+const FooterProfileIcon = lazy(() =>
+  import("./FooterLazyIcons").then((module) => ({ default: module.FooterProfileIcon }))
+);
 import Api from "../routeWrapper/Api";
 const Calculator = lazy(() =>
   import("../utils/UI/Calculator").then((module) => ({
@@ -175,7 +179,9 @@ const Footer: FC = () => {
                   className="w-7 h-7 rounded-full object-cover"
                 />
               ) : (
-                <User size={16} />
+                <Suspense fallback={<span className="w-4 h-4" aria-hidden="true" />}>
+                  <FooterProfileIcon />
+                </Suspense>
               )}
               <span className="text-[10px] font-medium">Profile</span>
             </NavLink>
@@ -197,84 +203,35 @@ const Footer: FC = () => {
       </nav>
 
       {isToolsOpen && (
-        <div className="fixed bottom-22 left-1/2 -translate-x-1/2 z-50 w-[92vw] max-w-sm">
-          <div className="rounded-2xl border border-white/15 bg-white/6 backdrop-blur-xl p-3 shadow-2xl">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  setShowAddExpense(true);
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                  <Plus size={14} className="text-white/80" />
-                </span>
-                Add Expense
-              </button>
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  setIsCalculatorOpen(true);
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                  <CalculatorIcon size={14} className="text-white/80" />
-                </span>
-                Calculator
-              </button>
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  alert("PDF download coming soon!");
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                  <FileDown size={14} className="text-white/80" />
-                </span>
-                PDF Report
-              </button>
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  alert("Excel export coming soon!");
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                  <FileSpreadsheet size={14} className="text-white/80" />
-                </span>
-                Export Excel
-              </button>
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  navigate("/settings");
-                }}
-                className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/4 px-3 py-2 text-[11px] text-white/80 hover:bg-white/8 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                  <Settings size={14} className="text-white/80" />
-                </span>
-                Settings
-              </button>
-              <button
-                onClick={() => {
-                  setIsToolsOpen(false);
-                  handleLogout();
-                }}
-                className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-300 hover:bg-red-500/20 transition-colors"
-              >
-                <span className="w-7 h-7 rounded-lg bg-red-500/20 flex items-center justify-center">
-                  <LogOut size={14} className="text-red-300" />
-                </span>
-                {isLoggingOut ? "Logging out..." : "Logout"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={null}>
+          <FooterToolsPanel
+            isLoggingOut={isLoggingOut}
+            onAddExpense={() => {
+              setIsToolsOpen(false);
+              setShowAddExpense(true);
+            }}
+            onCalculator={() => {
+              setIsToolsOpen(false);
+              setIsCalculatorOpen(true);
+            }}
+            onPdf={() => {
+              setIsToolsOpen(false);
+              alert("PDF download coming soon!");
+            }}
+            onExcel={() => {
+              setIsToolsOpen(false);
+              alert("Excel export coming soon!");
+            }}
+            onSettings={() => {
+              setIsToolsOpen(false);
+              navigate("/settings");
+            }}
+            onLogout={() => {
+              setIsToolsOpen(false);
+              handleLogout();
+            }}
+          />
+        </Suspense>
       )}
 
       {showAddExpense && (

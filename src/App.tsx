@@ -8,7 +8,7 @@ const AnalyticsLazy = lazy(() => import("./Components/Analytics"));
 const TransactionsLazy = lazy(() => import("./Components/Transactions"));
 const Profile = lazy(() => import("./Components/Profile"));
 const Settings = lazy(() => import("./Components/Settings"));
-import Login from "./Components/Login";
+const Login = lazy(() => import("./Components/Login"));
 const PublicProfile = lazy(() => import("./Components/PublicProfile"));
 const FollowListPage = lazy(() => import("./Components/FollowListPage"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
@@ -25,7 +25,14 @@ const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={(
+              <Suspense fallback={routeFallback}>
+                <Login />
+              </Suspense>
+            )}
+          />
 
           {/* Protected */}
           <Route element={<ProtectedRoute />}>
