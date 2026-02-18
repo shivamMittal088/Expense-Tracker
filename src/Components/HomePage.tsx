@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from "react";
-import AddExpenseModal from "./AddExpenseModal";
+const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
 import ExpenseHeatmap from "./ExpenseHeatmap";
@@ -331,10 +331,20 @@ export default function ExpenseTrackerHome() {
         />
       </Suspense>
 
-      <AddExpenseModal
-        open={showAddExpense}
-        onClose={() => setShowAddExpense(false)}
-      />
+      {showAddExpense && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <AddExpenseModal
+            open={showAddExpense}
+            onClose={() => setShowAddExpense(false)}
+          />
+        </Suspense>
+      )}
 
     </div>
   );

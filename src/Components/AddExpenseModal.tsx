@@ -12,7 +12,7 @@ const TimePicker = lazy(() =>
     default: module.TimePicker,
   }))
 );
-import AddTileModal from "./AddTileModal";
+const AddTileModal = lazy(() => import("./AddTileModal"));
 import { AxiosError } from "axios";
 
 interface ApiErrorResponse {
@@ -458,16 +458,26 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       </div>
 
       {/* Add Tile Modal */}
-      <AddTileModal
-        open={addTileOpen}
-        onClose={() => setAddTileOpen(false)}
-        onAdded={() => {
-          // Refresh tiles after adding new one
-          Api.get<Tile[]>("/api/tiles")
-            .then(({ data }) => setTiles(data))
-            .catch(() => {});
-        }}
-      />
+      {addTileOpen && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <AddTileModal
+            open={addTileOpen}
+            onClose={() => setAddTileOpen(false)}
+            onAdded={() => {
+              // Refresh tiles after adding new one
+              Api.get<Tile[]>("/api/tiles")
+                .then(({ data }) => setTiles(data))
+                .catch(() => {});
+            }}
+          />
+        </Suspense>
+      )}
 
       {/* Delete Confirmation Modal */}
       {tileToDelete && (
