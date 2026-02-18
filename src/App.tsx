@@ -5,7 +5,7 @@ import { store } from "./store/store";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
 const AnalyticsLazy = lazy(() => import("./Components/Analytics"));
-import Transactions from "./Components/Transactions";
+const TransactionsLazy = lazy(() => import("./Components/Transactions"));
 const Profile = lazy(() => import("./Components/Profile"));
 const Settings = lazy(() => import("./Components/Settings"));
 import Login from "./Components/Login";
@@ -41,7 +41,11 @@ const App: React.FC = () => {
               />
               <Route
                 path="transactions"
-                element={<Transactions />}
+                element={(
+                  <Suspense fallback={routeFallback}>
+                    <TransactionsLazy />
+                  </Suspense>
+                )}
               />
               <Route
                 path="profile"

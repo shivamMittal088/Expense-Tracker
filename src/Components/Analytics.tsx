@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import api from "../routeWrapper/Api";
-import Transactions from "./Transactions";
 
 type DropdownType = "date" | "payment" | "category" | "amount" | null;
 
@@ -340,8 +339,7 @@ const CATEGORY_COLORS = [
   "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#84cc16"
 ];
 
-const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions" }) => {
-  const isTransactionsOnly = mode === "transactions";
+const Analytics = () => {
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("month");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
@@ -375,9 +373,6 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
 
   // Fetch expenses on mount - using date range endpoint (1 API call instead of 30)
   useEffect(() => {
-    if (isTransactionsOnly) {
-      return;
-    }
     const fetchExpenses = async () => {
       try {
         setLoading(true);
@@ -422,13 +417,10 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
 
     fetchExpenses();
     fetchRecurringPayments();
-  }, [isTransactionsOnly]);
+  }, []);
 
   // Fetch payment breakdown when period changes
   useEffect(() => {
-    if (isTransactionsOnly) {
-      return;
-    }
     const fetchPaymentBreakdown = async () => {
       try {
         setPaymentBreakdownLoading(true);
@@ -444,13 +436,10 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
     };
 
     fetchPaymentBreakdown();
-  }, [isTransactionsOnly, paymentPeriod]);
+  }, [paymentPeriod]);
 
   // Fetch spending trends when view changes
   useEffect(() => {
-    if (isTransactionsOnly) {
-      return;
-    }
     const fetchSpendingTrends = async () => {
       try {
         setTrendsLoading(true);
@@ -467,7 +456,7 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
     };
 
     fetchSpendingTrends();
-  }, [isTransactionsOnly, trendsView]);
+  }, [trendsView]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -583,10 +572,6 @@ const Analytics = ({ mode = "analytics" }: { mode?: "analytics" | "transactions"
   const toggleDropdown = (type: DropdownType) => {
     setOpenDropdown(openDropdown === type ? null : type);
   };
-
-  if (isTransactionsOnly) {
-    return <Transactions />;
-  }
 
   // Loading skeleton
   if (loading) {

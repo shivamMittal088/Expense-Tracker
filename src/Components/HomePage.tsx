@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from "react";
 import { Activity, Plus } from "lucide-react";
-const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
+const loadAddExpenseModal = () => import("./AddExpenseModal");
+const AddExpenseModal = lazy(loadAddExpenseModal);
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
 import ExpenseDay from "./ExpenseDay";
@@ -68,6 +69,34 @@ export default function ExpenseTrackerHome() {
     return localStorage.getItem("showActivity") === "true";
   });
   const dayLimit = 8;
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let idleId: number | null = null;
+
+    const prefetch = () => {
+      void loadAddExpenseModal();
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(() => {
+        prefetch();
+      }, { timeout: 3000 });
+    } else {
+      timeoutId = setTimeout(() => {
+        prefetch();
+      }, 2500);
+    }
+
+    return () => {
+      if (idleId !== null && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
@@ -390,21 +419,23 @@ export default function ExpenseTrackerHome() {
         `}</style>
       </main>
 
-      <Suspense
-        fallback={(
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
-          </div>
-        )}
-      >
-        <CalendarPicker
-          isOpen={isCalendarOpen}
-          onClose={() => setIsCalendarOpen(false)}
-          selectedDate={selectedDate}
-          onDateSelect={handleDateSelect}
-          maxDate={today}
-        />
-      </Suspense>
+      {isCalendarOpen && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <CalendarPicker
+            isOpen={isCalendarOpen}
+            onClose={() => setIsCalendarOpen(false)}
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            maxDate={today}
+          />
+        </Suspense>
+      )}
 
       {showAddExpense && (
         <Suspense
