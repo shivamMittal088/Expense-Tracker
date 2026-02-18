@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Outlet} from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import PeopleSearchModal from "./PeopleSearchModal.tsx";
-import NotificationsModal, { type FollowRequest } from "./NotificationsModal";
+import type { FollowRequest } from "./NotificationsModal";
 import api from "../routeWrapper/Api";
+
+const PeopleSearchModal = lazy(() => import("./PeopleSearchModal"));
+const NotificationsModal = lazy(() => import("./NotificationsModal"));
 
 export default function Layout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -51,7 +53,7 @@ export default function Layout() {
     if (!isNotificationsOpen) return;
     if (notificationRequests !== null) return;
     fetchNotifications();
-  }, [isNotificationsOpen, notificationRequests]);
+  }, [isNotificationsOpen, notificationRequests, fetchNotifications]);
 
   const handleOpenNotifications = () => {
     setIsNotificationsOpen(true);
@@ -83,20 +85,38 @@ export default function Layout() {
       <Footer />
 
       {isSearchOpen && (
-        <PeopleSearchModal
-          open={isSearchOpen}
-          onClose={() => setIsSearchOpen(false)}
-        />
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-70 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <PeopleSearchModal
+            open={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+          />
+        </Suspense>
       )}
-      <NotificationsModal
-        open={isNotificationsOpen}
-        onClose={() => setIsNotificationsOpen(false)}
-        count={notificationRequests?.length || 0}
-        requests={notificationRequests || []}
-        loading={loadingNotifications}
-        onAccept={handleAcceptRequest}
-        onDecline={handleDeclineRequest}
-      />
+      {isNotificationsOpen && (
+        <Suspense
+          fallback={(
+            <div className="fixed inset-0 z-70 flex items-center justify-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-300/25 border-t-emerald-300 animate-spin shadow-[0_0_14px_rgba(52,211,153,0.35)]" />
+            </div>
+          )}
+        >
+          <NotificationsModal
+            open={isNotificationsOpen}
+            onClose={() => setIsNotificationsOpen(false)}
+            count={notificationRequests?.length || 0}
+            requests={notificationRequests || []}
+            loading={loadingNotifications}
+            onAccept={handleAcceptRequest}
+            onDecline={handleDeclineRequest}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
