@@ -83,16 +83,6 @@ const ExpenseDay = ({
                     key={expense._id}
                     className="group flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-3.5 py-3 transition-all hover:border-zinc-700 hover:bg-zinc-900"
                   >
-                    <div
-                      className="relative w-10 h-10 rounded-2xl flex items-center justify-center text-base"
-                      style={{ backgroundColor: `${expense.category.color || "#10b981"}18` }}
-                    >
-                      <span>{expense.category.emoji || "\uD83D\uDCB0"}</span>
-                      <span
-                        className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-black"
-                        style={{ backgroundColor: expense.category.color || "#10b981" }}
-                      />
-                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-white truncate">
                         {expense.category.name}
