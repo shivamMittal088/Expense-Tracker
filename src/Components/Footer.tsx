@@ -24,6 +24,7 @@ const Footer: FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollYRef = useRef(0);
   const scrollRafRef = useRef<number | null>(null);
+  const toolsCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -129,17 +130,32 @@ const Footer: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isToolsOpen) {
-      setIsToolsVisible(true);
-      return;
+    return () => {
+      if (toolsCloseTimerRef.current) {
+        clearTimeout(toolsCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  const openTools = () => {
+    if (toolsCloseTimerRef.current) {
+      clearTimeout(toolsCloseTimerRef.current);
+      toolsCloseTimerRef.current = null;
     }
+    setIsToolsVisible(true);
+    setIsToolsOpen(true);
+  };
 
-    const timeoutId = setTimeout(() => {
+  const closeTools = () => {
+    setIsToolsOpen(false);
+    if (toolsCloseTimerRef.current) {
+      clearTimeout(toolsCloseTimerRef.current);
+    }
+    toolsCloseTimerRef.current = setTimeout(() => {
       setIsToolsVisible(false);
+      toolsCloseTimerRef.current = null;
     }, 180);
-
-    return () => clearTimeout(timeoutId);
-  }, [isToolsOpen]);
+  };
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -162,7 +178,7 @@ const Footer: FC = () => {
           className={`fixed inset-0 z-40 backdrop-blur-[2px] transition-all duration-200 ${
             isToolsOpen ? "bg-black/55 opacity-100" : "bg-black/0 opacity-0"
           }`}
-          onClick={() => setIsToolsOpen(false)}
+          onClick={closeTools}
         />
       )}
 
@@ -200,7 +216,13 @@ const Footer: FC = () => {
 
             {/* Floating Add Button */}
             <button
-              onClick={() => setIsToolsOpen((prev) => !prev)}
+              onClick={() => {
+                if (isToolsOpen) {
+                  closeTools();
+                } else {
+                  openTools();
+                }
+              }}
               className={`rounded-xl w-11 h-11 flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-92 ${
                 isToolsOpen
                   ? "bg-zinc-100 text-black shadow-white/20 ring-2 ring-white/35"
@@ -257,23 +279,23 @@ const Footer: FC = () => {
             isOpen={isToolsOpen}
             isLoggingOut={isLoggingOut}
             onAddExpense={() => {
-              setIsToolsOpen(false);
+              closeTools();
               setShowAddExpense(true);
             }}
             onCalculator={() => {
-              setIsToolsOpen(false);
+              closeTools();
               setIsCalculatorOpen(true);
             }}
             onExcel={() => {
-              setIsToolsOpen(false);
+              closeTools();
               navigate("/exports");
             }}
             onSettings={() => {
-              setIsToolsOpen(false);
+              closeTools();
               navigate("/settings");
             }}
             onLogout={() => {
-              setIsToolsOpen(false);
+              closeTools();
               handleLogout();
             }}
           />

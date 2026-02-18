@@ -1,16 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from "react";
 const loadAddExpenseModal = () => import("./AddExpenseModal");
 const AddExpenseModal = lazy(loadAddExpenseModal);
-const loadHomePageQuickIcons = () => import("./HomePageQuickIcons");
-const HomeQuickAddIcon = lazy(() =>
-  loadHomePageQuickIcons().then((module) => ({ default: module.HomeQuickAddIcon }))
-);
-const HomeActivityIcon = lazy(() =>
-  loadHomePageQuickIcons().then((module) => ({ default: module.HomeActivityIcon }))
-);
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
-import { useIdlePrefetch } from "../hooks/useIdlePrefetch";
 const ExpenseDay = lazy(() => import("./ExpenseDay"));
 import HomeTopBar from "./HomeTopBar.tsx";
 
@@ -75,50 +67,10 @@ export default function ExpenseTrackerHome() {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("showActivity") === "true";
   });
-  const [showIdleIcons, setShowIdleIcons] = useState(false);
   const dayLimit = 8;
 
-  useIdlePrefetch(loadAddExpenseModal, {
-    idleTimeoutMs: 3000,
-    fallbackDelayMs: 2500,
-  });
-
-  useIdlePrefetch(loadHomePageQuickIcons, {
-    idleTimeoutMs: 2200,
-    fallbackDelayMs: 1800,
-  });
-
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let idleId: number | null = null;
-
-    const revealIcons = () => {
-      setShowIdleIcons(true);
-    };
-
-    const browserWindow = window as Window & {
-      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-
-    if (browserWindow.requestIdleCallback) {
-      idleId = browserWindow.requestIdleCallback(() => {
-        revealIcons();
-      }, { timeout: 2200 });
-    } else {
-      timeoutId = setTimeout(() => {
-        revealIcons();
-      }, 1800);
-    }
-
-    return () => {
-      if (idleId !== null) {
-        browserWindow.cancelIdleCallback?.(idleId);
-      }
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
+  const prefetchAddExpenseModal = useCallback(() => {
+    void loadAddExpenseModal();
   }, []);
 
   const today = new Date();
@@ -326,13 +278,7 @@ export default function ExpenseTrackerHome() {
               <li className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3.5 flex items-center justify-between gap-2 transition-colors hover:border-zinc-700">
                 <div className="flex items-center gap-3">
                   <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
-                    {showIdleIcons ? (
-                      <Suspense fallback={<span className="w-4 h-4" aria-hidden="true" />}>
-                        <HomeQuickAddIcon />
-                      </Suspense>
-                    ) : (
-                      <span className="w-4 h-4" aria-hidden="true" />
-                    )}
+                    <span className="text-base leading-none">+</span>
                   </span>
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">Quick Add</p>
@@ -340,6 +286,9 @@ export default function ExpenseTrackerHome() {
                   </div>
                 </div>
                 <button
+                  onMouseEnter={prefetchAddExpenseModal}
+                  onFocus={prefetchAddExpenseModal}
+                  onTouchStart={prefetchAddExpenseModal}
                   onClick={() => setShowAddExpense(true)}
                   className="h-9 min-w-16 rounded-lg bg-white text-black px-3 text-[11px] font-semibold hover:bg-white/90 transition-all active:scale-95"
                   aria-label="Add expense"
@@ -351,13 +300,7 @@ export default function ExpenseTrackerHome() {
               <li className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3.5 flex items-center justify-between gap-2 transition-colors hover:border-zinc-700">
                 <div className="flex items-center gap-3">
                   <span className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center">
-                    {showIdleIcons ? (
-                      <Suspense fallback={<span className="w-4 h-4" aria-hidden="true" />}>
-                        <HomeActivityIcon />
-                      </Suspense>
-                    ) : (
-                      <span className="w-4 h-4" aria-hidden="true" />
-                    )}
+                    <span className="text-xs font-semibold">#</span>
                   </span>
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">Activity</p>
