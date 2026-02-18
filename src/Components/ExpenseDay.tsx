@@ -87,14 +87,6 @@ const ExpenseDay = ({
                       <p className="text-sm font-semibold text-white truncate">
                         {expense.category.name}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] uppercase tracking-wide text-zinc-300 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-full">
-                          {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
-                        </span>
-                        <span className="text-[11px] text-zinc-500 truncate">
-                          {expense.notes || "No notes"}
-                        </span>
-                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-white">
