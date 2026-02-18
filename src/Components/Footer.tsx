@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { lazy, Suspense } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Home, BarChart3, User, List, Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 const AddExpenseModal = lazy(() => import("./AddExpenseModal"));
 import Api from "../routeWrapper/Api";
 const Calculator = lazy(() =>
@@ -17,7 +17,8 @@ const Footer: FC = () => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
+  const scrollRafRef = useRef<number | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -31,22 +32,52 @@ const Footer: FC = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Show footer when scrolling up, hide when scrolling down
-      if (currentScrollY < lastScrollY || currentScrollY < 50) {
-        setIsVisible(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        setIsVisible(false);
+    const scrollContainer = document.getElementById("app-scroll-container");
+    const scrollTarget: HTMLElement | Window = scrollContainer || window;
+
+    const getCurrentScrollY = () => {
+      if (scrollTarget instanceof HTMLElement) {
+        return scrollTarget.scrollTop;
       }
-      
-      setLastScrollY(currentScrollY);
+      return window.scrollY;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    const handleScroll = () => {
+      if (scrollRafRef.current !== null) {
+        return;
+      }
+
+      scrollRafRef.current = window.requestAnimationFrame(() => {
+        const currentScrollY = getCurrentScrollY();
+        const previousScrollY = lastScrollYRef.current;
+
+        setIsVisible((prevIsVisible) => {
+          if (currentScrollY < previousScrollY || currentScrollY < 50) {
+            return true;
+          }
+          if (currentScrollY > previousScrollY && currentScrollY > 50) {
+            return false;
+          }
+          return prevIsVisible;
+        });
+
+        lastScrollYRef.current = currentScrollY;
+        scrollRafRef.current = null;
+      });
+    };
+
+    scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Sync baseline when component mounts
+    lastScrollYRef.current = getCurrentScrollY();
+
+    return () => {
+      scrollTarget.removeEventListener('scroll', handleScroll);
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -139,6 +170,8 @@ const Footer: FC = () => {
                 <img
                   src={profilePhotoUrl}
                   alt="Profile"
+                  loading="lazy"
+                  decoding="async"
                   className="w-7 h-7 rounded-full object-cover"
                 />
               ) : (

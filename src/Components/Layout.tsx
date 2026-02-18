@@ -31,8 +31,39 @@ export default function Layout() {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (notificationRequests !== null) return;
+
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let idleId: number | null = null;
+
+    const scheduleFetch = () => {
+      fetchNotifications();
+    };
+
+    const browserWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (browserWindow.requestIdleCallback) {
+      idleId = browserWindow.requestIdleCallback(() => {
+        scheduleFetch();
+      }, { timeout: 3000 });
+    } else {
+      timeoutId = setTimeout(() => {
+        scheduleFetch();
+      }, 2000);
+    }
+
+    return () => {
+      if (idleId !== null) {
+        browserWindow.cancelIdleCallback?.(idleId);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [fetchNotifications, notificationRequests]);
 
   useEffect(() => {
     const seedKey = "seedTilesOnce";
@@ -78,7 +109,7 @@ export default function Layout() {
       />
 
       {/* This is the scrollable area */}
-      <div className="flex-1 overflow-y-auto">
+      <div id="app-scroll-container" className="flex-1 overflow-y-auto">
         <Outlet />
       </div>
 
