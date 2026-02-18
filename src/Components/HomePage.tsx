@@ -4,6 +4,7 @@ const loadAddExpenseModal = () => import("./AddExpenseModal");
 const AddExpenseModal = lazy(loadAddExpenseModal);
 import api from "../routeWrapper/Api"; // axios instance with auth token
 import { useAppSelector } from "../store/hooks";
+import { useIdlePrefetch } from "../hooks/useIdlePrefetch";
 import ExpenseDay from "./ExpenseDay";
 import HomeTopBar from "./HomeTopBar.tsx";
 
@@ -70,33 +71,10 @@ export default function ExpenseTrackerHome() {
   });
   const dayLimit = 8;
 
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let idleId: number | null = null;
-
-    const prefetch = () => {
-      void loadAddExpenseModal();
-    };
-
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(() => {
-        prefetch();
-      }, { timeout: 3000 });
-    } else {
-      timeoutId = setTimeout(() => {
-        prefetch();
-      }, 2500);
-    }
-
-    return () => {
-      if (idleId !== null && typeof window !== "undefined" && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, []);
+  useIdlePrefetch(loadAddExpenseModal, {
+    idleTimeoutMs: 3000,
+    fallbackDelayMs: 2500,
+  });
 
   const today = new Date();
   const isToday = selectedDate.toDateString() === today.toDateString();
