@@ -89,13 +89,42 @@ const Footer: FC = () => {
       return;
     }
 
-    Api.get("/api/profile/view")
-      .then(({ data }) => {
-        setProfilePhotoUrl(getFullPhotoURL(data?.photoURL));
-      })
-      .catch(() => {
-        setProfilePhotoUrl(null);
-      });
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let idleId: number | null = null;
+
+    const fetchProfilePhoto = () => {
+      Api.get("/api/profile/view")
+        .then(({ data }) => {
+          setProfilePhotoUrl(getFullPhotoURL(data?.photoURL));
+        })
+        .catch(() => {
+          setProfilePhotoUrl(null);
+        });
+    };
+
+    const browserWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (browserWindow.requestIdleCallback) {
+      idleId = browserWindow.requestIdleCallback(() => {
+        fetchProfilePhoto();
+      }, { timeout: 3500 });
+    } else {
+      timeoutId = setTimeout(() => {
+        fetchProfilePhoto();
+      }, 2000);
+    }
+
+    return () => {
+      if (idleId !== null) {
+        browserWindow.cancelIdleCallback?.(idleId);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   const handleLogout = async () => {

@@ -71,13 +71,42 @@ export default function Layout() {
       return;
     }
 
-    api.post("/api/seed/tiles")
-      .then(() => {
-        localStorage.setItem(seedKey, "true");
-      })
-      .catch(() => {
-        // Ignore failures to avoid blocking app load.
-      });
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let idleId: number | null = null;
+
+    const runSeed = () => {
+      api.post("/api/seed/tiles")
+        .then(() => {
+          localStorage.setItem(seedKey, "true");
+        })
+        .catch(() => {
+          // Ignore failures to avoid blocking app load.
+        });
+    };
+
+    const browserWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (browserWindow.requestIdleCallback) {
+      idleId = browserWindow.requestIdleCallback(() => {
+        runSeed();
+      }, { timeout: 5000 });
+    } else {
+      timeoutId = setTimeout(() => {
+        runSeed();
+      }, 3000);
+    }
+
+    return () => {
+      if (idleId !== null) {
+        browserWindow.cancelIdleCallback?.(idleId);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   useEffect(() => {
