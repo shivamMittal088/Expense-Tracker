@@ -14,16 +14,24 @@ export default function Layout() {
   const [notificationRequests, setNotificationRequests] = useState<FollowRequest[] | null>(null);
   const loadingNotifications = isNotificationsOpen && notificationRequests === null;
   const notificationsInFlight = useRef(false);
+  const notificationsRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchNotifications = useCallback(() => {
+  const fetchNotifications = useCallback(function loadNotifications() {
     if (notificationsInFlight.current) return;
     notificationsInFlight.current = true;
+    if (notificationsRetryTimer.current) {
+      clearTimeout(notificationsRetryTimer.current);
+      notificationsRetryTimer.current = null;
+    }
+
     api.get("/api/profile/follow-requests")
       .then((res) => {
         setNotificationRequests(res.data?.requests || []);
       })
       .catch(() => {
-        setNotificationRequests([]);
+        notificationsRetryTimer.current = setTimeout(() => {
+          loadNotifications();
+        }, 4000);
       })
       .finally(() => {
         notificationsInFlight.current = false;
@@ -111,9 +119,28 @@ export default function Layout() {
 
   useEffect(() => {
     if (!isNotificationsOpen) return;
-    if (notificationRequests !== null) return;
     fetchNotifications();
-  }, [isNotificationsOpen, notificationRequests, fetchNotifications]);
+  }, [isNotificationsOpen, fetchNotifications]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        fetchNotifications();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+      if (notificationsRetryTimer.current) {
+        clearTimeout(notificationsRetryTimer.current);
+        notificationsRetryTimer.current = null;
+      }
+    };
+  }, [fetchNotifications]);
 
   const handleOpenNotifications = () => {
     setIsNotificationsOpen(true);
