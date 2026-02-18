@@ -6,7 +6,7 @@ import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
 const AnalyticsLazy = lazy(() => import("./Components/Analytics"));
 import Transactions from "./Components/Transactions";
-import Profile from "./Components/Profile";
+const Profile = lazy(() => import("./Components/Profile"));
 const Settings = lazy(() => import("./Components/Settings"));
 import Login from "./Components/Login";
 const PublicProfile = lazy(() => import("./Components/PublicProfile"));
@@ -43,7 +43,14 @@ const App: React.FC = () => {
                 path="transactions"
                 element={<Transactions />}
               />
-              <Route path="profile" element={<Profile />} />
+              <Route
+                path="profile"
+                element={(
+                  <Suspense fallback={routeFallback}>
+                    <Profile />
+                  </Suspense>
+                )}
+              />
               <Route
                 path="profile/followers"
                 element={(
