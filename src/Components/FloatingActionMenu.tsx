@@ -44,7 +44,7 @@ const FloatingActionMenu = () => {
       return;
     }
     if (action === "excel") {
-      alert("Excel export coming soon!");
+      navigate("/exports");
       return;
     }
     if (action === "settings") {

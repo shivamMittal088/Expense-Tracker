@@ -94,8 +94,8 @@ const Footer: FC = () => {
 
     const fetchProfilePhoto = () => {
       Api.get("/api/profile/view")
-        .then(({ data }) => {
-          setProfilePhotoUrl(getFullPhotoURL(data?.photoURL));
+        .then((response) => {
+          setProfilePhotoUrl(getFullPhotoURL(response.data?.photoURL));
         })
         .catch(() => {
           setProfilePhotoUrl(null);
@@ -145,7 +145,7 @@ const Footer: FC = () => {
     <>
       {isToolsOpen && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px]"
           onClick={() => setIsToolsOpen(false)}
         />
       )}
@@ -185,7 +185,11 @@ const Footer: FC = () => {
             {/* Floating Add Button */}
             <button
               onClick={() => setIsToolsOpen((prev) => !prev)}
-              className="bg-white text-black rounded-xl w-11 h-11 flex items-center justify-center shadow-lg shadow-black/60 transition-all hover:scale-105 active:scale-92"
+              className={`rounded-xl w-11 h-11 flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-92 ${
+                isToolsOpen
+                  ? "bg-zinc-100 text-black shadow-white/20 ring-2 ring-white/35"
+                  : "bg-white text-black shadow-black/60"
+              }`}
               aria-label="Open tools"
             >
               <Plus size={20} strokeWidth={2.5} className={`transition-transform ${isToolsOpen ? "rotate-45" : "rotate-0"}`} />
@@ -243,13 +247,9 @@ const Footer: FC = () => {
               setIsToolsOpen(false);
               setIsCalculatorOpen(true);
             }}
-            onPdf={() => {
-              setIsToolsOpen(false);
-              alert("PDF download coming soon!");
-            }}
             onExcel={() => {
               setIsToolsOpen(false);
-              alert("Excel export coming soon!");
+              navigate("/exports");
             }}
             onSettings={() => {
               setIsToolsOpen(false);

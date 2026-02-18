@@ -9,6 +9,7 @@ const TransactionsLazy = lazy(() => import("./Components/Transactions"));
 const Profile = lazy(() => import("./Components/Profile"));
 const Settings = lazy(() => import("./Components/Settings"));
 const Login = lazy(() => import("./Components/Login"));
+const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
 const PublicProfile = lazy(() => import("./Components/PublicProfile"));
 const FollowListPage = lazy(() => import("./Components/FollowListPage"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
@@ -91,6 +92,14 @@ const App: React.FC = () => {
                 element={(
                   <Suspense fallback={routeFallback}>
                     <Settings />
+                  </Suspense>
+                )}
+              />
+              <Route
+                path="exports"
+                element={(
+                  <Suspense fallback={routeFallback}>
+                    <ExportExcelPage />
                   </Suspense>
                 )}
               />

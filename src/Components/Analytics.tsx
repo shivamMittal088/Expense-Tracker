@@ -5,9 +5,6 @@ import {
   Tag, 
   IndianRupee, 
   X, 
-  TrendingUp, 
-  TrendingDown,
-  Wallet,
   ArrowUpRight,
   ArrowDownRight,
   BarChart3,
@@ -76,64 +73,6 @@ type SpendingTrendsSummary = {
   lowestPeriod: SpendingTrend;
   trendPercentage: number;
   trendDirection: "up" | "down" | "flat";
-};
-
-// Stat Card Component
-const StatCard = ({
-  icon: Icon,
-  label,
-  value,
-  subValue,
-  trend,
-  color = "emerald",
-  delay = 0,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  subValue?: string;
-  trend?: { value: number; isPositive: boolean };
-  color?: "emerald" | "violet" | "amber" | "rose";
-  delay?: number;
-}) => {
-  const colorClasses = {
-    emerald: "from-emerald-500/20 to-emerald-500/5 border-emerald-500/20 text-emerald-400",
-    violet: "from-violet-500/20 to-violet-500/5 border-violet-500/20 text-violet-400",
-    amber: "from-amber-500/20 to-amber-500/5 border-amber-500/20 text-amber-400",
-    rose: "from-rose-500/20 to-rose-500/5 border-rose-500/20 text-rose-400",
-  };
-
-  const iconBgClasses = {
-    emerald: "bg-emerald-500/20 text-emerald-400",
-    violet: "bg-violet-500/20 text-violet-400",
-    amber: "bg-amber-500/20 text-amber-400",
-    rose: "bg-rose-500/20 text-rose-400",
-  };
-
-  return (
-    <div
-      className={`relative overflow-hidden rounded-lg bg-linear-to-br ${colorClasses[color]} border backdrop-blur-xl p-2.5 transition-all duration-500 hover:scale-[1.01] hover:shadow-lg hover:shadow-${color}-500/10`}
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-start justify-between mb-1.5">
-        <div className={`p-1 rounded-md ${iconBgClasses[color]}`}>
-          <Icon size={14} strokeWidth={2} />
-        </div>
-        {trend && (
-          <div className={`flex items-center gap-0.5 text-[9px] font-medium ${trend.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-            {trend.isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
-            {Math.abs(trend.value)}%
-          </div>
-        )}
-      </div>
-      <p className="text-zinc-400 text-[10px] font-medium mb-0.5">{label}</p>
-      <p className="text-white text-base font-bold tracking-tight">{value}</p>
-      {subValue && <p className="text-zinc-500 text-[9px] mt-0.5">{subValue}</p>}
-      
-      {/* Decorative glow */}
-      <div className={`absolute -top-8 -right-8 w-16 h-16 bg-${color}-500/10 rounded-full blur-2xl`} />
-    </div>
-  );
 };
 
 // Donut Chart Component
