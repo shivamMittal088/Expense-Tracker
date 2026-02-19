@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="../Backend/docs/images/readme-banner-small.svg" alt="Expense Tracker Banner" width="760"/>
+<img src="./docs/images/readme-banner-small.svg" alt="Expense Tracker Banner" width="760"/>
 
 ### Mobile-first expense tracking with social features and analytics
 
@@ -45,14 +45,14 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 ### 🏠 Home → Quick Actions
 
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-home.png" width="230" alt="Mobile Home"/>
+  <img src="./docs/images/mobile-home.png" width="230" alt="Mobile Home"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-home-4.png" width="230" alt="Mobile Home 4"/>
+  <img src="./docs/images/mobile-home-4.png" width="230" alt="Mobile Home 4"/>
 </p>
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-add-expense-1.png" width="230" alt="Mobile Add Expense 1"/>
+  <img src="./docs/images/mobile-add-expense-1.png" width="230" alt="Mobile Add Expense 1"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-add-expense-2.png" width="230" alt="Mobile Add Expense 2"/>
+  <img src="./docs/images/mobile-add-expense-2.png" width="230" alt="Mobile Add Expense 2"/>
 </p>
 
 ---
@@ -60,11 +60,11 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 ### 📈 Analytics → 💸 Transactions
 
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-analytics-1.png" width="220" alt="Mobile Analytics 1"/>
+  <img src="./docs/images/mobile-analytics-1.png" width="220" alt="Mobile Analytics 1"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-analytics-2.png" width="220" alt="Mobile Analytics 2"/>
+  <img src="./docs/images/mobile-analytics-2.png" width="220" alt="Mobile Analytics 2"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-transactions.png" width="220" alt="Mobile Transactions"/>
+  <img src="./docs/images/mobile-transactions.png" width="220" alt="Mobile Transactions"/>
 </p>
 
 ---
@@ -72,7 +72,7 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 ### 🪵 Axiom Logging
 
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-axiom-logging.png" width="920" alt="Axiom Logging Dashboard"/>
+  <img src="./docs/images/mobile-axiom-logging.png" width="920" alt="Axiom Logging Dashboard"/>
 </p>
 
 ---
@@ -80,14 +80,14 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 ### 👤 Profile → 📤 Export
 
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-profile.png" width="220" alt="Mobile Profile"/>
+  <img src="./docs/images/mobile-profile.png" width="220" alt="Mobile Profile"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-public-profile.png" width="220" alt="Mobile Public Profile"/>
+  <img src="./docs/images/mobile-public-profile.png" width="220" alt="Mobile Public Profile"/>
 </p>
 <p align="center">
-  <img src="../Backend/expense-tracker-screenshot/mobile-public-profile-2.png" width="220" alt="Mobile Public Profile 2"/>
+  <img src="./docs/images/mobile-public-profile-2.png" width="220" alt="Mobile Public Profile 2"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="../Backend/expense-tracker-screenshot/mobile-export.png" width="220" alt="Mobile Export"/>
+  <img src="./docs/images/mobile-export.png" width="220" alt="Mobile Export"/>
 </p>
 
 ---
