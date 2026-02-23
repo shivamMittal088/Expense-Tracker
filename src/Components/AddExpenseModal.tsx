@@ -2,6 +2,8 @@ import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock
 import { useEffect, useState, lazy, Suspense } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
+import { useAppDispatch } from "../store/hooks";
+import { addTodayTransaction, getLocalDateKey, type TodayTransaction } from "../store/slices/todayTransactionsSlice";
 const CalendarPicker = lazy(() =>
   import("../utils/UI/CalendarPicker").then((module) => ({
     default: module.CalendarPicker,
@@ -41,6 +43,7 @@ const paymentModes = [
 ];
 
 export default function AddExpenseModal({ open, onClose }: Props) {
+  const dispatch = useAppDispatch();
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [loadingTiles, setLoadingTiles] = useState(true);
 
@@ -71,6 +74,19 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     next.setHours(time.hours, time.minutes, 0, 0);
     return next.toISOString();
   };
+
+  const normalizeExpense = (raw: Record<string, any>): TodayTransaction => ({
+    _id: raw._id,
+    amount: Number(raw.amount || 0),
+    category: {
+      name: raw.category?.name || "Other",
+      color: raw.category?.color || "#CCCCCC",
+      emoji: raw.category?.emoji || "✨",
+    },
+    notes: raw.notes || "",
+    occurredAt: raw.occurredAt || raw.occuredAt || raw.createdAt || new Date().toISOString(),
+    payment_mode: raw.payment_mode || "cash",
+  });
 
   const handleDeleteTile = (tile: Tile, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -153,6 +169,15 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           tzOffsetMinutes: new Date().getTimezoneOffset(),
         },
       });
+
+      const createdExpense = data?.data;
+      const occurredAtForDate = createdExpense?.occurredAt || payload.occurredAt;
+      const createdDateKey = getLocalDateKey(occurredAtForDate);
+      const todayDateKey = getLocalDateKey(new Date());
+      if (createdExpense && createdDateKey === todayDateKey) {
+        dispatch(addTodayTransaction({ dateKey: todayDateKey, item: normalizeExpense(createdExpense) }));
+      }
+
       showTopToast(data?.message || "Expense added successfully", { duration: 2000 });
 
       setAmount("");

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } fro
 const loadAddExpenseModal = () => import("./AddExpenseModal");
 const AddExpenseModal = lazy(loadAddExpenseModal);
 import api from "../routeWrapper/Api"; // axios instance with auth token
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { setTodayTransactions } from "../store/slices/todayTransactionsSlice";
 const ExpenseDay = lazy(() => import("./ExpenseDay"));
 import HomeTopBar from "./HomeTopBar.tsx";
 
@@ -51,7 +52,10 @@ type RibbonDay = {
 };
 
 export default function ExpenseTrackerHome() {
+  const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
+  const isLoggedIn = useAppSelector((state) => state.user.isAuthenticated);
+  const todayTransactionsState = useAppSelector((state) => state.todayTransactions);
   
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -110,6 +114,7 @@ export default function ExpenseTrackerHome() {
   };
 
   const apiDate = getFormattedDate(selectedDate);
+  const todayDateKey = getFormattedDate(today);
 
   const handleRibbonSelect = (date: Date) => {
     setDayPage(1);
@@ -143,7 +148,18 @@ export default function ExpenseTrackerHome() {
   // Abort controller ref for cancelling in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchExpenses = useCallback(async () => {
+  const applyTodayStateToView = useCallback((items: Expense[], hiddenCount: number) => {
+    const pagedItems = items.slice((dayPage - 1) * dayLimit, dayPage * dayLimit);
+    const totalAmount = items.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+
+    setVisibleTotal(totalAmount);
+    setDayExpenses(pagedItems);
+    setDayTotalCount(items.length);
+    setDayTotalAmount(totalAmount);
+    setDayHiddenCount(hiddenCount);
+  }, [dayLimit, dayPage]);
+
+  const fetchNonTodayExpenses = useCallback(async () => {
     // Cancel any previous in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -190,6 +206,41 @@ export default function ExpenseTrackerHome() {
     }
   }, [apiDate, dayLimit, dayPage]);
 
+  const fetchAllTodayExpenses = useCallback(async () => {
+    const limit = 200;
+    let page = 1;
+    let totalCount = 0;
+    let hiddenCount = 0;
+    const allItems: RawExpense[] = [];
+
+    while (true) {
+      const res = await api.get(`/api/expense/${todayDateKey}`, {
+        params: {
+          tzOffsetMinutes: new Date().getTimezoneOffset(),
+          page,
+          limit,
+        },
+      });
+
+      const pageItems: RawExpense[] = res.data?.data || [];
+      const meta = res.data?.meta || {};
+      totalCount = Number(meta.totalCount || 0);
+      hiddenCount = Number(meta.hiddenCount || 0);
+
+      allItems.push(...pageItems);
+
+      if (allItems.length >= totalCount || pageItems.length < limit) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    const normalized = normalizeExpenses(allItems);
+    dispatch(setTodayTransactions({ dateKey: todayDateKey, items: normalized, hiddenCount }));
+    applyTodayStateToView(normalized, hiddenCount);
+  }, [applyTodayStateToView, dispatch, todayDateKey]);
+
   // Debounce API calls when date changes rapidly
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -199,7 +250,33 @@ export default function ExpenseTrackerHome() {
     }
 
     debounceRef.current = setTimeout(() => {
-      fetchExpenses();
+      if (apiDate === todayDateKey) {
+        if (!isLoggedIn) {
+          setVisibleTotal(0);
+          setDayExpenses([]);
+          setDayTotalCount(0);
+          setDayTotalAmount(0);
+          setDayHiddenCount(0);
+          return;
+        }
+
+        if (todayTransactionsState.isLoaded && todayTransactionsState.dateKey === todayDateKey) {
+          applyTodayStateToView(todayTransactionsState.items, todayTransactionsState.hiddenCount);
+          return;
+        }
+
+        fetchAllTodayExpenses().catch((err) => {
+          console.error("Failed to load today's expenses", err);
+          setVisibleTotal(0);
+          setDayExpenses([]);
+          setDayTotalCount(0);
+          setDayTotalAmount(0);
+          setDayHiddenCount(0);
+        });
+        return;
+      }
+
+      fetchNonTodayExpenses();
     }, 250);
 
     return () => {
@@ -207,11 +284,42 @@ export default function ExpenseTrackerHome() {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [fetchExpenses]);
+  }, [
+    apiDate,
+    applyTodayStateToView,
+    fetchAllTodayExpenses,
+    fetchNonTodayExpenses,
+    isLoggedIn,
+    todayDateKey,
+    todayTransactionsState.dateKey,
+    todayTransactionsState.hiddenCount,
+    todayTransactionsState.isLoaded,
+    todayTransactionsState.items,
+  ]);
+
+  useEffect(() => {
+    if (apiDate !== todayDateKey) return;
+    if (!todayTransactionsState.isLoaded || todayTransactionsState.dateKey !== todayDateKey) return;
+    applyTodayStateToView(todayTransactionsState.items, todayTransactionsState.hiddenCount);
+  }, [
+    apiDate,
+    applyTodayStateToView,
+    todayDateKey,
+    todayTransactionsState.dateKey,
+    todayTransactionsState.hiddenCount,
+    todayTransactionsState.isLoaded,
+    todayTransactionsState.items,
+  ]);
 
   useEffect(() => {
     const handleExpenseAdded = () => {
-      fetchExpenses();
+      if (apiDate === todayDateKey) {
+        if (todayTransactionsState.isLoaded && todayTransactionsState.dateKey === todayDateKey) {
+          applyTodayStateToView(todayTransactionsState.items, todayTransactionsState.hiddenCount);
+        }
+      } else {
+        fetchNonTodayExpenses();
+      }
       setRibbonRefreshKey((prev) => prev + 1);
     };
 
@@ -221,7 +329,16 @@ export default function ExpenseTrackerHome() {
       window.removeEventListener("expense:added", handleExpenseAdded as EventListener);
       window.removeEventListener("expense:changed", handleExpenseAdded as EventListener);
     };
-  }, [fetchExpenses]);
+  }, [
+    apiDate,
+    applyTodayStateToView,
+    fetchNonTodayExpenses,
+    todayDateKey,
+    todayTransactionsState.dateKey,
+    todayTransactionsState.hiddenCount,
+    todayTransactionsState.isLoaded,
+    todayTransactionsState.items,
+  ]);
 
   useEffect(() => {
     const fetchRibbonData = async () => {
@@ -381,7 +498,13 @@ export default function ExpenseTrackerHome() {
             hiddenCount={dayHiddenCount}
             totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
             onPageChange={setDayPage}
-            onExpenseHidden={fetchExpenses}
+            onExpenseHidden={() => {
+              if (apiDate === todayDateKey) {
+                applyTodayStateToView(todayTransactionsState.items, todayTransactionsState.hiddenCount);
+                return;
+              }
+              return fetchNonTodayExpenses();
+            }}
           />
         </Suspense>
 

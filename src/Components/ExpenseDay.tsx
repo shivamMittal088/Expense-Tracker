@@ -2,6 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, X } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
+import { useAppDispatch } from "../store/hooks";
+import {
+  getLocalDateKey,
+  hideTodayTransaction,
+  restoreTodayTransaction,
+  updateTodayTransaction,
+  type TodayTransaction,
+} from "../store/slices/todayTransactionsSlice";
 
 type ExpenseDayItem = {
   _id: string;
@@ -45,7 +53,10 @@ const ExpenseDay = ({
   onPageChange,
   onExpenseHidden,
 }: ExpenseDayProps) => {
+  const dispatch = useAppDispatch();
   const rupeeSymbol = String.fromCharCode(0x20B9);
+  const todayDateKey = getLocalDateKey(new Date());
+  const isTodayDateView = apiDate === todayDateKey;
   const hasTransactions = dayExpenses.length > 0;
   const safeTotalAmount = useMemo(() => totalAmount || 0, [totalAmount]);
   const [confirmHideExpenseId, setConfirmHideExpenseId] = useState<string | null>(null);
@@ -70,10 +81,15 @@ const ExpenseDay = ({
     setHidingExpenseId(expenseToHide._id);
     try {
       await api.patch(`/api/expenseMutations/${expenseToHide._id}/hide`);
+      if (isTodayDateView) {
+        dispatch(hideTodayTransaction(expenseToHide._id));
+      }
       showTopToast("Expense hidden", { duration: 1700 });
       window.dispatchEvent(new CustomEvent("expense:changed"));
       setConfirmHideExpenseId(null);
-      await onExpenseHidden?.();
+      if (!isTodayDateView) {
+        await onExpenseHidden?.();
+      }
     } catch {
       showTopToast("Failed to hide expense", { tone: "error", duration: 2200 });
     } finally {
@@ -112,11 +128,33 @@ const ExpenseDay = ({
     if (restoringExpenseId) return;
     setRestoringExpenseId(expenseId);
     try {
-      await api.patch(`/api/expenseMutations/${expenseId}/restore`);
+      const res = await api.patch(`/api/expenseMutations/${expenseId}/restore`);
+      const restored = res.data?.data as Partial<TodayTransaction> | undefined;
+      if (isTodayDateView && restored?._id) {
+        dispatch(
+          restoreTodayTransaction({
+            dateKey: todayDateKey,
+            item: {
+              _id: restored._id,
+              amount: Number(restored.amount || 0),
+              category: {
+                name: restored.category?.name || "Other",
+                color: restored.category?.color || "#CCCCCC",
+                emoji: restored.category?.emoji || "✨",
+              },
+              notes: restored.notes || "",
+              occurredAt: restored.occurredAt || new Date().toISOString(),
+              payment_mode: restored.payment_mode || "cash",
+            },
+          })
+        );
+      }
       showTopToast("Expense restored", { duration: 1700 });
       window.dispatchEvent(new CustomEvent("expense:changed"));
       await fetchHiddenExpenses();
-      await onExpenseHidden?.();
+      if (!isTodayDateView) {
+        await onExpenseHidden?.();
+      }
     } catch {
       showTopToast("Failed to restore expense", { tone: "error", duration: 2200 });
     } finally {
@@ -152,9 +190,22 @@ const ExpenseDay = ({
         amount: parsedAmount,
         notes: editNote.trim() || "",
       });
+      if (isTodayDateView) {
+        dispatch(
+          updateTodayTransaction({
+            id: editingExpense._id,
+            changes: {
+              amount: parsedAmount,
+              notes: editNote.trim() || "",
+            },
+          })
+        );
+      }
       showTopToast("Expense updated", { duration: 1700 });
       window.dispatchEvent(new CustomEvent("expense:changed"));
-      await onExpenseHidden?.();
+      if (!isTodayDateView) {
+        await onExpenseHidden?.();
+      }
       handleCloseEdit();
     } catch {
       showTopToast("Failed to update expense", { tone: "error", duration: 2200 });
