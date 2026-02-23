@@ -147,7 +147,7 @@ const ExpenseDay = ({
                   onClick={() => setHiddenModalOpen(true)}
                   className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
                 >
-                  Hidden Expenses ({hiddenCount})
+                  Hidden ({hiddenCount})
                 </button>
               )}
               <div className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1">
@@ -180,7 +180,7 @@ const ExpenseDay = ({
                     <button
                       type="button"
                       onClick={() => setConfirmHideExpenseId(expense._id)}
-                      className="h-7 w-7 shrink-0 rounded-full border border-zinc-700 bg-zinc-950/90 text-zinc-400 transition-all hover:border-red-400/70 hover:text-red-300 sm:opacity-0 sm:group-hover:opacity-100"
+                      className="h-7 w-7 shrink-0 rounded-full border border-zinc-700 bg-zinc-950/90 text-zinc-400 transition-all hover:border-red-400/70 hover:text-red-300"
                       aria-label="Hide expense"
                       title="Hide expense"
                     >
