@@ -63,6 +63,7 @@ export default function ExpenseTrackerHome() {
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
   const [ribbonData, setRibbonData] = useState<RibbonDay[]>([]);
   const [ribbonLoading, setRibbonLoading] = useState(false);
+  const [ribbonRefreshKey, setRibbonRefreshKey] = useState(0);
   const [showActivity, setShowActivity] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("showActivity") === "true";
@@ -207,11 +208,14 @@ export default function ExpenseTrackerHome() {
   useEffect(() => {
     const handleExpenseAdded = () => {
       fetchExpenses();
+      setRibbonRefreshKey((prev) => prev + 1);
     };
 
     window.addEventListener("expense:added", handleExpenseAdded as EventListener);
+    window.addEventListener("expense:changed", handleExpenseAdded as EventListener);
     return () => {
       window.removeEventListener("expense:added", handleExpenseAdded as EventListener);
+      window.removeEventListener("expense:changed", handleExpenseAdded as EventListener);
     };
   }, [fetchExpenses]);
 
@@ -232,7 +236,7 @@ export default function ExpenseTrackerHome() {
     };
 
     fetchRibbonData();
-  }, [selectedDate]);
+  }, [selectedDate, ribbonRefreshKey]);
 
   const ribbonMap = useMemo(() => {
     const map = new Map<string, RibbonDay>();
@@ -364,6 +368,7 @@ export default function ExpenseTrackerHome() {
           <ExpenseDay
             dayExpenses={dayExpenses}
             displayLabel={displayLabel}
+            apiDate={apiDate}
             isToday={isToday}
             hideAmounts={hideAmounts}
             page={dayPage}
@@ -371,6 +376,7 @@ export default function ExpenseTrackerHome() {
             totalAmount={dayTotalAmount}
             totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
             onPageChange={setDayPage}
+            onExpenseHidden={fetchExpenses}
           />
         </Suspense>
 

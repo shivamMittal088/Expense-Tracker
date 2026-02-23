@@ -14,6 +14,7 @@ type Expense = {
   notes?: string;
   occurredAt: string;
   payment_mode: string;
+  isHidden?: boolean;
 };
 
 const Transactions = () => {
@@ -45,11 +46,12 @@ const Transactions = () => {
       }
 
       const { data } = await api.get("/api/expenses/paged", { params });
-      const list = data?.data || [];
+      const rawList: Expense[] = data?.data || [];
+      const list = rawList.filter((expense) => expense?.isHidden !== true);
 
       setTransactions((prev) => (append ? [...prev, ...list] : list));
       setTransactionsCursor(data?.nextCursor ?? null);
-      setTransactionsHasMore(Boolean(data?.nextCursor) && list.length > 0);
+      setTransactionsHasMore(Boolean(data?.nextCursor) && rawList.length > 0);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
       if (!append) {

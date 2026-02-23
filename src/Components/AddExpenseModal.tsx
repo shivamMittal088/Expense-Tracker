@@ -162,6 +162,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       setSelectedDate(new Date());
       setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
       window.dispatchEvent(new CustomEvent("expense:added"));
+      window.dispatchEvent(new CustomEvent("expense:changed"));
       onClose();
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;

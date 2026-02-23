@@ -44,7 +44,11 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
   useEffect(() => {
     const handleExpenseChange = () => setRefreshKey((k) => k + 1);
     window.addEventListener("expense:added", handleExpenseChange);
-    return () => window.removeEventListener("expense:added", handleExpenseChange);
+    window.addEventListener("expense:changed", handleExpenseChange);
+    return () => {
+      window.removeEventListener("expense:added", handleExpenseChange);
+      window.removeEventListener("expense:changed", handleExpenseChange);
+    };
   }, []);
 
   useEffect(() => () => {
