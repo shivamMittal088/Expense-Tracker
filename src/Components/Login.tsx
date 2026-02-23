@@ -13,6 +13,7 @@ import {
 import api from "../routeWrapper/Api";
 import { useAppDispatch } from "../store/hooks";
 import { setUserProfile } from "../store/slices/userSlice";
+import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 
 import type {
   ChangeEvent,
@@ -40,6 +41,7 @@ interface AuthResponse {
   isPublic?: boolean;
   followersCount?: number;
   followingCount?: number;
+  hideAmounts?: boolean;
   createdAt?: string;
   updatedAt?: string;
   token?: string;
@@ -153,6 +155,7 @@ const Login: React.FC = () => {
           isPublic,
           followersCount,
           followingCount,
+          hideAmounts,
           createdAt,
           updatedAt,
         } = res.data;
@@ -171,6 +174,7 @@ const Login: React.FC = () => {
             updatedAt,
           })
         );
+        dispatch(setHideAmountsAction(Boolean(hideAmounts)));
 
         // Store token in localStorage (fallback for iOS where cookies may be blocked)
         if (res.data.token) {
@@ -199,6 +203,7 @@ const Login: React.FC = () => {
           isPublic,
           followersCount,
           followingCount,
+          hideAmounts,
           createdAt,
           updatedAt,
         } = res.data;
@@ -217,6 +222,7 @@ const Login: React.FC = () => {
             updatedAt,
           })
         );
+        dispatch(setHideAmountsAction(Boolean(hideAmounts)));
 
         // Store token in localStorage (fallback for iOS where cookies may be blocked)
         if (res.data.token) {

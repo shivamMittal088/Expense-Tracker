@@ -19,6 +19,7 @@ export default function Settings() {
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const profile = useAppSelector((state) => state.user.profile);
   const isPublic = profile?.isPublic ?? true;
+  const [hideAmountsUpdating, setHideAmountsUpdating] = useState(false);
   const [privacyUpdating, setPrivacyUpdating] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -53,6 +54,20 @@ export default function Settings() {
     }
   };
 
+  const handleHideAmountsToggle = async (nextValue: boolean) => {
+    if (hideAmountsUpdating) return;
+    setHideAmountsUpdating(true);
+    try {
+      await Api.patch("/api/profile/update", { hideAmounts: nextValue });
+      setHideAmounts(nextValue);
+      showTopToast(nextValue ? "Amounts hidden" : "Amounts visible", { duration: 1500 });
+    } catch {
+      showTopToast("Failed to update hide amounts setting", { tone: "error" });
+    } finally {
+      setHideAmountsUpdating(false);
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto px-4 py-8 pb-28">
       <div className="mb-7">
@@ -71,10 +86,8 @@ export default function Settings() {
             label="Hide Amounts"
             description="Blur amounts until tapped (for privacy)"
             enabled={hideAmounts}
-            onChange={(v) => {
-              setHideAmounts(v);
-              showTopToast(v ? "Amounts hidden" : "Amounts visible", { duration: 1500 });
-            }}
+            disabled={hideAmountsUpdating}
+            onChange={handleHideAmountsToggle}
           />
           <div className="h-px bg-white/5" />
           <SettingToggle

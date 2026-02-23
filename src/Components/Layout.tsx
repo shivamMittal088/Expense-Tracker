@@ -4,6 +4,7 @@ import NavBar from "./NavBar";
 import Footer from "./Footer";
 import api from "../routeWrapper/Api";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 import {
   removeNotificationRequest,
   setNotificationsLoading,
@@ -17,11 +18,30 @@ export default function Layout() {
   const dispatch = useAppDispatch();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
   const notificationRequests = useAppSelector((state) => state.notifications.requests);
   const notificationsLoaded = useAppSelector((state) => state.notifications.isLoaded);
   const notificationsLoading = useAppSelector((state) => state.notifications.loading);
   const loadingNotifications = isNotificationsOpen && notificationsLoading;
   const notificationsInFlight = useRef(false);
+  const hideAmountsHydrated = useRef(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      hideAmountsHydrated.current = false;
+      return;
+    }
+    if (hideAmountsHydrated.current) return;
+
+    hideAmountsHydrated.current = true;
+    api.get("/api/profile/view")
+      .then((res) => {
+        dispatch(setHideAmountsAction(Boolean(res.data?.hideAmounts)));
+      })
+      .catch(() => {
+        // Ignore hydration failure and keep default redux value.
+      });
+  }, [dispatch, isAuthenticated]);
 
   const fetchNotifications = useCallback(async (force = false) => {
     if (!force && notificationsLoaded) return;

@@ -15,11 +15,9 @@ const amountSlice = createSlice({
   reducers: {
     setHideAmounts: (state, action: PayloadAction<boolean>) => {
       state.hideAmounts = action.payload;
-      localStorage.setItem("hideAmounts", String(action.payload));
     },
     toggleHideAmounts: (state) => {
       state.hideAmounts = !state.hideAmounts;
-      localStorage.setItem("hideAmounts", String(state.hideAmounts));
     },
   },
 });
