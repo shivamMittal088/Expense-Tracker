@@ -77,6 +77,14 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 
 ---
 
+### 📱 Lighthouse (Mobile)
+
+<p align="center">
+  <img src="./expense-tracker-screenshot/mobile-lighthouse.png" width="360" alt="Mobile Lighthouse Report"/>
+</p>
+
+---
+
 ### 👤 Profile → 📤 Export
 
 <p align="center">
