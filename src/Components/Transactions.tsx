@@ -45,7 +45,7 @@ const Transactions = () => {
         params.cursor = cursor;
       }
 
-      const { data } = await api.get("/api/expenses/paged", { params });
+      const { data } = await api.get("/api/expense/paged", { params });
       const rawList: Expense[] = data?.data || [];
       const list = rawList.filter((expense) => expense?.isHidden !== true);
 

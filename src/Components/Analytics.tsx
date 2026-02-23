@@ -322,7 +322,7 @@ const Analytics = () => {
         
         const formatDate = (d: Date) => d.toISOString().split("T")[0];
         
-        const response = await api.get('/api/expenses/range', {
+        const response = await api.get('/api/expenseAnalytics/range', {
           params: {
             startDate: formatDate(startDate),
             endDate: formatDate(today),
@@ -341,7 +341,7 @@ const Analytics = () => {
     const fetchRecurringPayments = async () => {
       try {
         setRecurringLoading(true);
-        const response = await api.get('/api/expenses/recurring');
+        const response = await api.get('/api/expenseAnalytics/recurring');
         const data = response.data?.data || [];
         const summary = response.data?.summary || {};
         
@@ -363,7 +363,7 @@ const Analytics = () => {
     const fetchPaymentBreakdown = async () => {
       try {
         setPaymentBreakdownLoading(true);
-        const response = await api.get('/api/expenses/payment-breakdown', {
+        const response = await api.get('/api/expenseAnalytics/payment-breakdown', {
           params: { period: paymentPeriod },
         });
         setPaymentBreakdown(response.data?.data || []);
@@ -382,7 +382,7 @@ const Analytics = () => {
     const fetchSpendingTrends = async () => {
       try {
         setTrendsLoading(true);
-        const response = await api.get('/api/expenses/spending-trends', {
+        const response = await api.get('/api/expenseAnalytics/spending-trends', {
           params: { view: trendsView },
         });
         setSpendingTrends(response.data?.data || []);

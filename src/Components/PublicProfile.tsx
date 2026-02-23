@@ -45,7 +45,7 @@ export default function PublicProfile() {
   useEffect(() => {
     if (!id) return;
     api
-      .get(`/api/profile/follow-status/${id}`)
+      .get(`/api/follow/follow-status/${id}`)
       .then((res) => {
         const status = res.data?.status || "none";
         if (status === "pending" || status === "accepted") {
@@ -87,7 +87,7 @@ export default function PublicProfile() {
     setIsFollowing(true);
     try {
       const trimmed = note.trim();
-      const res = await api.post(`/api/profile/follow/${id}`, {
+      const res = await api.post(`/api/follow/follow/${id}`, {
         ...(trimmed ? { note: trimmed } : {}),
       });
       const status = res.data?.status || "pending";
@@ -104,7 +104,7 @@ export default function PublicProfile() {
     if (!id || followStatus !== "pending") return;
     setIsCancelling(true);
     try {
-      await api.delete(`/api/profile/follow/${id}`);
+      await api.delete(`/api/follow/follow/${id}`);
       setFollowStatus("none");
     } catch {
       showTopToast("Failed to cancel request", { tone: "error" });

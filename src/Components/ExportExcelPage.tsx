@@ -69,7 +69,7 @@ const ExportExcelPage = () => {
       setErrorMessage(null);
 
       const tzOffsetMinutes = new Date().getTimezoneOffset();
-      const response = await api.get("/api/expenses/export/excel", {
+      const response = await api.get("/api/expenseExport/excel", {
         responseType: "blob",
         params: {
           tzOffsetMinutes,

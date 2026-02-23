@@ -51,7 +51,7 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
   const inFlightRef = useRef(false);
 
   const title = mode === "followers" ? "Followers" : "Following";
-  const endpoint = mode === "followers" ? "/api/profile/all-followers" : "/api/profile/all-following";
+  const endpoint = mode === "followers" ? "/api/follow/all-followers" : "/api/follow/all-following";
 
   const emptyCopy = useMemo(() => {
     if (mode === "followers") return "No followers yet";
@@ -100,7 +100,7 @@ export default function FollowListPage({ mode }: FollowListPageProps) {
     if (unfollowId) return;
     setUnfollowId(userId);
     try {
-      await Api.delete(`/api/profile/follow/${userId}`);
+      await Api.delete(`/api/follow/follow/${userId}`);
       setItems((prev) => prev.filter((item) => item.following?._id !== userId));
     } catch {
       showTopToast("Failed to unfollow", { tone: "error" });

@@ -48,7 +48,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    api.get("/api/profile/search-users", {
+    api.get("/api/search/search-users", {
         params: { q: trimmed, limit: 10 },
       })
       .then((res) => {
@@ -63,7 +63,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
   useEffect(() => {
     if (!open) return;
     if (query.trim()) return;
-    api.get("/api/profile/recent-searches")
+    api.get("/api/search/recent-searches")
       .then((res) => {
         const recent = (res.data?.recent || [])
           .map((entry: { user?: UserResult | null }) => entry.user)
@@ -88,7 +88,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
 
   const handleUserSelect = async (userId: string) => {
     try {
-      await api.post("/api/profile/recent-searches", { userId });
+      await api.post("/api/search/recent-searches", { userId });
     } catch {
       // ignore recent-search errors
     }
@@ -98,7 +98,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
 
   const handleRemoveRecent = async (userId: string) => {
     try {
-      await api.delete(`/api/profile/recent-searches/${userId}`);
+      await api.delete(`/api/search/recent-searches/${userId}`);
       setRecentResults((prev) => (prev ? prev.filter((u) => u._id !== userId) : prev));
     } catch {
       // ignore recent-search errors
@@ -107,7 +107,7 @@ export default function PeopleSearchModal({ open, onClose }: PeopleSearchModalPr
 
   const handleClearRecent = async () => {
     try {
-      await api.delete("/api/profile/recent-searches");
+      await api.delete("/api/search/recent-searches");
       setRecentResults([]);
     } catch {
       // ignore recent-search errors

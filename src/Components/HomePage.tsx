@@ -229,7 +229,7 @@ export default function ExpenseTrackerHome() {
       try {
         const year = selectedDate.getFullYear();
         const tzOffsetMinutes = new Date().getTimezoneOffset();
-        const res = await api.get(`/api/expenses/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
+        const res = await api.get(`/api/expenseAnalytics/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
         setRibbonData(res.data.data || []);
       } catch (err) {
         console.error("Failed to load ribbon data", err);

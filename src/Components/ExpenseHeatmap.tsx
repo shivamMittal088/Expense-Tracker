@@ -28,7 +28,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
       setLoading(true);
       try {
         const tzOffsetMinutes = new Date().getTimezoneOffset();
-        const res = await api.get(`/api/expenses/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
+        const res = await api.get(`/api/expenseAnalytics/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
         setHeatmapData(res.data.data || []);
       } catch (err) {
         console.error("Failed to fetch heatmap data:", err);

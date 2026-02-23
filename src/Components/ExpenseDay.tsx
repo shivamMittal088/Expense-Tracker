@@ -69,7 +69,7 @@ const ExpenseDay = ({
 
     setHidingExpenseId(expenseToHide._id);
     try {
-      await api.patch(`/api/expense/${expenseToHide._id}/hide`);
+      await api.patch(`/api/expenseMutations/${expenseToHide._id}/hide`);
       showTopToast("Expense hidden", { duration: 1700 });
       window.dispatchEvent(new CustomEvent("expense:changed"));
       setConfirmHideExpenseId(null);
@@ -84,7 +84,7 @@ const ExpenseDay = ({
   const fetchHiddenExpenses = useCallback(async () => {
     setHiddenLoading(true);
     try {
-      const res = await api.get(`/api/expense/${apiDate}/hidden`, {
+      const res = await api.get(`/api/expenseMutations/${apiDate}/hidden`, {
         params: {
           tzOffsetMinutes: new Date().getTimezoneOffset(),
         },
@@ -112,7 +112,7 @@ const ExpenseDay = ({
     if (restoringExpenseId) return;
     setRestoringExpenseId(expenseId);
     try {
-      await api.patch(`/api/expense/${expenseId}/restore`);
+      await api.patch(`/api/expenseMutations/${expenseId}/restore`);
       showTopToast("Expense restored", { duration: 1700 });
       window.dispatchEvent(new CustomEvent("expense:changed"));
       await fetchHiddenExpenses();
@@ -148,7 +148,7 @@ const ExpenseDay = ({
 
     setSavingEdit(true);
     try {
-      await api.patch(`/api/expense/${editingExpense._id}`, {
+      await api.patch(`/api/expenseMutations/${editingExpense._id}`, {
         amount: parsedAmount,
         notes: editNote.trim() || "",
       });

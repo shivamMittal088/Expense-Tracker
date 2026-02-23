@@ -163,6 +163,22 @@ Local URLs:
 
 ---
 
+## 🔌 Backend API Prefixes
+
+Current frontend integration uses these backend route groups:
+
+- `/api/auth/*` → authentication routes
+- `/api/expense/*` → add/day/paged expense routes
+- `/api/expenseMutations/*` → hide/restore/update + hidden-day routes
+- `/api/expenseAnalytics/*` → range, recurring, payment-breakdown, trends, heatmap
+- `/api/expenseExport/*` → excel export route
+- `/api/profile/*` → profile view/update/privacy/public profile/upload-avatar
+- `/api/follow/*` → follow/follow-status/follow-requests/followers/following
+- `/api/search/*` → search-users + recent-searches
+- `/api/tile/*` and `/api/seed/*` → tiles and initial tile seeding
+
+---
+
 ## 📋 TODOs
 
 - [ ] Add stronger unit/integration coverage for key UI flows

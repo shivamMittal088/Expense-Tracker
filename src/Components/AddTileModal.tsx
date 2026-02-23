@@ -42,7 +42,7 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
 
     setLoading(true);
     try {
-      await Api.post("/api/tiles/add", {
+      await Api.post("/api/tile/add", {
         name: name.trim(),
         emoji: selectedEmoji,
         color: selectedColor,

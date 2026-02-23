@@ -83,7 +83,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     const tileId = tileToDelete._id;
     setDeletingTileId(tileId);
     try {
-      await Api.delete(`/api/tiles/remove/${tileId}`);
+      await Api.delete(`/api/tile/remove/${tileId}`);
       setTiles((prev) => prev.filter((t) => t._id !== tileId));
       if (category === tileToDelete.name) {
         setCategory("");
@@ -107,7 +107,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     setSelectedDate(new Date());
     setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
 
-    Api.get<Tile[]>("/api/tiles")
+    Api.get<Tile[]>("/api/tile")
       .then(({ data }) => {
         if (cancelled) return;
         setTiles(data);
@@ -459,7 +459,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             onClose={() => setAddTileOpen(false)}
             onAdded={() => {
               // Refresh tiles after adding new one
-              Api.get<Tile[]>("/api/tiles")
+              Api.get<Tile[]>("/api/tile")
                 .then(({ data }) => setTiles(data))
                 .catch(() => {});
             }}

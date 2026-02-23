@@ -24,7 +24,7 @@ export default function Layout() {
       notificationsRetryTimer.current = null;
     }
 
-    api.get("/api/profile/follow-requests")
+    api.get("/api/follow/follow-requests")
       .then((res) => {
         setNotificationRequests(res.data?.requests || []);
       })
@@ -147,12 +147,12 @@ export default function Layout() {
   };
 
   const handleAcceptRequest = async (requestId: string) => {
-    await api.post(`/api/profile/follow-requests/${requestId}/accept`);
+    await api.post(`/api/follow/follow-requests/${requestId}/accept`);
     setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
   };
 
   const handleDeclineRequest = async (requestId: string) => {
-    await api.delete(`/api/profile/follow-requests/${requestId}`);
+    await api.delete(`/api/follow/follow-requests/${requestId}`);
     setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
   };
 
