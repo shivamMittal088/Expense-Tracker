@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { Search, Heart } from "lucide-react";
+import { useAppSelector } from "../store/hooks";
 
 interface NavBarProps {
   onSearchClick?: () => void;
@@ -10,9 +11,7 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ onSearchClick, onNotificationClick, notificationCount = 0 }) => {
   const location = useLocation();
-
-  // Check if user is logged in - read directly from localStorage each render
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const isLoggedIn = useAppSelector((state) => state.user.isAuthenticated);
 
   // Don't show icons on login page
   const isLoginPage = location.pathname === "/login";

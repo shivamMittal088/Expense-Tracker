@@ -29,6 +29,21 @@ type Tile = {
   isBuiltIn?: boolean;
 };
 
+type CreatedExpenseResponse = {
+  _id: string;
+  amount: number;
+  category?: {
+    name?: string;
+    color?: string;
+    emoji?: string;
+  };
+  notes?: string;
+  occurredAt?: string;
+  occuredAt?: string;
+  createdAt?: string;
+  payment_mode?: string;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -75,7 +90,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     return next.toISOString();
   };
 
-  const normalizeExpense = (raw: Record<string, any>): TodayTransaction => ({
+  const normalizeExpense = (raw: CreatedExpenseResponse): TodayTransaction => ({
     _id: raw._id,
     amount: Number(raw.amount || 0),
     category: {
@@ -186,7 +201,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       setNotes("");
       setSelectedDate(new Date());
       setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
-      window.dispatchEvent(new CustomEvent("expense:added"));
       window.dispatchEvent(new CustomEvent("expense:changed"));
       onClose();
     } catch (err) {

@@ -323,10 +323,8 @@ export default function ExpenseTrackerHome() {
       setRibbonRefreshKey((prev) => prev + 1);
     };
 
-    window.addEventListener("expense:added", handleExpenseAdded as EventListener);
     window.addEventListener("expense:changed", handleExpenseAdded as EventListener);
     return () => {
-      window.removeEventListener("expense:added", handleExpenseAdded as EventListener);
       window.removeEventListener("expense:changed", handleExpenseAdded as EventListener);
     };
   }, [

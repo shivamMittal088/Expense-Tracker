@@ -40,6 +40,14 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
     const [view, setView] = useState<'days' | 'months' | 'years'>('days');
     const calendarRef = useRef<HTMLDivElement>(null);
 
+    const handleClose = useCallback(() => {
+        setIsClosing(true);
+        setTimeout(() => {
+            onClose();
+            setIsClosing(false);
+        }, 150);
+    }, [onClose]);
+
     // Generate years for year picker (2020 to current year)
     const years = useMemo(() => {
         const currentYear = maxDate.getFullYear();
@@ -79,7 +87,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('touchstart', handleClickOutside);
         };
-    }, [isOpen, closeOnClickOutside]);
+    }, [isOpen, closeOnClickOutside, handleClose]);
 
     // Handle escape key
     useEffect(() => {
@@ -93,15 +101,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
 
         document.addEventListener('keydown', handleEscape);
         return () => document.removeEventListener('keydown', handleEscape);
-    }, [isOpen]);
-
-    const handleClose = useCallback(() => {
-        setIsClosing(true);
-        setTimeout(() => {
-            onClose();
-            setIsClosing(false);
-        }, 150);
-    }, [onClose]);
+    }, [isOpen, handleClose]);
 
     const handleDateClick = (date: Date) => {
         onDateSelect(date);

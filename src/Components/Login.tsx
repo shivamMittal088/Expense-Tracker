@@ -176,7 +176,6 @@ const Login: React.FC = () => {
         if (res.data.token) {
           localStorage.setItem("authToken", res.data.token);
         }
-        localStorage.setItem("isLoggedIn", "true");
         navigate("/");
       } else {
         // SIGNUP
@@ -223,8 +222,6 @@ const Login: React.FC = () => {
         if (res.data.token) {
           localStorage.setItem("authToken", res.data.token);
         }
-
-        localStorage.setItem("isLoggedIn", "true");
         navigate("/");
       }
     } catch (error) {

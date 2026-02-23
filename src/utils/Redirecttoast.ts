@@ -4,6 +4,10 @@ interface ToastOverlay extends HTMLDivElement {
   _timeoutId?: number;
 }
 
+interface InlineToastContainer extends HTMLDivElement {
+  _timeoutId?: number;
+}
+
 type ToastOptions = {
   title?: string;
   duration?: number;
@@ -148,7 +152,7 @@ export const showTopToast = (
   const existing = document.getElementById("inline-toast");
   existing?.remove();
 
-  const container = document.createElement("div");
+  const container = document.createElement("div") as InlineToastContainer;
   container.id = "inline-toast";
   container.style.cssText = [
     "position:fixed",
@@ -202,8 +206,8 @@ export const showTopToast = (
     card.style.transform = "translateY(0) scale(1)";
   });
 
-  window.clearTimeout((container as any)._timeoutId);
-  (container as any)._timeoutId = window.setTimeout(() => {
+  window.clearTimeout(container._timeoutId);
+  container._timeoutId = window.setTimeout(() => {
     const current = document.getElementById("inline-toast");
     if (current) {
       (current.firstChild as HTMLElement).style.opacity = "0";

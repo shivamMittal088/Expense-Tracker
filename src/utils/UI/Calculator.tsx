@@ -24,63 +24,17 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
   const [activeButton, setActiveButton] = useState<string | null>(null);
   const calculatorRef = useRef<HTMLDivElement>(null);
 
-  // Reset when opening
-  useEffect(() => {
-    if (isOpen) {
-      setIsClosing(false);
-      setShowHistory(false);
-    }
-  }, [isOpen]);
-
-
-
-  // Handle keyboard input
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        handleClose();
-        return;
-      }
-      
-      if (e.key >= "0" && e.key <= "9") {
-        handleNumber(e.key);
-      } else if (e.key === "+") {
-        handleOperator("+");
-      } else if (e.key === "-") {
-        handleOperator("-");
-      } else if (e.key === "*") {
-        handleOperator("×");
-      } else if (e.key === "/") {
-        handleOperator("÷");
-      } else if (e.key === "Enter" || e.key === "=") {
-        e.preventDefault();
-        handleEquals();
-      } else if (e.key === "Backspace") {
-        handleBackspace();
-      } else if (e.key === "." || e.key === ",") {
-        handleDecimal();
-      } else if (e.key === "c" || e.key === "C") {
-        handleClear();
-      } else if (e.key === "%") {
-        handleOperator("%");
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, display, equation, isNewNumber]);
-
   const handleClose = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
+      setShowHistory(false);
+      setCopied(false);
       onClose();
       setIsClosing(false);
     }, 200);
   }, [onClose]);
 
-  const handleNumber = (num: string) => {
+  const handleNumber = useCallback((num: string) => {
     setActiveButton(num);
     setTimeout(() => setActiveButton(null), 150);
     
@@ -92,16 +46,16 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
         setDisplay(display === "0" ? num : display + num);
       }
     }
-  };
+  }, [display, isNewNumber]);
 
-  const handleOperator = (op: string) => {
+  const handleOperator = useCallback((op: string) => {
     setActiveButton(op);
     setTimeout(() => setActiveButton(null), 150);
     setEquation(display + " " + op + " ");
     setIsNewNumber(true);
-  };
+  }, [display]);
 
-  const handleEquals = () => {
+  const handleEquals = useCallback(() => {
     setActiveButton("=");
     setTimeout(() => setActiveButton(null), 150);
     
@@ -130,17 +84,17 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
       setEquation("");
       setIsNewNumber(true);
     }
-  };
+  }, [display, equation]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setActiveButton("AC");
     setTimeout(() => setActiveButton(null), 150);
     setDisplay("0");
     setEquation("");
     setIsNewNumber(true);
-  };
+  }, []);
 
-  const handleBackspace = () => {
+  const handleBackspace = useCallback(() => {
     setActiveButton("DEL");
     setTimeout(() => setActiveButton(null), 150);
     
@@ -150,9 +104,9 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
       setDisplay("0");
       setIsNewNumber(true);
     }
-  };
+  }, [display]);
 
-  const handleDecimal = () => {
+  const handleDecimal = useCallback(() => {
     setActiveButton(".");
     setTimeout(() => setActiveButton(null), 150);
     
@@ -160,7 +114,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
       setDisplay(display + ".");
       setIsNewNumber(false);
     }
-  };
+  }, [display]);
 
   const handleCopy = async () => {
     try {
@@ -185,6 +139,53 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
   };
+
+  // Handle keyboard input
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+        return;
+      }
+
+      if (e.key >= "0" && e.key <= "9") {
+        handleNumber(e.key);
+      } else if (e.key === "+") {
+        handleOperator("+");
+      } else if (e.key === "-") {
+        handleOperator("-");
+      } else if (e.key === "*") {
+        handleOperator("×");
+      } else if (e.key === "/") {
+        handleOperator("÷");
+      } else if (e.key === "Enter" || e.key === "=") {
+        e.preventDefault();
+        handleEquals();
+      } else if (e.key === "Backspace") {
+        handleBackspace();
+      } else if (e.key === "." || e.key === ",") {
+        handleDecimal();
+      } else if (e.key === "c" || e.key === "C") {
+        handleClear();
+      } else if (e.key === "%") {
+        handleOperator("%");
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [
+    isOpen,
+    handleBackspace,
+    handleClear,
+    handleClose,
+    handleDecimal,
+    handleEquals,
+    handleNumber,
+    handleOperator,
+  ]);
 
   if (!isOpen) return null;
 

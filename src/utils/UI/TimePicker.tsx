@@ -40,15 +40,13 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         }
     };
 
-    // Reset when picker opens
-    useEffect(() => {
-        if (isOpen) {
-            setHours(selectedTime.hours);
-            setMinutes(selectedTime.minutes);
-            setPeriod(selectedTime.hours >= 12 ? 'PM' : 'AM');
+    const handleClose = useCallback(() => {
+        setIsClosing(true);
+        setTimeout(() => {
+            onClose();
             setIsClosing(false);
-        }
-    }, [isOpen, selectedTime]);
+        }, 150);
+    }, [onClose]);
 
     // Handle escape key
     useEffect(() => {
@@ -62,15 +60,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
 
         document.addEventListener('keydown', handleEscape);
         return () => document.removeEventListener('keydown', handleEscape);
-    }, [isOpen]);
-
-    const handleClose = useCallback(() => {
-        setIsClosing(true);
-        setTimeout(() => {
-            onClose();
-            setIsClosing(false);
-        }, 150);
-    }, [onClose]);
+    }, [isOpen, handleClose]);
 
     const handleConfirm = () => {
         const hour24 = to24Hour(get12Hour(hours), period);

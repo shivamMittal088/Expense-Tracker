@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
+import { AxiosError } from "axios";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { emojiCategories, type EmojiCategoryName } from "../utils/EmojiCategories";
 import { colorPalette } from "../utils/ColorPalette";
+
+interface ApiErrorResponse {
+  message?: string;
+}
 
 type Props = {
   open: boolean;
@@ -50,8 +55,9 @@ export default function AddTileModal({ open, onClose, onAdded }: Props) {
       showTopToast("Category added successfully!", { duration: 2000 });
       onAdded?.();
       onClose();
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to add category";
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      const message = axiosError?.response?.data?.message || "Failed to add category";
       showTopToast(message, { tone: "error" });
     } finally {
       setLoading(false);
