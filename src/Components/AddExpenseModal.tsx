@@ -4,6 +4,7 @@ import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch } from "../store/hooks";
 import { addTodayTransaction, getLocalDateKey, type TodayTransaction } from "../store/slices/todayTransactionsSlice";
+import { addMonthlyTransaction, isWithinLast30Days } from "../store/slices/monthlyTransactionsSlice";
 const CalendarPicker = lazy(() =>
   import("../utils/UI/CalendarPicker").then((module) => ({
     default: module.CalendarPicker,
@@ -189,8 +190,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       const occurredAtForDate = createdExpense?.occurredAt || payload.occurredAt;
       const createdDateKey = getLocalDateKey(occurredAtForDate);
       const todayDateKey = getLocalDateKey(new Date());
+      const normalizedCreatedExpense = createdExpense ? normalizeExpense(createdExpense) : null;
+
+      if (normalizedCreatedExpense && isWithinLast30Days(normalizedCreatedExpense.occurredAt)) {
+        dispatch(addMonthlyTransaction(normalizedCreatedExpense));
+      }
+
       if (createdExpense && createdDateKey === todayDateKey) {
-        dispatch(addTodayTransaction({ dateKey: todayDateKey, item: normalizeExpense(createdExpense) }));
+        dispatch(addTodayTransaction({ dateKey: todayDateKey, item: normalizedCreatedExpense || normalizeExpense(createdExpense) }));
       }
 
       showTopToast(data?.message || "Expense added successfully", { duration: 2000 });
