@@ -169,3 +169,7 @@ Local URLs:
 - [ ] Improve offline/PWA readiness
 - [ ] Add richer empty/error UI states
 - [ ] Continue Lighthouse and bundle optimization
+- [ ] Add streak freeze support
+- [ ] Integrate Google Sign-In API
+- [ ] Add email verification code flow
+- [ ] Add cron jobs for scheduled maintenance tasks

@@ -240,6 +240,13 @@ export default function ExpenseTrackerHome() {
     return map;
   }, [ribbonData]);
 
+  const calendarSpendMap = useMemo(() => {
+    return ribbonData.reduce((acc: Record<string, number>, day) => {
+      acc[day.date] = Number(day.totalAmount || 0);
+      return acc;
+    }, {});
+  }, [ribbonData]);
+
   const ribbonDays = useMemo(() => {
     const days: Date[] = [];
     for (let i = 6; i >= 0; i -= 1) {
@@ -413,6 +420,7 @@ export default function ExpenseTrackerHome() {
             isOpen={isCalendarOpen}
             onClose={() => setIsCalendarOpen(false)}
             selectedDate={selectedDate}
+            daySpendMap={calendarSpendMap}
             onDateSelect={handleDateSelect}
             maxDate={today}
           />

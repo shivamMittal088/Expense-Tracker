@@ -10,6 +10,7 @@ interface CalendarPickerProps {
     onDateSelect: (date: Date) => void;
     maxDate?: Date;
     closeOnClickOutside?: boolean;
+    daySpendMap?: Record<string, number>;
 }
 
 const MONTHS = [
@@ -32,6 +33,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
     onDateSelect,
     maxDate = new Date(),
     closeOnClickOutside = true,
+    daySpendMap = {},
 }) => {
     const [isClosing, setIsClosing] = useState(false);
     const [viewDate, setViewDate] = useState(selectedDate);
@@ -184,6 +186,23 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
         return nextMonth <= maxDate;
     };
 
+    const getDateKey = (date: Date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    };
+
+    const formatDayAmount = (amount: number) => {
+        if (amount >= 100000) {
+            return `₹${(amount / 1000).toFixed(0)}k`;
+        }
+        if (amount >= 1000) {
+            return `₹${(amount / 1000).toFixed(1)}k`;
+        }
+        return `₹${Math.round(amount)}`;
+    };
+
     if (!isOpen) return null;
 
     const calendarContent = (
@@ -256,12 +275,20 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
                         <div className="calendar-days">
                             {calendarDays.map((day, idx) => (
                                 <button
+                                    type="button"
                                     key={idx}
-                                    className={`calendar-day ${day.isCurrentMonth ? '' : 'outside'} ${day.isToday ? 'today' : ''} ${day.isSelected ? 'selected' : ''} ${day.isDisabled ? 'disabled' : ''}`}
+                                    className={`calendar-day ${day.isCurrentMonth ? '' : 'outside'} ${day.isToday ? 'today' : ''} ${day.isSelected ? 'selected' : ''} ${day.isDisabled ? 'disabled' : ''} ${daySpendMap[getDateKey(day.date)] > 0 ? 'has-amount' : ''}`}
                                     onClick={() => !day.isDisabled && handleDateClick(day.date)}
                                     disabled={day.isDisabled}
+                                    title={daySpendMap[getDateKey(day.date)] > 0 ? `Spent ${formatDayAmount(daySpendMap[getDateKey(day.date)])}` : undefined}
+                                    aria-label={daySpendMap[getDateKey(day.date)] > 0 ? `${day.date.toDateString()}, spent ${formatDayAmount(daySpendMap[getDateKey(day.date)])}` : day.date.toDateString()}
                                 >
-                                    {day.date.getDate()}
+                                    <span className="calendar-day-content">
+                                        <span className="calendar-day-number">{day.date.getDate()}</span>
+                                        {day.isCurrentMonth && !day.isDisabled && daySpendMap[getDateKey(day.date)] > 0 && (
+                                            <span className="calendar-day-amount">{formatDayAmount(daySpendMap[getDateKey(day.date)])}</span>
+                                        )}
+                                    </span>
                                 </button>
                             ))}
                         </div>
