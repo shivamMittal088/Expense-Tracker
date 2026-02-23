@@ -48,7 +48,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [category, setCategory] = useState("");
   const [paymentMode, setPaymentMode] = useState("");
   const [notes, setNotes] = useState("");
-  const [occurredAt, setOccurredAt] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -67,13 +66,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     backdropFilter: "blur(10px)",
   } as const;
 
-  const getLocalISOString = () => {
-    const now = new Date();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return [
-      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
-      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
-    ].join("T");
+  const buildOccurredAtISO = (date: Date, time: { hours: number; minutes: number }) => {
+    const next = new Date(date);
+    next.setHours(time.hours, time.minutes, 0, 0);
+    return next.toISOString();
   };
 
   const handleDeleteTile = (tile: Tile, e: React.MouseEvent) => {
@@ -110,7 +106,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     setLoadingTiles(true);
     setSelectedDate(new Date());
     setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
-    setOccurredAt(getLocalISOString());
 
     Api.get<Tile[]>("/api/tiles")
       .then(({ data }) => {
@@ -148,7 +143,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       },
       payment_mode: paymentMode === "UPI" ? "UPI" : paymentMode.toLowerCase(),
       notes,
-      ...(occurredAt ? { occurredAt } : {}),
+      occurredAt: buildOccurredAtISO(selectedDate, selectedTime),
     };
 
     setLoading(true);
@@ -166,7 +161,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       setNotes("");
       setSelectedDate(new Date());
       setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
-      setOccurredAt(getLocalISOString());
       window.dispatchEvent(new CustomEvent("expense:added"));
       onClose();
     } catch (err) {
@@ -401,10 +395,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   selectedDate={selectedDate}
                   onDateSelect={(date) => {
                     setSelectedDate(date);
-                    const pad = (n: number) => String(n).padStart(2, "0");
-                    const dateStr = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-                    const timeStr = `${pad(selectedTime.hours)}:${pad(selectedTime.minutes)}:00`;
-                    setOccurredAt(`${dateStr}T${timeStr}`);
                     setCalendarOpen(false);
                   }}
                   maxDate={new Date()}
@@ -428,9 +418,6 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                   selectedTime={selectedTime}
                   onTimeSelect={(hours, minutes) => {
                     setSelectedTime({ hours, minutes });
-                    const pad = (n: number) => String(n).padStart(2, "0");
-                    const dateStr = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}`;
-                    setOccurredAt(`${dateStr}T${pad(hours)}:${pad(minutes)}:00`);
                   }}
                   closeOnClickOutside={true}
                 />

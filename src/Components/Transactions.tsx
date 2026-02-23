@@ -133,7 +133,7 @@ const Transactions = () => {
           <>
             <div
               ref={transactionsListRef}
-              className="divide-y divide-zinc-800 max-h-[70vh] overflow-y-auto overscroll-contain pb-16 sm:pb-6"
+              className="divide-y divide-zinc-800 max-h-[70vh] overflow-y-auto overscroll-contain pb-24 sm:pb-6"
             >
               {transactions.map((expense, index) => {
                 const occurredAt = new Date(expense.occurredAt);

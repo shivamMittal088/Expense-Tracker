@@ -50,28 +50,6 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         }
     }, [isOpen, selectedTime]);
 
-    // Handle click outside
-    useEffect(() => {
-        if (!isOpen || !closeOnClickOutside) return;
-
-        const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-            if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-                handleClose();
-            }
-        };
-
-        const timer = setTimeout(() => {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('touchstart', handleClickOutside);
-        }, 10);
-
-        return () => {
-            clearTimeout(timer);
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchstart', handleClickOutside);
-        };
-    }, [isOpen, closeOnClickOutside]);
-
     // Handle escape key
     useEffect(() => {
         if (!isOpen) return;
@@ -152,12 +130,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                         </div>
                         <div className="time-picker-period-row">
                             <button
+                                type="button"
                                 onClick={() => handlePeriodChange('AM')}
                                 className={`time-picker-period-btn ${period === 'AM' ? 'selected' : ''}`}
                             >
                                 AM
                             </button>
                             <button
+                                type="button"
                                 onClick={() => handlePeriodChange('PM')}
                                 className={`time-picker-period-btn ${period === 'PM' ? 'selected' : ''}`}
                             >
@@ -168,6 +148,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                             {[0, 15, 30, 45].map((m) => (
                                 <button
                                     key={m}
+                                    type="button"
                                     onClick={() => setMinutes(m)}
                                     className={`time-picker-quick-btn ${minutes === m ? 'selected' : ''}`}
                                 >
@@ -188,6 +169,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                                 {hoursArray.map((h) => (
                                     <button
                                         key={h}
+                                        type="button"
                                         onClick={() => handleHourChange(h)}
                                         className={`time-picker-option ${display12Hour === h ? 'selected' : ''}`}
                                     >
@@ -206,6 +188,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                                 {minutesArray.map((m) => (
                                     <button
                                         key={m}
+                                        type="button"
                                         onClick={() => setMinutes(m)}
                                         className={`time-picker-option ${minutes === m ? 'selected' : ''}`}
                                     >
@@ -220,12 +203,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                 {/* Action Buttons */}
                 <div className="time-picker-actions">
                     <button
+                        type="button"
                         onClick={handleNow}
                         className="time-picker-btn-secondary"
                     >
                         Now
                     </button>
                     <button
+                        type="button"
                         onClick={handleConfirm}
                         className="time-picker-btn-primary"
                     >
