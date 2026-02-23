@@ -26,6 +26,7 @@ type ExpenseDayProps = {
   totalPages: number;
   totalCount: number;
   totalAmount: number;
+  hiddenCount: number;
   onPageChange: (page: number) => void;
   onExpenseHidden?: () => Promise<void> | void;
 };
@@ -40,6 +41,7 @@ const ExpenseDay = ({
   totalPages,
   totalCount,
   totalAmount,
+  hiddenCount,
   onPageChange,
   onExpenseHidden,
 }: ExpenseDayProps) => {
@@ -139,13 +141,15 @@ const ExpenseDay = ({
                   Showing {dayExpenses.length} of {totalCount}
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={() => setHiddenModalOpen(true)}
-                className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
-              >
-                Hidden Expenses
-              </button>
+              {hiddenCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setHiddenModalOpen(true)}
+                  className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[11px] text-zinc-300 hover:text-white hover:border-zinc-500 transition-all"
+                >
+                  Hidden Expenses ({hiddenCount})
+                </button>
+              )}
               <div className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1">
                 <span className="text-[11px] text-zinc-300">
                   {hideAmounts ? `${rupeeSymbol}****` : `${rupeeSymbol}${safeTotalAmount.toLocaleString()}`}

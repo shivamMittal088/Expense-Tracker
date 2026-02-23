@@ -61,6 +61,7 @@ export default function ExpenseTrackerHome() {
   const [dayPage, setDayPage] = useState(1);
   const [dayTotalCount, setDayTotalCount] = useState(0);
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
+  const [dayHiddenCount, setDayHiddenCount] = useState(0);
   const [ribbonData, setRibbonData] = useState<RibbonDay[]>([]);
   const [ribbonLoading, setRibbonLoading] = useState(false);
   const [ribbonRefreshKey, setRibbonRefreshKey] = useState(0);
@@ -165,12 +166,14 @@ export default function ExpenseTrackerHome() {
       const meta = res.data?.meta || {};
       const totalCount = Number(meta.totalCount || 0);
       const totalAmount = Number(meta.totalAmount || 0);
+      const hiddenCount = Number(meta.hiddenCount || 0);
 
       setVisibleTotal(totalAmount);
 
       setDayExpenses(normalized);
       setDayTotalCount(totalCount);
       setDayTotalAmount(totalAmount);
+      setDayHiddenCount(hiddenCount);
     } catch (err: unknown) {
       // Ignore aborted requests
       if (err instanceof Error && err.name === 'AbortError') {
@@ -181,6 +184,7 @@ export default function ExpenseTrackerHome() {
       setDayExpenses([]);
       setDayTotalCount(0);
       setDayTotalAmount(0);
+      setDayHiddenCount(0);
     } finally {
       // Keep silent for now since the expenses section is hidden on the home page.
     }
@@ -374,6 +378,7 @@ export default function ExpenseTrackerHome() {
             page={dayPage}
             totalCount={dayTotalCount}
             totalAmount={dayTotalAmount}
+            hiddenCount={dayHiddenCount}
             totalPages={Math.max(1, Math.ceil(dayTotalCount / dayLimit))}
             onPageChange={setDayPage}
             onExpenseHidden={fetchExpenses}
