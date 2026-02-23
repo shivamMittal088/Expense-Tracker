@@ -112,13 +112,13 @@ const Transactions = () => {
 
   return (
     <div className="px-3 sm:px-4 pt-3 pb-28 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-            <Wallet className="text-zinc-300" size={22} />
+          <h1 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <Wallet className="text-zinc-300" size={20} />
             Transactions
           </h1>
-          <p className="text-zinc-500 text-sm mt-0.5">All expenses, newest first</p>
+          <p className="text-zinc-500 text-xs mt-0.5">All expenses, newest first</p>
         </div>
       </div>
 
@@ -142,34 +142,34 @@ const Transactions = () => {
                 return (
                   <div
                     key={expense._id}
-                    className="group flex items-center gap-3 px-3.5 sm:px-4 py-3.5 transition-all hover:bg-zinc-900 active:scale-[0.995]"
+                    className="group flex items-center gap-2.5 px-3 sm:px-3.5 py-2.5 transition-all hover:bg-zinc-900 active:scale-[0.995]"
                     style={{ animationDelay: `${index * 20}ms` }}
                   >
                     <div
-                      className="relative w-11 h-11 rounded-2xl flex items-center justify-center text-lg shrink-0"
+                      className="relative w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0"
                       style={{ backgroundColor: `${expense.category.color || "#10b981"}18` }}
                     >
                       <span className="drop-shadow">{expense.category.emoji || "\uD83D\uDCB0"}</span>
                       <span
-                        className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-black"
+                        className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-black"
                         style={{ backgroundColor: expense.category.color || "#10b981" }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-semibold tracking-wide truncate">
+                      <p className="text-white text-[13px] sm:text-sm font-semibold tracking-wide truncate leading-tight">
                         {expense.category.name}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] uppercase tracking-wide text-zinc-300 bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded-full">
+                      <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                        <span className="text-[10px] uppercase tracking-wide text-zinc-300 bg-zinc-900 border border-zinc-700 px-1.5 py-0.5 rounded-full shrink-0">
                           {expense.payment_mode === "bank_transfer" ? "Bank" : expense.payment_mode.toUpperCase()}
                         </span>
                         {expense.notes && (
-                          <span className="text-zinc-500 text-xs truncate">{expense.notes}</span>
+                          <span className="text-zinc-500 text-[11px] truncate">{expense.notes}</span>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-white font-semibold text-sm sm:text-base">
+                        <p className="text-white font-semibold text-[13px] sm:text-sm leading-tight">
                           {hideAmounts ? (
                             `${rupeeSymbol}****`
                           ) : (
@@ -179,7 +179,7 @@ const Transactions = () => {
                             </>
                           )}
                         </p>
-                      <p className="text-[10px] sm:text-[11px] text-zinc-500">
+                      <p className="text-[10px] text-zinc-500 mt-0.5 leading-tight">
                         {occurredAt.toLocaleDateString("en-IN", {
                           day: "2-digit",
                           month: "short",

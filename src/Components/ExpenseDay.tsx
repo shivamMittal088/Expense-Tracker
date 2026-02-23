@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 
@@ -54,6 +54,10 @@ const ExpenseDay = ({
   const [hiddenExpenses, setHiddenExpenses] = useState<ExpenseDayItem[]>([]);
   const [hiddenLoading, setHiddenLoading] = useState(false);
   const [restoringExpenseId, setRestoringExpenseId] = useState<string | null>(null);
+  const [editingExpense, setEditingExpense] = useState<ExpenseDayItem | null>(null);
+  const [editAmount, setEditAmount] = useState<string>("");
+  const [editNote, setEditNote] = useState<string>("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const expenseToHide = useMemo(
     () => dayExpenses.find((expense) => expense._id === confirmHideExpenseId) || null,
@@ -120,6 +124,45 @@ const ExpenseDay = ({
     }
   };
 
+  const handleOpenEdit = (expense: ExpenseDayItem) => {
+    setEditingExpense(expense);
+    setEditAmount(String(expense.amount));
+    setEditNote(expense.notes || "");
+  };
+
+  const handleCloseEdit = () => {
+    if (savingEdit) return;
+    setEditingExpense(null);
+    setEditAmount("");
+    setEditNote("");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingExpense || savingEdit) return;
+
+    const parsedAmount = Number(editAmount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      showTopToast("Enter a valid amount", { tone: "error", duration: 2200 });
+      return;
+    }
+
+    setSavingEdit(true);
+    try {
+      await api.patch(`/api/expense/${editingExpense._id}`, {
+        amount: parsedAmount,
+        notes: editNote.trim() || "",
+      });
+      showTopToast("Expense updated", { duration: 1700 });
+      window.dispatchEvent(new CustomEvent("expense:changed"));
+      await onExpenseHidden?.();
+      handleCloseEdit();
+    } catch {
+      showTopToast("Failed to update expense", { tone: "error", duration: 2200 });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   return (
     <section className="max-w-5xl mx-auto">
       <div
@@ -177,6 +220,15 @@ const ExpenseDay = ({
                         {expense.category.name}
                       </p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(expense)}
+                      className="h-7 w-7 shrink-0 rounded-full border border-zinc-700 bg-zinc-950/90 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200"
+                      aria-label="Edit expense"
+                      title="Edit expense"
+                    >
+                      <Pencil size={12} className="mx-auto" />
+                    </button>
                     <button
                       type="button"
                       onClick={() => setConfirmHideExpenseId(expense._id)}
@@ -319,6 +371,72 @@ const ExpenseDay = ({
                   );
                 })
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingExpense && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-zinc-700 bg-zinc-950 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-white">Edit Expense</h3>
+              <button
+                type="button"
+                onClick={handleCloseEdit}
+                disabled={savingEdit}
+                className="h-8 w-8 rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white disabled:opacity-60"
+                aria-label="Close edit expense"
+              >
+                <X size={14} className="mx-auto" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="text-[11px] text-zinc-400">Amount</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  disabled={savingEdit}
+                  className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500 disabled:opacity-60"
+                  placeholder="Enter amount"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-zinc-400">Note</label>
+                <textarea
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  disabled={savingEdit}
+                  rows={3}
+                  className="mt-1 w-full resize-none rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-500 disabled:opacity-60"
+                  placeholder="Add note"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={handleCloseEdit}
+                disabled={savingEdit}
+                className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveEdit}
+                disabled={savingEdit}
+                className="flex-1 rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60"
+              >
+                {savingEdit ? "Saving..." : "Save"}
+              </button>
             </div>
           </div>
         </div>

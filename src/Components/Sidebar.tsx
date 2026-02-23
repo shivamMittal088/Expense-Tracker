@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, X, ChevronRight, LogOut } from "lucide-react";
+import { Calculator as CalculatorIcon, FileSpreadsheet, Settings, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
 import api from "../routeWrapper/Api";
 
@@ -17,7 +17,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { icon: CalculatorIcon, label: "Calculator", description: "Quick calculations", action: "calculator" },
-    { icon: FileDown, label: "Download PDF", description: "Export as PDF report", action: "pdf" },
     { icon: FileSpreadsheet, label: "Export to Excel", description: "Download spreadsheet", action: "excel" },
     { icon: Settings, label: "Settings", description: "Manage preferences", action: "settings" },
   ];
@@ -39,8 +38,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     onClose();
     if (item.action === "calculator") {
       setIsCalculatorOpen(true);
-    } else if (item.action === "pdf") {
-      alert("PDF download coming soon!");
     } else if (item.action === "excel") {
       alert("Excel export coming soon!");
     } else if (item.action === "settings") {
@@ -78,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Sidebar Menu */}
       <div 
         ref={menuRef}
-        className={`fixed top-0 left-0 h-[100dvh] w-[72vw] max-w-[240px] z-50 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`fixed top-0 left-0 h-dvh w-[72vw] max-w-60 z-50 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isOpen 
             ? 'translate-x-0 opacity-100 pointer-events-auto' 
             : '-translate-x-full opacity-0 pointer-events-none'
@@ -86,11 +83,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Pure black background */}
         <div className="absolute inset-0 bg-black" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-white/[0.02]" />
-        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-white/2 via-transparent to-white/2" />
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-white/20 to-transparent" />
         
         {/* Subtle corner glow */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/[0.03] rounded-full blur-[60px] pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/3 rounded-full blur-[60px] pointer-events-none" />
 
         {/* Content */}
         <div className="relative h-full flex flex-col">
@@ -136,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   }}
                 >
                   {/* Hover background */}
-                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/[0.05] transition-all duration-300 rounded-xl" />
+                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-xl" />
                   
                   {/* Left accent bar on hover */}
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-0 group-hover:h-6 bg-white rounded-full transition-all duration-300" />

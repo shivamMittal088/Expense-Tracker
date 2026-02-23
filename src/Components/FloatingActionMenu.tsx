@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Plus, Calculator as CalculatorIcon, FileDown, FileSpreadsheet, Settings, LogOut } from "lucide-react";
+import { Plus, Calculator as CalculatorIcon, FileSpreadsheet, Settings, LogOut } from "lucide-react";
 const Calculator = lazy(() =>
   import("../utils/UI/Calculator").then((module) => ({
     default: module.Calculator,
@@ -37,10 +37,6 @@ const FloatingActionMenu = () => {
     setOpen(false);
     if (action === "calculator") {
       setIsCalculatorOpen(true);
-      return;
-    }
-    if (action === "pdf") {
-      alert("PDF download coming soon!");
       return;
     }
     if (action === "excel") {
@@ -83,15 +79,6 @@ const FloatingActionMenu = () => {
               <CalculatorIcon size={16} className="text-white/80" />
             </span>
             Calculator
-          </button>
-          <button
-            onClick={() => handleAction("pdf")}
-            className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
-          >
-            <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-              <FileDown size={16} className="text-white/80" />
-            </span>
-            Download PDF
           </button>
           <button
             onClick={() => handleAction("excel")}
