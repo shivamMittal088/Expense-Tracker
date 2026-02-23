@@ -2,50 +2,51 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { Outlet} from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import type { FollowRequest } from "./NotificationsModal";
 import api from "../routeWrapper/Api";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  removeNotificationRequest,
+  setNotificationsLoading,
+  setNotificationRequests,
+} from "../store/slices/notificationsSlice";
 
 const PeopleSearchModal = lazy(() => import("./PeopleSearchModal"));
 const NotificationsModal = lazy(() => import("./NotificationsModal"));
 
 export default function Layout() {
+  const dispatch = useAppDispatch();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notificationRequests, setNotificationRequests] = useState<FollowRequest[] | null>(null);
-  const loadingNotifications = isNotificationsOpen && notificationRequests === null;
+  const notificationRequests = useAppSelector((state) => state.notifications.requests);
+  const notificationsLoaded = useAppSelector((state) => state.notifications.isLoaded);
+  const notificationsLoading = useAppSelector((state) => state.notifications.loading);
+  const loadingNotifications = isNotificationsOpen && notificationsLoading;
   const notificationsInFlight = useRef(false);
-  const notificationsRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchNotifications = useCallback(function loadNotifications() {
+  const fetchNotifications = useCallback(async (force = false) => {
+    if (!force && notificationsLoaded) return;
     if (notificationsInFlight.current) return;
     notificationsInFlight.current = true;
-    if (notificationsRetryTimer.current) {
-      clearTimeout(notificationsRetryTimer.current);
-      notificationsRetryTimer.current = null;
-    }
+    dispatch(setNotificationsLoading(true));
 
-    api.get("/api/follow/follow-requests")
-      .then((res) => {
-        setNotificationRequests(res.data?.requests || []);
-      })
-      .catch(() => {
-        notificationsRetryTimer.current = setTimeout(() => {
-          loadNotifications();
-        }, 4000);
-      })
-      .finally(() => {
-        notificationsInFlight.current = false;
-      });
-  }, []);
+    try {
+      const res = await api.get("/api/follow/follow-requests");
+      dispatch(setNotificationRequests(res.data?.requests || []));
+    } catch {
+      dispatch(setNotificationsLoading(false));
+    } finally {
+      notificationsInFlight.current = false;
+    }
+  }, [dispatch, notificationsLoaded]);
 
   useEffect(() => {
-    if (notificationRequests !== null) return;
+    if (notificationsLoaded) return;
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let idleId: number | null = null;
 
     const scheduleFetch = () => {
-      fetchNotifications();
+      void fetchNotifications();
     };
 
     const browserWindow = window as Window & {
@@ -71,7 +72,7 @@ export default function Layout() {
         clearTimeout(timeoutId);
       }
     };
-  }, [fetchNotifications, notificationRequests]);
+  }, [fetchNotifications, notificationsLoaded]);
 
   useEffect(() => {
     const seedKey = "seedTilesOnce";
@@ -119,28 +120,8 @@ export default function Layout() {
 
   useEffect(() => {
     if (!isNotificationsOpen) return;
-    fetchNotifications();
+    void fetchNotifications();
   }, [isNotificationsOpen, fetchNotifications]);
-
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState === "visible") {
-        fetchNotifications();
-      }
-    };
-
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
-
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
-      if (notificationsRetryTimer.current) {
-        clearTimeout(notificationsRetryTimer.current);
-        notificationsRetryTimer.current = null;
-      }
-    };
-  }, [fetchNotifications]);
 
   const handleOpenNotifications = () => {
     setIsNotificationsOpen(true);
@@ -148,12 +129,12 @@ export default function Layout() {
 
   const handleAcceptRequest = async (requestId: string) => {
     await api.post(`/api/follow/follow-requests/${requestId}/accept`);
-    setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
+    dispatch(removeNotificationRequest(requestId));
   };
 
   const handleDeclineRequest = async (requestId: string) => {
     await api.delete(`/api/follow/follow-requests/${requestId}`);
-    setNotificationRequests((prev) => (prev ? prev.filter((r) => r.id !== requestId) : prev));
+    dispatch(removeNotificationRequest(requestId));
   };
 
   return (
@@ -161,7 +142,7 @@ export default function Layout() {
       <NavBar
         onSearchClick={() => setIsSearchOpen(true)}
         onNotificationClick={handleOpenNotifications}
-        notificationCount={notificationRequests?.length || 0}
+        notificationCount={notificationRequests.length}
       />
 
       {/* This is the scrollable area */}
@@ -196,9 +177,10 @@ export default function Layout() {
           <NotificationsModal
             open={isNotificationsOpen}
             onClose={() => setIsNotificationsOpen(false)}
-            count={notificationRequests?.length || 0}
-            requests={notificationRequests || []}
+            count={notificationRequests.length}
+            requests={notificationRequests}
             loading={loadingNotifications}
+            onRefresh={() => fetchNotifications(true)}
             onAccept={handleAcceptRequest}
             onDecline={handleDeclineRequest}
           />

@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import amountReducer from "./slices/amountSlice";
 import userReducer from "./slices/userSlice";
 import todayTransactionsReducer from "./slices/todayTransactionsSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 
 export const store = configureStore({
   reducer: {
     amount: amountReducer,
     user: userReducer,
     todayTransactions: todayTransactionsReducer,
+    notifications: notificationsReducer,
   },
 });
 

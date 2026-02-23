@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, X, UserPlus } from "lucide-react";
+import type { FollowRequest } from "../store/slices/notificationsSlice";
 
 interface NotificationsModalProps {
   open: boolean;
@@ -7,22 +8,10 @@ interface NotificationsModalProps {
   count: number;
   requests: FollowRequest[];
   loading: boolean;
+  onRefresh?: () => Promise<void> | void;
   onAccept: (requestId: string) => Promise<void>;
   onDecline: (requestId: string) => Promise<void>;
 }
-
-export type FollowRequest = {
-  id: string;
-  follower: {
-    _id: string;
-    name: string;
-    emailId?: string;
-    photoURL?: string;
-    statusMessage?: string;
-  } | null;
-  note?: string;
-  createdAt?: string;
-};
 
 const getFullPhotoURL = (photoURL?: string) => {
   if (!photoURL) return undefined;
@@ -53,6 +42,7 @@ export default function NotificationsModal({
   count,
   requests,
   loading,
+  onRefresh,
   onAccept,
   onDecline,
 }: NotificationsModalProps) {
@@ -97,13 +87,26 @@ export default function NotificationsModal({
                 <p className="text-[10px] text-white/40">Notifications</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[10px] text-white/40 hover:text-white/70"
-            >
-              Close
-            </button>
+            <div className="flex items-center gap-2">
+              {onRefresh && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void onRefresh();
+                  }}
+                  className="text-[10px] text-white/40 hover:text-white/70"
+                >
+                  Refresh
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-[10px] text-white/40 hover:text-white/70"
+              >
+                Close
+              </button>
+            </div>
           </div>
 
           {loading ? (
