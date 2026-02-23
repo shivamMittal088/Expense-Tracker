@@ -13,26 +13,16 @@ import {
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { AxiosError } from "axios";
-
-interface ProfileData {
-  _id: string;
-  name: string;
-  emailId: string;
-  photoURL?: string;
-  statusMessage?: string;
-  followersCount?: number;
-  followingCount?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { updateUserProfile } from "../store/slices/userSlice";
 
 interface ApiErrorResponse {
   message?: string;
 }
 
 export default function Profile() {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector((state) => state.user.profile);
   const [editingName, setEditingName] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [nameValue, setNameValue] = useState("");
@@ -55,37 +45,31 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    // Fetch profile first (required)
-    Api.get<ProfileData>("/api/profile/view")
-      .then(({ data }) => {
-        // Convert relative photoURL to full URL
-        const profileWithFullPhotoURL = {
-          ...data,
-          photoURL: getFullPhotoURL(data.photoURL),
-        };
-        setProfile(profileWithFullPhotoURL);
-        setNameValue(data.name);
-        setStatusValue(data.statusMessage || "");
-      })
-      .catch(() => {
-        showTopToast("Failed to load profile", { tone: "error" });
-      })
-      .finally(() => setLoading(false));
-
-  }, []);
+    if (!profile) return;
+    setNameValue(profile.name);
+    setStatusValue(profile.statusMessage || "");
+  }, [profile]);
 
   const handleSaveName = async () => {
     if (!nameValue.trim()) {
       showTopToast("Name cannot be empty", { tone: "error" });
       return;
     }
+    if (!profile) return;
+
+    const prevName = profile.name;
+    const nextName = nameValue.trim();
+
     setSaving(true);
+    dispatch(updateUserProfile({ name: nextName }));
+    setEditingName(false);
+
     try {
-      await Api.patch("/api/profile/update", { name: nameValue.trim() });
-      setProfile((prev) => prev ? { ...prev, name: nameValue.trim() } : null);
-      setEditingName(false);
+      await Api.patch("/api/profile/update", { name: nextName });
       showTopToast("Name updated", { duration: 1500 });
     } catch (err) {
+      dispatch(updateUserProfile({ name: prevName }));
+      setEditingName(true);
       const axiosError = err as AxiosError<ApiErrorResponse>;
       showTopToast(axiosError?.response?.data?.message || "Failed to update", { tone: "error" });
     } finally {
@@ -94,13 +78,21 @@ export default function Profile() {
   };
 
   const handleSaveStatus = async () => {
+    if (!profile) return;
+
+    const prevStatus = profile.statusMessage || "";
+    const nextStatus = statusValue.trim();
+
     setSaving(true);
+    dispatch(updateUserProfile({ statusMessage: nextStatus }));
+    setEditingStatus(false);
+
     try {
-      await Api.patch("/api/profile/update", { statusMessage: statusValue.trim() });
-      setProfile((prev) => prev ? { ...prev, statusMessage: statusValue.trim() } : null);
-      setEditingStatus(false);
+      await Api.patch("/api/profile/update", { statusMessage: nextStatus });
       showTopToast("Status updated", { duration: 1500 });
     } catch (err) {
+      dispatch(updateUserProfile({ statusMessage: prevStatus }));
+      setEditingStatus(true);
       const axiosError = err as AxiosError<ApiErrorResponse>;
       showTopToast(axiosError?.response?.data?.message || "Failed to update", { tone: "error" });
     } finally {
@@ -139,7 +131,7 @@ export default function Profile() {
       // Build full URL for the photo
       const fullPhotoURL = getFullPhotoURL(res.data.photoURL);
       
-      setProfile((prev) => prev ? { ...prev, photoURL: fullPhotoURL } : null);
+      dispatch(updateUserProfile({ photoURL: fullPhotoURL || undefined }));
       showTopToast("Photo updated!", { duration: 1500 });
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
@@ -161,19 +153,10 @@ export default function Profile() {
     });
   };
 
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-white/50 animate-spin" />
-      </div>
-    );
-  }
-
   if (!profile) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <p className="text-white/50">Failed to load profile</p>
+        <p className="text-white/50">No user profile found. Please login again.</p>
       </div>
     );
   }
@@ -190,7 +173,7 @@ export default function Profile() {
               <div className="relative">
                 {profile.photoURL ? (
                   <img
-                    src={profile.photoURL}
+                    src={getFullPhotoURL(profile.photoURL)}
                     alt={profile.name}
                     className="w-20 h-20 rounded-full object-cover border border-zinc-700 cursor-pointer"
                     onClick={() => setIsPhotoOpen(true)}
@@ -344,7 +327,7 @@ export default function Profile() {
             Close
           </button>
           <img
-            src={profile.photoURL}
+            src={getFullPhotoURL(profile.photoURL)}
             alt={profile.name}
             className="max-h-[80vh] max-w-[90vw] rounded-2xl border border-zinc-700"
             onClick={() => setIsPhotoOpen(false)}
@@ -397,7 +380,7 @@ export default function Profile() {
             </div>
             <div className="flex-1">
               <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Member Since</p>
-              <p className="text-sm text-white">{formatDate(profile.createdAt)}</p>
+              <p className="text-sm text-white">{profile.createdAt ? formatDate(profile.createdAt) : "-"}</p>
             </div>
           </div>
 
@@ -410,7 +393,7 @@ export default function Profile() {
             </div>
             <div className="flex-1">
               <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Last Updated</p>
-              <p className="text-sm text-white">{formatDate(profile.updatedAt)}</p>
+              <p className="text-sm text-white">{profile.updatedAt ? formatDate(profile.updatedAt) : "-"}</p>
             </div>
           </div>
         </div>

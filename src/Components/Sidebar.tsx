@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Calculator as CalculatorIcon, FileSpreadsheet, Settings, X, ChevronRight, LogOut } from "lucide-react";
 import { Calculator } from "../utils/UI/Calculator";
 import api from "../routeWrapper/Api";
+import { useAppDispatch } from "../store/hooks";
+import { clearUserProfile } from "../store/slices/userSlice";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [isCalculatorOpen, setIsCalculatorOpen] = React.useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,14 +52,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     setIsLoggingOut(true);
     try {
       await api.post("/api/auth/logout");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("authToken");
+      dispatch(clearUserProfile());
       navigate("/login");
     } catch {
       alert("Failed to logout. Please try again.");
       setIsLoggingOut(false);
     }
-  }, [navigate]);
+  }, [dispatch, navigate]);
 
   return (
     <>

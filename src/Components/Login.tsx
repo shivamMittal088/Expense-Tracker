@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import api from "../routeWrapper/Api";
+import { useAppDispatch } from "../store/hooks";
+import { setUserProfile } from "../store/slices/userSlice";
 
 import type {
   ChangeEvent,
@@ -27,6 +29,20 @@ interface FormData {
   emailId: string;
   password: string;
   confirmPassword: string;
+}
+
+interface AuthResponse {
+  _id: string;
+  name: string;
+  emailId: string;
+  photoURL?: string;
+  statusMessage?: string;
+  isPublic?: boolean;
+  followersCount?: number;
+  followingCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  token?: string;
 }
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -101,6 +117,7 @@ const Login: React.FC = () => {
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
 
   const [formData, setFormData] = useState<FormData>({
@@ -122,10 +139,38 @@ const Login: React.FC = () => {
     try {
       if (isLogin) {
         // LOGIN
-        const res = await api.post("/api/auth/login", {
+        const res = await api.post<AuthResponse>("/api/auth/login", {
           emailId: formData.emailId,
           password: formData.password,
         });
+
+        const {
+          _id,
+          name,
+          emailId,
+          photoURL,
+          statusMessage,
+          isPublic,
+          followersCount,
+          followingCount,
+          createdAt,
+          updatedAt,
+        } = res.data;
+
+        dispatch(
+          setUserProfile({
+            _id,
+            name,
+            emailId,
+            photoURL,
+            statusMessage,
+            isPublic,
+            followersCount,
+            followingCount,
+            createdAt,
+            updatedAt,
+          })
+        );
 
         // Store token in localStorage (fallback for iOS where cookies may be blocked)
         if (res.data.token) {
@@ -140,16 +185,45 @@ const Login: React.FC = () => {
           return;
         }
 
-        await api.post("/api/auth/signup", {
+        const res = await api.post<AuthResponse>("/api/auth/signup", {
           name: formData.name,
           emailId: formData.emailId,
           password: formData.password,
-        }).then((res) => {
-          // Store token in localStorage (fallback for iOS where cookies may be blocked)
-          if (res.data.token) {
-            localStorage.setItem("authToken", res.data.token);
-          }
         });
+
+        const {
+          _id,
+          name,
+          emailId,
+          photoURL,
+          statusMessage,
+          isPublic,
+          followersCount,
+          followingCount,
+          createdAt,
+          updatedAt,
+        } = res.data;
+
+        dispatch(
+          setUserProfile({
+            _id,
+            name,
+            emailId,
+            photoURL,
+            statusMessage,
+            isPublic,
+            followersCount,
+            followingCount,
+            createdAt,
+            updatedAt,
+          })
+        );
+
+        // Store token in localStorage (fallback for iOS where cookies may be blocked)
+        if (res.data.token) {
+          localStorage.setItem("authToken", res.data.token);
+        }
+
         localStorage.setItem("isLoggedIn", "true");
         navigate("/");
       }

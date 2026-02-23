@@ -9,6 +9,8 @@ const FooterProfileIcon = lazy(() =>
   import("./FooterLazyIcons").then((module) => ({ default: module.FooterProfileIcon }))
 );
 import Api from "../routeWrapper/Api";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { clearUserProfile } from "../store/slices/userSlice";
 const Calculator = lazy(() =>
   import("../utils/UI/Calculator").then((module) => ({
     default: module.Calculator,
@@ -25,7 +27,8 @@ const Footer: FC = () => {
   const lastScrollYRef = useRef(0);
   const scrollRafRef = useRef<number | null>(null);
   const toolsCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const profile = useAppSelector((state) => state.user.profile);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const getFullPhotoURL = (photoURL?: string) => {
@@ -36,6 +39,8 @@ const Footer: FC = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
     return `${baseUrl}${photoURL}`;
   };
+
+  const profilePhotoUrl = getFullPhotoURL(profile?.photoURL);
 
   useEffect(() => {
     const scrollContainer = document.getElementById("app-scroll-container");
@@ -86,50 +91,6 @@ const Footer: FC = () => {
   }, []);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!isLoggedIn) {
-      return;
-    }
-
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let idleId: number | null = null;
-
-    const fetchProfilePhoto = () => {
-      Api.get("/api/profile/view")
-        .then((response) => {
-          setProfilePhotoUrl(getFullPhotoURL(response.data?.photoURL));
-        })
-        .catch(() => {
-          setProfilePhotoUrl(null);
-        });
-    };
-
-    const browserWindow = window as Window & {
-      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-
-    if (browserWindow.requestIdleCallback) {
-      idleId = browserWindow.requestIdleCallback(() => {
-        fetchProfilePhoto();
-      }, { timeout: 3500 });
-    } else {
-      timeoutId = setTimeout(() => {
-        fetchProfilePhoto();
-      }, 2000);
-    }
-
-    return () => {
-      if (idleId !== null) {
-        browserWindow.cancelIdleCallback?.(idleId);
-      }
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     return () => {
       if (toolsCloseTimerRef.current) {
         clearTimeout(toolsCloseTimerRef.current);
@@ -162,8 +123,7 @@ const Footer: FC = () => {
     setIsLoggingOut(true);
     try {
       await Api.post("/api/auth/logout");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("authToken");
+      dispatch(clearUserProfile());
       navigate("/login");
     } catch {
       alert("Failed to logout. Please try again.");

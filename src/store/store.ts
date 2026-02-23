@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import amountReducer from "./slices/amountSlice";
-import privacyReducer from "./slices/privacySlice";
+import userReducer from "./slices/userSlice";
 
 export const store = configureStore({
   reducer: {
     amount: amountReducer,
-    privacy: privacyReducer,
+    user: userReducer,
   },
 });
 

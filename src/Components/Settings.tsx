@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Shield,
   LogOut,
   ChevronRight,
-  Loader2,
   Key,
   EyeOff,
   Eye,
@@ -12,38 +11,22 @@ import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
-import { setIsPublic as setIsPublicAction } from "../store/slices/privacySlice";
-
-interface ProfileView {
-  isPublic?: boolean;
-}
+import { clearUserProfile, setUserPrivacy } from "../store/slices/userSlice";
 
 export default function Settings() {
   const dispatch = useAppDispatch();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
-  const isPublic = useAppSelector((state) => state.privacy.isPublic);
+  const profile = useAppSelector((state) => state.user.profile);
+  const isPublic = profile?.isPublic ?? true;
   const [privacyUpdating, setPrivacyUpdating] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  
-  useEffect(() => {
-    Api.get<ProfileView>("/api/profile/view")
-      .then(({ data }) => {
-        dispatch(setIsPublicAction(data.isPublic ?? true));
-      })
-      .catch(() => {
-        showTopToast("Failed to load privacy setting", { tone: "error" });
-      })
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleLogout = async () => {
     try {
       await Api.post("/api/auth/logout");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("authToken");
+      dispatch(clearUserProfile());
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to logout", { tone: "error" });
@@ -52,29 +35,23 @@ export default function Settings() {
 
   const handlePrivacyToggle = async (isPrivate: boolean) => {
     const nextIsPublic = !isPrivate;
+    const prevIsPublic = isPublic;
+
     setPrivacyUpdating(true);
+    dispatch(setUserPrivacy(nextIsPublic));
+
     try {
       await Api.patch("/api/profile/privacy", { isPublic: nextIsPublic });
-      dispatch(setIsPublicAction(nextIsPublic));
       showTopToast(nextIsPublic ? "Account is now public" : "Account is now private", {
         duration: 1500,
       });
-      setTimeout(() => window.location.reload(), 300);
     } catch {
+      dispatch(setUserPrivacy(prevIsPublic));
       showTopToast("Failed to update privacy", { tone: "error" });
     } finally {
       setPrivacyUpdating(false);
     }
   };
-
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-xl mx-auto px-4 py-8 pb-28">
