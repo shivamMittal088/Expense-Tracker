@@ -159,6 +159,38 @@ Local URLs:
 
 ---
 
+## 🐳 Docker (Pull-Only)
+
+The app can be run directly from published Docker Hub images via the root compose file.
+
+### Images
+
+- `shivammittal088/expense-tracker:frontend-latest`
+- `shivammittal088/expense-tracker:backend-latest`
+- `shivammittal088/expense-tracker:mongo-7`
+
+### Run with Docker Compose
+
+From project root:
+
+```powershell
+docker compose pull
+docker compose up -d
+```
+
+Open:
+
+- Frontend: `http://localhost:5173`
+- Backend health check: `http://localhost:5000/test`
+
+Stop:
+
+```powershell
+docker compose down
+```
+
+---
+
 ## 📋 Routes Snapshot
 
 - `/` Home dashboard
