@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import api from "../routeWrapper/Api";
+import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch } from "../store/hooks";
 import { setUserProfile } from "../store/slices/userSlice";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
@@ -58,6 +59,24 @@ interface PasswordInputProps {
   show: boolean;
   toggle: () => void;
 }
+
+const LOGIN_LOCKOUT_UNTIL_KEY = "loginLockoutUntil";
+
+const getInitialLockoutSeconds = (): number => {
+  if (typeof window === "undefined") {
+    return 0;
+  }
+
+  const rawValue = window.localStorage.getItem(LOGIN_LOCKOUT_UNTIL_KEY);
+  const lockoutUntilMs = Number(rawValue);
+
+  if (!Number.isFinite(lockoutUntilMs) || lockoutUntilMs <= Date.now()) {
+    window.localStorage.removeItem(LOGIN_LOCKOUT_UNTIL_KEY);
+    return 0;
+  }
+
+  return Math.max(0, Math.ceil((lockoutUntilMs - Date.now()) / 1000));
+};
 
 /* ---------------- Inputs ---------------- */
 
@@ -118,6 +137,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [lockoutSecondsLeft, setLockoutSecondsLeft] = useState<number>(() => getInitialLockoutSeconds());
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -129,7 +150,32 @@ const Login: React.FC = () => {
     confirmPassword: "",
   });
 
+  useEffect(() => {
+    if (lockoutSecondsLeft <= 0) return;
+
+    const timer = window.setInterval(() => {
+      setLockoutSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [lockoutSecondsLeft]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (lockoutSecondsLeft > 0) {
+      const lockoutUntilMs = Date.now() + lockoutSecondsLeft * 1000;
+      window.localStorage.setItem(LOGIN_LOCKOUT_UNTIL_KEY, String(lockoutUntilMs));
+      return;
+    }
+
+    window.localStorage.removeItem(LOGIN_LOCKOUT_UNTIL_KEY);
+  }, [lockoutSecondsLeft]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (attemptsRemaining !== null) {
+      setAttemptsRemaining(null);
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -138,11 +184,22 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (lockoutSecondsLeft > 0) {
+      setAttemptsRemaining(0);
+      showTopToast(`Too many attempts. Retry after ${lockoutSecondsLeft} seconds.`, {
+        tone: "error",
+        duration: 1800,
+      });
+      return;
+    }
+
+    const normalizedEmail = formData.emailId.trim().toLowerCase();
+
     try {
       if (isLogin) {
         // LOGIN
         const res = await api.post<AuthResponse>("/api/auth/login", {
-          emailId: formData.emailId,
+          emailId: normalizedEmail,
           password: formData.password,
         });
 
@@ -180,17 +237,18 @@ const Login: React.FC = () => {
         if (res.data.token) {
           localStorage.setItem("authToken", res.data.token);
         }
+        setAttemptsRemaining(null);
         navigate("/");
       } else {
         // SIGNUP
         if (formData.password !== formData.confirmPassword) {
-          alert("Passwords do not match");
+          showTopToast("Passwords do not match", { tone: "error" });
           return;
         }
 
         const res = await api.post<AuthResponse>("/api/auth/signup", {
           name: formData.name,
-          emailId: formData.emailId,
+          emailId: normalizedEmail,
           password: formData.password,
         });
 
@@ -228,15 +286,52 @@ const Login: React.FC = () => {
         if (res.data.token) {
           localStorage.setItem("authToken", res.data.token);
         }
+        setAttemptsRemaining(null);
         navigate("/");
       }
     } catch (error) {
-  if (axios.isAxiosError(error)) {
-    alert(error.response?.data?.message || "Request failed");
-  } else {
-    alert("Something went wrong");
-  }
-}
+      if (axios.isAxiosError(error)) {
+        const responseData = (error.response?.data || {}) as {
+          message?: string;
+          retryAfterSeconds?: number | string;
+          attemptsRemaining?: number | string;
+        };
+
+        const message = responseData.message || "Request failed";
+        const retryAfterSeconds = Number(responseData.retryAfterSeconds);
+        const attemptsRemaining = Number(responseData.attemptsRemaining);
+
+        if (
+          error.response?.status === 429 &&
+          Number.isFinite(retryAfterSeconds) &&
+          retryAfterSeconds > 0
+        ) {
+          setLockoutSecondsLeft(Math.ceil(retryAfterSeconds));
+          setAttemptsRemaining(0);
+          showTopToast(`${message} Retry after ${Math.ceil(retryAfterSeconds)} seconds.`, {
+            tone: "error",
+            duration: 2400,
+          });
+        } else if (
+          error.response?.status === 400 &&
+          message === "Invalid credentials" &&
+          Number.isFinite(attemptsRemaining)
+        ) {
+          const safeAttemptsRemaining = Math.max(0, Math.floor(attemptsRemaining));
+          setAttemptsRemaining(safeAttemptsRemaining);
+          showTopToast(`${message}. ${Math.max(0, Math.floor(attemptsRemaining))} attempts remaining.`, {
+            tone: "error",
+            duration: 2400,
+          });
+        } else {
+          setAttemptsRemaining(null);
+          showTopToast(message, { tone: "error" });
+        }
+      } else {
+        setAttemptsRemaining(null);
+        showTopToast("Something went wrong", { tone: "error" });
+      }
+    }
 
   };
 
@@ -267,7 +362,9 @@ const Login: React.FC = () => {
             {/* Toggle */}
             <div className="flex mb-5 bg-zinc-900 rounded-lg p-1 border border-zinc-700">
               <button
-                onClick={() => setIsLogin(true)}
+                onClick={() => {
+                  setIsLogin(true);
+                }}
                 className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
                   isLogin
                     ? "bg-zinc-100 text-black"
@@ -277,7 +374,9 @@ const Login: React.FC = () => {
                 Sign In
               </button>
               <button
-                onClick={() => setIsLogin(false)}
+                onClick={() => {
+                  setIsLogin(false);
+                }}
                 className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
                   !isLogin
                     ? "bg-zinc-100 text-black"
@@ -315,6 +414,12 @@ const Login: React.FC = () => {
               toggle={() => setShowPassword(!showPassword)}
             />
 
+            {isLogin && attemptsRemaining !== null && lockoutSecondsLeft <= 0 && (
+              <p className="text-[11px] text-zinc-400">
+                Attempts remaining: {attemptsRemaining}
+              </p>
+            )}
+
             {!isLogin && (
               <Input
                 label="Confirm Password"
@@ -339,16 +444,29 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-2.5 mt-2 bg-zinc-100 hover:bg-zinc-200 text-black text-sm font-semibold rounded-lg transition-colors"
+                disabled={lockoutSecondsLeft > 0}
+                className="w-full py-2.5 mt-2 bg-zinc-100 hover:bg-zinc-200 text-black text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isLogin ? "Sign In" : "Create Account"}
+                {lockoutSecondsLeft > 0
+                  ? `Retry in ${lockoutSecondsLeft}s`
+                  : isLogin
+                    ? "Sign In"
+                    : "Create Account"}
               </button>
+
+              {lockoutSecondsLeft > 0 && (
+                <p className="text-center text-[11px] text-zinc-400">
+                  Too many incorrect attempts. Please wait {lockoutSecondsLeft}s.
+                </p>
+              )}
 
               <p className="text-center text-[11px] text-zinc-400 pt-3">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                 <button
                   type="button"
-                  onClick={() => setIsLogin(!isLogin)}
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                  }}
                   className="text-zinc-100 font-medium hover:text-zinc-300"
                 >
                   {isLogin ? "Sign up" : "Sign in"}
