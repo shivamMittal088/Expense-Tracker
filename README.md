@@ -1,46 +1,28 @@
-<div align="center">
+# 1. Project Title
 
-<img src="./docs/images/readme-banner-small.svg" alt="Expense Tracker Banner" width="760"/>
+## Expense Tracker Frontend
 
-### Mobile-first expense tracking with social features and analytics
-
-[![Live Demo](https://img.shields.io/badge/Live-Demo-22C55E?style=for-the-badge&logo=vercel&logoColor=white)](https://www.track-expense.com/)
-
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-State-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
-
-</div>
+Expense Tracker Frontend is a mobile-first React application for daily expense capture, analytics, social discovery, and export workflows.
 
 ---
 
-## 🌐 Live Deployment
+# 2. Project Overview
 
-- **Project URL:** [https://www.track-expense.com/](https://www.track-expense.com/)
-- **Backend Repository:** [https://github.com/shivamMittal088/ExpenseTracker-backend](https://github.com/shivamMittal088/ExpenseTracker-backend)
+This frontend is the user-facing layer of the Expense Tracker platform. It is built as a Vite + React SPA and integrates with a cookie-authenticated backend API.
 
----
+The app focuses on fast daily usage patterns:
 
-## 💡 What is Expense Tracker Frontend?
+- Quick expense entry from home actions
+- Date-aware browsing and transaction history
+- Analytics for trends, recurring expenses, and payment behavior
+- Social features like follow requests, public profiles, and notifications
+- Export-ready data views for reporting
 
-Expense Tracker Frontend is the user-facing app used to **log expenses quickly** and get a **clear, visual view of your financial activity**. It delivers smooth mobile-first flows for adding, reviewing, analyzing, and exporting expenses.
-
----
-
-## 🧠 Engineering Insights
-
-- Implemented **route/component lazy loading** to reduce initial bundle size and improve loading performance.
-- Added **modal prefetching** and deferred optional UI chunks to improve real-world responsiveness.
-- Built **cursor-based transaction flows** and optimized list rendering for smoother infinite browsing.
-- Reduced redundant API pressure with **debounced state-driven requests**.
-- Integrated robust **notification and follow-request UX**, including safe async action states.
-- Delivered **Excel export UX** with previous week/month presets and custom date-range support.
+In production, the app can send relative `/api/*` requests and rely on hosting rewrites/proxy rules to reach backend services.
 
 ---
 
-## 📸 Screenshots
+# 3. Screenshots
 
 ### 🏠 Home → Quick Actions
 
@@ -100,78 +82,176 @@ Expense Tracker Frontend is the user-facing app used to **log expenses quickly**
 
 ---
 
-## ✨ Features
+# 4. Features
 
-| Feature | Description |
-|---------|-------------|
-| ⚡ **Quick Add** | Fast expense entry from home cards and footer tools |
-| 📅 **Date Navigation** | Day-wise tracking with calendar picker and heatmap selection |
-| 📜 **Transactions** | Dedicated paginated transactions route |
-| 📊 **Analytics** | Spending trends, category split, recurring insights, payment methods |
-| 👥 **Social** | User search, follow requests, followers/following lists, public profiles |
-| 👤 **Profile** | Edit name/status, upload avatar, and manage visibility |
-| 🔔 **Notifications** | Follow-request modal with accept/decline actions |
-| 📤 **Export Excel** | Previous week/month + custom date range export page |
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|:------|:-----------|
-| Framework | React 19 |
-| Language | TypeScript |
-| Build Tool | Vite |
-| Routing | React Router |
-| State | Redux Toolkit |
-| Styling | Tailwind CSS |
-| API Client | Axios |
+- Email/password authentication flow (signup, login, logout)
+- Protected routing with auth-aware redirects
+- Day-level expense tracking with pagination
+- Transaction feed for historical browsing
+- Analytics dashboards (range, recurring, payment breakdown, trends, heatmap)
+- Expense mutation flows (hide, restore, update)
+- Category/tile management and seed initialization
+- Social graph UX: search users, follow/unfollow, requests, followers/following
+- Profile management: name, status, privacy, avatar upload, hide-amount preference
+- Excel export by date range
+- Lazy-loaded routes and heavy UI chunks for better initial load performance
 
 ---
 
-## 🚀 Getting Started
+# 5. Tech Stack
 
-### 1) Install
+| Technology | Where Used | Why It Is Used |
+| --- | --- | --- |
+| React 19 | Frontend app | Component-driven UI and stateful rendering |
+| TypeScript | Frontend app | Type safety for components, state, and API calls |
+| Vite 7 | Frontend tooling | Fast local dev server and modern build pipeline |
+| React Router DOM 7 | Routing | SPA route composition and protected route boundaries |
+| Redux Toolkit | Global state | Predictable app state for auth/user and transaction slices |
+| React Redux | State bindings | Hooks-based Redux integration in components |
+| Axios | API layer | Centralized HTTP client with auth/error interceptors |
+| Tailwind CSS 4 | Styling | Utility-first, responsive UI development |
+| Day.js | Date handling | Lightweight date operations for analytics and UI |
+| Nginx | Container runtime | Serves static SPA and proxies `/api/*` to backend in Docker |
+| Vercel rewrites | Production routing | Routes frontend calls to backend API without exposing CORS complexity |
+
+---
+
+# 6. Project Architecture
+
+```mermaid
+flowchart LR
+  USER[Browser Client] --> WEB[Expense Tracker Frontend (React + Vite)]
+  WEB -->|/api/* via Axios with credentials| API[Expense Tracker Backend]
+  API --> DB[(MongoDB)]
+  API --> CACHE[(Redis)]
+  API --> MEDIA[(Cloudinary)]
+```
+
+High-level request flow:
+
+- User signs in and receives auth cookie from backend
+- Frontend sends credentialed API requests (`withCredentials: true`)
+- Protected routes load profile/session data before rendering app flows
+- Backend performs auth/validation and returns domain data for UI modules
+
+---
+
+# 7. Project Folder Structure
+
+```text
+frontend/
+├── src/
+│   ├── Components/          # Page and UI components (home, analytics, profile, exports, modals)
+│   ├── hooks/               # Custom hooks (for example idle prefetch behavior)
+│   ├── routeWrapper/        # Axios API client and route guards
+│   ├── store/               # Redux store, hooks, and slices
+│   ├── utils/               # Shared utility modules and UI helpers
+│   ├── App.tsx              # Route tree and protected/public routing
+│   └── main.tsx             # App bootstrap entrypoint
+├── public/                  # Static assets
+├── docs/                    # Frontend learning notes and screenshots
+├── Dockerfile               # Multi-stage frontend image build
+├── nginx.conf               # SPA serving + API proxy in container
+├── vite.config.ts           # Vite and chunk-splitting config
+├── vercel.json              # Rewrite and header rules for deployment
+└── package.json             # Scripts and dependencies
+```
+
+---
+
+# 8. Installation Steps
+
+## Prerequisites
+
+- Git
+- Node.js 18+ (Node.js 20 recommended)
+- npm
+- Running backend API (local or hosted)
+
+## Clone repository
 
 ```bash
-cd frontend
+git clone <your-repo-url>
+cd expense-tracker/frontend
+```
+
+## Create environment file
+
+PowerShell (Windows):
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Bash (macOS/Linux):
+
+```bash
+cp .env.example .env
+```
+
+## Install dependencies
+
+```bash
 npm install
 ```
 
-### 2) Environment
+---
 
-Create `.env` in `frontend/` for local backend usage:
+# 9. Environment Variables
 
-```env
-VITE_API_BASE_URL=http://localhost:5000
+## Frontend (`frontend/.env`)
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Yes (for local dev) | Backend base URL in development (for example `http://localhost:5000`) |
+
+Notes:
+
+- In production builds, `src/routeWrapper/Api.ts` uses relative API base (`""`) and depends on host-level rewrites/proxy for `/api/*`.
+- `frontend/vercel.json` currently rewrites `/api/:path*` to the deployed backend URL.
+
+---
+
+# 10. How to Run the Project
+
+Use separate terminals for frontend and backend.
+
+## 1) Start backend
+
+From repository root:
+
+```bash
+cd Backend
+npm install
+npm run dev
 ```
 
-### 3) Run
+Default backend URL: `http://localhost:5000`
+
+## 2) Start frontend
+
+From `frontend/`:
 
 ```bash
 npm run dev
 ```
 
-Local URLs:
+Default frontend URL: `http://localhost:5173`
 
-- Frontend app: `http://localhost:5173`
-- Backend API: `http://localhost:5000`
+## 3) Build and preview frontend (optional)
+
+```bash
+npm run build
+npm run preview
+```
 
 ---
 
-## 🐳 Docker (Pull-Only)
+# 11. Running with Docker
 
-The app can be run directly from published Docker Hub images via the root compose file.
+## Option A: Root docker compose (published images)
 
-### Images
-
-- `shivammittal088/expense-tracker:frontend-latest`
-- `shivammittal088/expense-tracker:backend-latest`
-- `shivammittal088/expense-tracker:mongo-7`
-
-### Run with Docker Compose
-
-From project root:
+From repository root:
 
 ```powershell
 docker compose pull
@@ -181,7 +261,7 @@ docker compose up -d
 Open:
 
 - Frontend: `http://localhost:5173`
-- Backend health check: `http://localhost:5000/test`
+- Backend test route: `http://localhost:5000/test`
 
 Stop:
 
@@ -189,43 +269,75 @@ Stop:
 docker compose down
 ```
 
----
+## Option B: Build frontend image locally
 
-## 📋 Routes Snapshot
+From `frontend/`:
 
-- `/` Home dashboard
-- `/analytics` Analytics view
-- `/transactions` Transactions page
-- `/profile` Current user profile
-- `/profile/:id` Public profile
-- `/exports` Excel export page
-- `/settings` User settings
+```bash
+docker build -t expense-tracker-frontend-local .
+docker run --rm -p 5173:80 expense-tracker-frontend-local
+```
 
----
-
-## 🔌 Backend API Prefixes
-
-Current frontend integration uses these backend route groups:
-
-- `/api/auth/*` → authentication routes
-- `/api/expense/*` → add/day/paged expense routes
-- `/api/expenseMutations/*` → hide/restore/update + hidden-day routes
-- `/api/expenseAnalytics/*` → range, recurring, payment-breakdown, trends, heatmap
-- `/api/expenseExport/*` → excel export route
-- `/api/profile/*` → profile view/update/privacy/public profile/upload-avatar
-- `/api/follow/*` → follow/follow-status/follow-requests/followers/following
-- `/api/search/*` → search-users + recent-searches
-- `/api/tile/*` and `/api/seed/*` → tiles and initial tile seeding
+The container serves the SPA through Nginx and proxies `/api/*` to `http://backend:5000` (as defined in `frontend/nginx.conf`).
 
 ---
 
-## 📋 TODOs
+# 12. Routes and Backend API Usage
 
-- [ ] Add stronger unit/integration coverage for key UI flows
-- [ ] Improve offline/PWA readiness
-- [ ] Add richer empty/error UI states
-- [ ] Continue Lighthouse and bundle optimization
-- [ ] Add streak freeze support
-- [ ] Integrate Google Sign-In API
-- [ ] Add email verification code flow
-- [ ] Add cron jobs for scheduled maintenance tasks
+## Frontend Routes
+
+| Route | Description |
+| --- | --- |
+| `/login` | Public authentication page |
+| `/` | Home dashboard |
+| `/analytics` | Analytics and trend visualizations |
+| `/transactions` | Paginated transaction feed |
+| `/profile` | Current user profile |
+| `/profile/followers` | Followers list |
+| `/profile/following` | Following list |
+| `/profile/:id` | Public user profile view |
+| `/settings` | User/account settings |
+| `/exports` | Excel export workflow |
+
+## Backend Route Groups Used by Frontend
+
+| Prefix | Examples |
+| --- | --- |
+| `/api/auth/*` | `signup`, `login`, `logout`, `update/password` |
+| `/api/profile/*` | `view`, `update`, `privacy`, `upload-avatar`, `user/:id` |
+| `/api/expense/*` | `add`, `:date`, `paged` |
+| `/api/expenseMutations/*` | `:id/hide`, `:id/restore`, `:id`, `:date/hidden` |
+| `/api/expenseAnalytics/*` | `range`, `recurring`, `payment-breakdown`, `spending-trends`, `heatmap` |
+| `/api/expenseExport/*` | `excel` |
+| `/api/follow/*` | follow actions, follow requests, followers/following lists |
+| `/api/search/*` | user search and recent searches |
+| `/api/tile/*` | tile list/create |
+| `/api/seed/*` | initial tile seeding |
+
+---
+
+# 13. Future Improvements
+
+- Add focused unit and integration tests for route-level UI behavior
+- Improve error boundaries and empty-state UX coverage
+- Expand offline-first/PWA capabilities
+- Harden accessibility checks across modals and dynamic lists
+- Add stronger telemetry for frontend performance and failure diagnostics
+- Continue bundle splitting and lazy-load tuning for slower mobile networks
+
+---
+
+# 14. Contributing Guidelines
+
+1. Fork the repository.
+2. Create a branch: `git checkout -b feat/your-feature-name`.
+3. Keep changes scoped and include tests when feasible.
+4. Update docs when routes, setup, or behavior changes.
+5. Run `npm run lint` and `npm run build` before opening a PR.
+6. Open a pull request describing what changed, why it changed, and how it was validated.
+
+Recommended commit style:
+
+- `feat: add xyz`
+- `fix: correct abc`
+- `docs: update frontend readme`
