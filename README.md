@@ -120,11 +120,33 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 
 ```mermaid
 flowchart LR
-  USER[Browser Client] --> WEB[Expense Tracker Frontend (React + Vite)]
-  WEB -->|/api/* via Axios with credentials| API[Expense Tracker Backend]
+  USER[Browser Client] --> WEB[expense-tracker-frontend React/Vite]
+  WEB --> API[expense-tracker-backend Express API]
   API --> DB[(MongoDB)]
-  API --> CACHE[(Redis)]
-  API --> MEDIA[(Cloudinary)]
+  API --> REDIS[(Redis)]
+  API --> CLOUD[(Cloudinary)]
+  WEB -. production rewrites .-> API
+  WEB -. docker nginx /api proxy .-> API
+```
+
+Docker runtime view:
+
+```mermaid
+flowchart LR
+  BROWSER[Browser] --> NGINX[frontend container Nginx :80]
+  NGINX -->|serve SPA| DIST[dist assets]
+  NGINX -->|/api/* proxy| BACKEND[backend container :5000]
+  BACKEND --> MONGO[(mongo container)]
+  BACKEND --> REDIS[(redis container)]
+```
+
+Text fallback diagram:
+
+```text
+Browser -> Frontend (React + Vite) -> Backend API (Express)
+                                      -> MongoDB
+                                      -> Redis
+                                      -> Cloudinary
 ```
 
 High-level request flow:
