@@ -4,6 +4,11 @@
 
 Expense Tracker Frontend is a mobile-first React application for daily expense capture, analytics, social discovery, and export workflows.
 
+## Quick Links
+
+- Live Deployment: https://www.track-expense.com/
+- Backend README: https://github.com/shivamMittal088/ExpenseTracker-backend
+
 ---
 
 # 2. Project Overview
