@@ -20,12 +20,16 @@ interface MonthlyTransactionsState {
   items: MonthlyTransaction[];
   isLoaded: boolean;
   loading: boolean;
+  nextCursor: string | null;
+  loadingMore: boolean;
 }
 
 const initialState: MonthlyTransactionsState = {
   items: [],
   isLoaded: false,
   loading: false,
+  nextCursor: null,
+  loadingMore: false,
 };
 
 export const isWithinLast30Days = (dateValue: string) => {
@@ -48,11 +52,24 @@ const monthlyTransactionsSlice = createSlice({
     setMonthlyTransactionsLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
-    setMonthlyTransactions: (state, action: PayloadAction<MonthlyTransaction[]>) => {
-      state.items = action.payload.filter((item) => item.isHidden !== true);
+    setMonthlyTransactions: (state, action: PayloadAction<{ data: MonthlyTransaction[]; nextCursor: string | null }>) => {
+      state.items = action.payload.data.filter((item) => item.isHidden !== true);
       sortByOccurredAtDesc(state.items);
+      state.nextCursor = action.payload.nextCursor;
       state.isLoaded = true;
       state.loading = false;
+    },
+    appendMonthlyTransactions: (state, action: PayloadAction<{ data: MonthlyTransaction[]; nextCursor: string | null }>) => {
+      const newItems = action.payload.data.filter(
+        (item) => item.isHidden !== true && !state.items.some((e) => e._id === item._id)
+      );
+      state.items.push(...newItems);
+      sortByOccurredAtDesc(state.items);
+      state.nextCursor = action.payload.nextCursor;
+      state.loadingMore = false;
+    },
+    setLoadingMore: (state, action: PayloadAction<boolean>) => {
+      state.loadingMore = action.payload;
     },
     addMonthlyTransaction: (state, action: PayloadAction<MonthlyTransaction>) => {
       if (!isWithinLast30Days(action.payload.occurredAt)) return;
@@ -71,6 +88,8 @@ const monthlyTransactionsSlice = createSlice({
 export const {
   setMonthlyTransactionsLoading,
   setMonthlyTransactions,
+  appendMonthlyTransactions,
+  setLoadingMore,
   addMonthlyTransaction,
   clearMonthlyTransactions,
 } = monthlyTransactionsSlice.actions;

@@ -1,10 +1,12 @@
-import { useCallback, useEffect } from "react";
-import { Wallet } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
+import { Wallet, Loader2 } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   setMonthlyTransactions,
   setMonthlyTransactionsLoading,
+  appendMonthlyTransactions,
+  setLoadingMore,
 } from "../store/slices/monthlyTransactionsSlice";
 
 type Expense = {
@@ -28,34 +30,41 @@ const Transactions = () => {
   const transactions = useAppSelector((state) => state.monthlyTransactions.items);
   const loading = useAppSelector((state) => state.monthlyTransactions.loading);
   const isLoaded = useAppSelector((state) => state.monthlyTransactions.isLoaded);
+  const nextCursor = useAppSelector((state) => state.monthlyTransactions.nextCursor);
+  const loadingMore = useAppSelector((state) => state.monthlyTransactions.loadingMore);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const fetchTransactions = useCallback(async (force = false) => {
     if (!force && isLoaded) return;
     dispatch(setMonthlyTransactionsLoading(true));
 
     try {
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 30);
-
-      const formatDate = (date: Date) => date.toISOString().split("T")[0];
-
-      const response = await api.get("/api/expenseAnalytics/range", {
-        params: {
-          startDate: formatDate(startDate),
-          endDate: formatDate(today),
-        },
-      });
-
+      const response = await api.get("/api/expense/paged");
       const data: Expense[] = response.data?.data || [];
-      dispatch(setMonthlyTransactions(data));
+      const cursor: string | null = response.data?.nextCursor || null;
+      dispatch(setMonthlyTransactions({ data, nextCursor: cursor }));
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
       dispatch(setMonthlyTransactionsLoading(false));
-    } finally {
-      dispatch(setMonthlyTransactionsLoading(false));
     }
   }, [dispatch, isLoaded]);
+
+  const fetchMore = useCallback(async () => {
+    if (!nextCursor || loadingMore) return;
+    dispatch(setLoadingMore(true));
+
+    try {
+      const response = await api.get("/api/expense/paged", {
+        params: { cursor: nextCursor },
+      });
+      const data: Expense[] = response.data?.data || [];
+      const cursor: string | null = response.data?.nextCursor || null;
+      dispatch(appendMonthlyTransactions({ data, nextCursor: cursor }));
+    } catch (error) {
+      console.error("Failed to fetch more transactions:", error);
+      dispatch(setLoadingMore(false));
+    }
+  }, [dispatch, nextCursor, loadingMore]);
 
   useEffect(() => {
     void fetchTransactions();
@@ -71,6 +80,23 @@ const Transactions = () => {
       window.removeEventListener("expense:changed", handleExpenseChange);
     };
   }, [fetchTransactions]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !nextCursor) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          void fetchMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [nextCursor, fetchMore]);
 
   if (loading) {
     return (
@@ -94,7 +120,7 @@ const Transactions = () => {
             <Wallet className="text-zinc-300" size={20} />
             Transactions
           </h1>
-          <p className="text-zinc-500 text-xs mt-0.5">Last 30 days, newest first</p>
+          <p className="text-zinc-500 text-xs mt-0.5">All transactions, newest first</p>
         </div>
       </div>
 
@@ -169,6 +195,12 @@ const Transactions = () => {
                   </div>
                 );
               })}
+              <div ref={sentinelRef} />
+              {loadingMore && (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="animate-spin text-zinc-500" size={20} />
+                </div>
+              )}
             </div>
           </>
         )}

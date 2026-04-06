@@ -38,6 +38,8 @@ const shouldForceLogout = (error: AxiosError<{ code?: string; message?: string }
 Api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ code?: string; message?: string }>) => {
+    if (!navigator.onLine) return Promise.reject(error);
+
     const requestUrl = error.config?.url;
 
     if (!isAuthRoute(requestUrl) && shouldForceLogout(error)) {
