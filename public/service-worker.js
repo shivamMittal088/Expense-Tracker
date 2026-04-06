@@ -1,44 +1,14 @@
 self.addEventListener('install', (event) => {
   console.log("[Service Worker] Installed");
 
-  // pre-cache assets
+  // pre-cache assets (stable files that don't change between builds)
   const cacheName = 'Static';
   const assetsToCache = [
     '/',
-    '/index.html',
     '/manifest.json',
     '/favicon.svg',
     '/logo.svg',
     '/vite.svg',
-    '/assets/index-yaglyqDZ.js',
-    '/assets/index-CBJbmTmS.css',
-    '/assets/reactVendor-DllcryNJ.js',
-    '/assets/uiVendor-DjDkK2NB.js',
-    '/assets/utilsVendor-B9ygI19o.js',
-    '/assets/Login-Copj51j3.js',
-    '/assets/Analytics-DF4XRBWA.js',
-    '/assets/Transactions-CIRNjKrf.js',
-    '/assets/Profile-CeAklzh6.js',
-    '/assets/Settings-DvqtnzZn.js',
-    '/assets/AddExpenseModal-DT74tvAn.js',
-    '/assets/AddTileModal-B0WTImge.js',
-    '/assets/ExpenseDay-Ub9jc7ax.js',
-    '/assets/ExpenseHeatmap-DfKwsODf.js',
-    '/assets/ExportExcelPage-Bu0OjYC7.js',
-    '/assets/FollowListPage-1cEQXGK-.js',
-    '/assets/PublicProfile-Dc2yoj0d.js',
-    '/assets/PeopleSearchModal-DMyFIG9D.js',
-    '/assets/NotificationsModal-AH-Nr7g4.js',
-    '/assets/FooterLazyIcons-DHzTPGY0.js',
-    '/assets/FooterToolsPanel-vyryFRu5.js',
-    '/assets/Calculator-YvXok7jd.js',
-    '/assets/Calculator-CPpVsaOt.css',
-    '/assets/CalendarPicker-B_LWi7F9.js',
-    '/assets/CalendarPicker-IWvcE5VP.css',
-    '/assets/TimePicker-aatDaI-z.js',
-    '/assets/TimePicker-DHyYQhok.css',
-    '/assets/Redirecttoast-DQhz_k59.js',
-    '/assets/heavyOptional-DcbensUn.js',
   ]
 
   event.waitUntil(
@@ -54,9 +24,30 @@ self.addEventListener('activate', (event) => {
 
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Skip non-GET and cross-origin requests
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Skip API requests
+  if (url.pathname.startsWith('/api/')) return;
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(event.request).then((networkResponse) => {
+        // Dynamic cache: JS, CSS, and assets on first fetch
+        if (
+          url.pathname.startsWith('/assets/') ||
+          url.pathname.endsWith('.js') ||
+          url.pathname.endsWith('.css')
+        ) {
+          const clone = networkResponse.clone();
+          caches.open('Dynamic').then((cache) => cache.put(event.request, clone));
+        }
+        return networkResponse;
+      });
     })
   );
 })
