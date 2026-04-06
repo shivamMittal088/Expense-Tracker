@@ -4,11 +4,11 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
-const AnalyticsLazy = lazy(() => import("./Components/Analytics"));
-const TransactionsLazy = lazy(() => import("./Components/Transactions"));
-const Profile = lazy(() => import("./Components/Profile"));
-const Settings = lazy(() => import("./Components/Settings"));
-const Login = lazy(() => import("./Components/Login"));
+import Analytics from "./Components/Analytics";
+import Transactions from "./Components/Transactions";
+import Profile from "./Components/Profile";
+import Settings from "./Components/Settings";
+import Login from "./Components/Login";
 const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
 const PublicProfile = lazy(() => import("./Components/PublicProfile"));
 const FollowListPage = lazy(() => import("./Components/FollowListPage"));
@@ -26,43 +26,15 @@ const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route
-            path="/login"
-            element={(
-              <Suspense fallback={routeFallback}>
-                <Login />
-              </Suspense>
-            )}
-          />
+          <Route path="/login" element={<Login />} />
 
           {/* Protected */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
-              <Route
-                path="analytics"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <AnalyticsLazy />
-                  </Suspense>
-                )}
-              />
-              <Route
-                path="transactions"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <TransactionsLazy />
-                  </Suspense>
-                )}
-              />
-              <Route
-                path="profile"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <Profile />
-                  </Suspense>
-                )}
-              />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="transactions" element={<Transactions />} />
+              <Route path="profile" element={<Profile />} />
               <Route
                 path="profile/followers"
                 element={(
@@ -87,14 +59,7 @@ const App: React.FC = () => {
                   </Suspense>
                 )}
               />
-              <Route
-                path="settings"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <Settings />
-                  </Suspense>
-                )}
-              />
+              <Route path="settings" element={<Settings />} />
               <Route
                 path="exports"
                 element={(
