@@ -11,15 +11,29 @@ self.addEventListener('install', (event) => {
     '/vite.svg',
   ]
 
+  self.skipWaiting();
+
   event.waitUntil(
-    caches.open(cacheName)
-      .then((cache) => cache.addAll(assetsToCache))
+    caches.delete('Dynamic').then(() =>
+      caches.open(cacheName)
+        .then((cache) => cache.addAll(assetsToCache))
+    )
   );
 });
 
 self.addEventListener('activate', (event) => {
   console.log("[Service Worker] Activated");
-  return self.clients.claim();
+
+  const allowedCaches = ['Static', 'Dynamic'];
+  event.waitUntil(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames
+          .filter((name) => !allowedCaches.includes(name))
+          .map((name) => caches.delete(name))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
 
@@ -31,6 +45,16 @@ self.addEventListener('fetch', (event) => {
 
   // Skip API requests
   if (url.pathname.startsWith('/api/')) return;
+
+  // SPA navigation fallback: serve cached '/' for HTML navigation requests
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('/').then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
