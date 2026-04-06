@@ -1,4 +1,4 @@
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
   console.log("[Service Worker] Installed");
 
   // pre-cache assets
@@ -12,10 +12,10 @@ self.addEventListener('install', () => {
     '/vite.svg',
   ]
 
-  caches.open(cacheName)
-    .then((cache) => {
-    cache.addAll(assetsToCache);
-  });
+  event.waitUntil(
+    caches.open(cacheName)
+      .then((cache) => cache.addAll(assetsToCache))
+  );
 });
 
 self.addEventListener('activate', (event) => {
