@@ -1,10 +1,13 @@
+var STATIC_CACHE_NAME = 'Static-V2';
+var DYNAMIC_CACHE_NAME = 'Dynamic-V2';
+
 self.addEventListener('install', (event) => {
   console.log("[Service Worker] Installed");
 
   // pre-cache assets (stable files that don't change between builds)
-  const cacheName = 'Static';
   const assetsToCache = [
     '/',
+    '/offline.html',
     '/manifest.json',
     '/favicon.svg',
     '/logo.svg',
@@ -14,17 +17,22 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.delete('Dynamic').then(() =>
-      caches.open(cacheName)
+    caches.delete(DYNAMIC_CACHE_NAME).then(() =>
+      caches.open(STATIC_CACHE_NAME)
         .then((cache) => cache.addAll(assetsToCache))
     )
   );
 });
 
+
+// 👉 The activate event runs when a new Service Worker takes control.So if we change in any file of our code , then service worker code is not changed , hence it use the precached files and gives us stale data hence we change the name of our caching so that service worker file changed but again it first check in previous cache so we also need to cleanup the previous cache so activate is the best place for cleanup as when new service worker takes control then the previous cache automtically deleted
+
+// This also known as cache versioning, where we can use different cache names for different versions of our app. When we update our app, we can change the cache name to ensure that users get the latest assets and we can also clean up old caches in the activate event.
+
 self.addEventListener('activate', (event) => {
   console.log("[Service Worker] Activated");
 
-  const allowedCaches = ['Static', 'Dynamic'];
+  const allowedCaches = [STATIC_CACHE_NAME, DYNAMIC_CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
@@ -47,11 +55,12 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) return;
 
   // SPA navigation fallback: serve cached '/' for HTML navigation requests
+  // If '/' is also not cached, serve offline.html as last resort
   if (event.request.mode === 'navigate') {
     event.respondWith(
       caches.match('/').then((cachedResponse) => {
         return cachedResponse || fetch(event.request);
-      })
+      }).catch(() => caches.match('/offline.html'))
     );
     return;
   }
@@ -68,7 +77,7 @@ self.addEventListener('fetch', (event) => {
           url.pathname.endsWith('.css')
         ) {
           const clone = networkResponse.clone();
-          caches.open('Dynamic').then((cache) => cache.put(event.request, clone));
+          caches.open(DYNAMIC_CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return networkResponse;
       });

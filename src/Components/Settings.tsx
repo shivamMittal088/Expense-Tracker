@@ -6,7 +6,9 @@ import {
   Key,
   EyeOff,
   Eye,
+  HelpCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Api from "../routeWrapper/Api";
 import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -15,6 +17,7 @@ import { clearUserProfile, setUserPrivacy } from "../store/slices/userSlice";
 
 export default function Settings() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const profile = useAppSelector((state) => state.user.profile);
@@ -117,6 +120,20 @@ export default function Settings() {
             icon={LogOut}
             label="Log Out"
             onClick={() => setShowLogoutConfirm(true)}
+          />
+        </div>
+      </section>
+
+      {/* Help & FAQs */}
+      <section className="mb-6">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
+          Help & FAQs
+        </h2>
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+          <SettingButton
+            icon={HelpCircle}
+            label="Help & FAQs"
+            onClick={() => navigate('/help')}
           />
         </div>
       </section>
