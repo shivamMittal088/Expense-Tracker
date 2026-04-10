@@ -1,7 +1,7 @@
 import { openDB } from "idb";
 
 const DB_NAME = "expense-tracker";
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 const STORE_NAME = "tiles";
 
 export type CachedTile = {
@@ -22,6 +22,9 @@ export const dbPromise = openDB(DB_NAME, DB_VERSION, {
     }
     if (!db.objectStoreNames.contains("transactions")) {
       db.createObjectStore("transactions", { keyPath: "_id" });
+    }
+    if (!db.objectStoreNames.contains("heatmap")) {
+      db.createObjectStore("heatmap");
     }
   },
 });

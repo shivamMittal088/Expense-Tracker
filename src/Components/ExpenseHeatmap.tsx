@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import api from "../routeWrapper/Api";
+import { cacheHeatmapData, getCachedHeatmapData } from "../utils/indexedDB/heatmapDB";
 
 type HeatmapData = {
   date: string;
@@ -29,8 +30,18 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
       try {
         const tzOffsetMinutes = new Date().getTimezoneOffset();
         const res = await api.get(`/api/expenseAnalytics/heatmap?year=${year}&tzOffsetMinutes=${tzOffsetMinutes}`);
-        setHeatmapData(res.data.data || []);
+        const data = res.data.data || [];
+        setHeatmapData(data);
+        cacheHeatmapData(year, data).catch(() => {});
       } catch (err) {
+        // Fallback to IndexedDB when API fails
+        try {
+          const cached = await getCachedHeatmapData(year);
+          if (cached?.length) {
+            setHeatmapData(cached);
+            return;
+          }
+        } catch { /* ignore */ }
         console.error("Failed to fetch heatmap data:", err);
         setHeatmapData([]);
       } finally {
