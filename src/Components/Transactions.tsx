@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Wallet, Loader2 } from "lucide-react";
 import api from "../routeWrapper/Api";
+import { cacheTransactions, appendCachedTransactions, getCachedTransactions } from "../utils/indexedDB/transactionsDB";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   setMonthlyTransactions,
@@ -43,7 +44,16 @@ const Transactions = () => {
       const data: Expense[] = response.data?.data || [];
       const cursor: string | null = response.data?.nextCursor || null;
       dispatch(setMonthlyTransactions({ data, nextCursor: cursor }));
+      cacheTransactions(data).catch(() => {});
     } catch (error) {
+      // Fallback to IndexedDB when API fails
+      try {
+        const cached = await getCachedTransactions();
+        if (cached.length) {
+          dispatch(setMonthlyTransactions({ data: cached, nextCursor: null }));
+          return;
+        }
+      } catch { /* ignore */ }
       console.error("Failed to fetch transactions:", error);
       dispatch(setMonthlyTransactionsLoading(false));
     }
@@ -60,6 +70,7 @@ const Transactions = () => {
       const data: Expense[] = response.data?.data || [];
       const cursor: string | null = response.data?.nextCursor || null;
       dispatch(appendMonthlyTransactions({ data, nextCursor: cursor }));
+      appendCachedTransactions(data).catch(() => {});
     } catch (error) {
       console.error("Failed to fetch more transactions:", error);
       dispatch(setLoadingMore(false));
