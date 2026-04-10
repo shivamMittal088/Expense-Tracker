@@ -1,7 +1,7 @@
 import { openDB } from "idb";
 
 const DB_NAME = "expense-tracker";
-const DB_VERSION = 1;
+const DB_VERSION = 3;
 const STORE_NAME = "tiles";
 
 export type CachedTile = {
@@ -12,10 +12,13 @@ export type CachedTile = {
   isBuiltIn?: boolean;
 };
 
-const dbPromise = openDB(DB_NAME, DB_VERSION, {
+export const dbPromise = openDB(DB_NAME, DB_VERSION, {
   upgrade(db) {
     if (!db.objectStoreNames.contains(STORE_NAME)) {
       db.createObjectStore(STORE_NAME, { keyPath: "_id" });
+    }
+    if (!db.objectStoreNames.contains("pendingExpenses")) {
+      db.createObjectStore("pendingExpenses", { keyPath: "id", autoIncrement: true });
     }
   },
 });

@@ -3,6 +3,8 @@ import { Outlet} from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 import api from "../routeWrapper/Api";
+import { getPendingExpenses, deletePendingExpense } from "../utils/indexedDB/expensesDB";
+import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 import {
@@ -136,6 +138,44 @@ export default function Layout() {
         clearTimeout(timeoutId);
       }
     };
+  }, []);
+
+  // Sync pending offline expenses when back online
+  useEffect(() => {
+    const syncPendingExpenses = async () => {
+      const pending = await getPendingExpenses();
+      if (!pending.length) return;
+
+      let synced = 0;
+      for (const expense of pending) {
+        try {
+          await api.post("/api/expense/add", {
+            amount: expense.amount,
+            category: expense.category,
+            payment_mode: expense.payment_mode,
+            notes: expense.notes,
+            occurredAt: expense.occurredAt,
+          }, {
+            params: { tzOffsetMinutes: new Date().getTimezoneOffset() },
+          });
+          if (expense.id != null) await deletePendingExpense(expense.id);
+          synced++;
+        } catch {
+          // Stop syncing on first failure — will retry next time online
+          break;
+        }
+      }
+      if (synced > 0) {
+        showTopToast(`${synced} expense${synced > 1 ? "s" : ""} moved from locally to database`, { duration: 2500 });
+      }
+      window.dispatchEvent(new CustomEvent("expense:changed"));
+    };
+
+    window.addEventListener("online", syncPendingExpenses);
+    // Also try syncing on mount in case we came online before this mounted
+    if (navigator.onLine) syncPendingExpenses();
+
+    return () => window.removeEventListener("online", syncPendingExpenses);
   }, []);
 
   useEffect(() => {

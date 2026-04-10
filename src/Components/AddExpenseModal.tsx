@@ -18,6 +18,7 @@ const TimePicker = lazy(() =>
 const AddTileModal = lazy(() => import("./AddTileModal"));
 import { AxiosError } from "axios";
 import { saveTilesToDB, getTilesFromDB } from "../utils/indexedDB/tilesDB";
+import { savePendingExpense } from "../utils/indexedDB/expensesDB";
 
 interface ApiErrorResponse {
   message?: string;
@@ -168,8 +169,16 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           setTiles(data);
           saveTilesToDB(data).catch(() => {});
         })
-        .catch(() => {
+        .catch(async () => {
           if (cancelled) return;
+          // Fall back to IndexedDB if API fails (e.g. network issue)
+          try {
+            const cached = await getTilesFromDB();
+            if (!cancelled && cached.length) {
+              setTiles(cached);
+              return;
+            }
+          } catch { /* ignore */ }
           showToast("Unable to load categories right now. Try again.");
         })
         .finally(() => {
@@ -237,6 +246,27 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       onClose();
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
+      // If network error (offline/no connection), save to IndexedDB
+      if (!axiosError.response) {
+        try {
+          await savePendingExpense({
+            amount: payload.amount,
+            category: payload.category,
+            payment_mode: payload.payment_mode,
+            notes: payload.notes || "",
+            occurredAt: payload.occurredAt,
+          });
+          showTopToast("You're offline. Expense saved locally and will sync when back online.", { duration: 2500 });
+          setAmount("");
+          setCategory("");
+          setPaymentMode("");
+          setNotes("");
+          setSelectedDate(new Date());
+          setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
+          onClose();
+          return;
+        } catch { /* fall through to generic error */ }
+      }
       const message = axiosError?.response?.data?.message || "Failed to save expense. Please try again.";
       showTopToast(message, { tone: "error", duration: 2500 });
     } finally {
