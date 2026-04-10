@@ -96,6 +96,7 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 - Analytics dashboards (range, recurring, payment breakdown, trends, heatmap)
 - Expense mutation flows (hide, restore, update)
 - Category/tile management and seed initialization
+- Offline tile access via IndexedDB caching (tiles cached on fetch, served from IndexedDB when offline)
 - Social graph UX: search users, follow/unfollow, requests, followers/following
 - Profile management: name, status, privacy, avatar upload, hide-amount preference
 - Excel export by date range
@@ -173,6 +174,7 @@ frontend/
 │   ├── routeWrapper/        # Axios API client and route guards
 │   ├── store/               # Redux store, hooks, and slices
 │   ├── utils/               # Shared utility modules and UI helpers
+│   │   └── indexedDB/       # IndexedDB helpers for offline data caching
 │   ├── App.tsx              # Route tree and protected/public routing
 │   └── main.tsx             # App bootstrap entrypoint
 ├── public/                  # Static assets
@@ -347,7 +349,7 @@ The container serves the SPA through Nginx and proxies `/api/*` to `http://backe
 
 - Add focused unit and integration tests for route-level UI behavior
 - Improve error boundaries and empty-state UX coverage
-- Expand offline-first/PWA capabilities
+- Expand offline-first/PWA capabilities (currently tiles are cached via IndexedDB)
 - Harden accessibility checks across modals and dynamic lists
 - Add stronger telemetry for frontend performance and failure diagnostics
 - Continue bundle splitting and lazy-load tuning for slower mobile networks
