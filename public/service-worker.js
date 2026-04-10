@@ -60,7 +60,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.match('/').then((cachedResponse) => {
         return cachedResponse || fetch(event.request);
-      }).catch(() => caches.match('/offline.html'))
+      })
     );
     return;
   }

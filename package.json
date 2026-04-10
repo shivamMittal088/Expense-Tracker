@@ -15,6 +15,7 @@
     "cloudinary": "^2.9.0",
     "dayjs": "^1.11.19",
     "html-to-image": "^1.11.13",
+    "idb": "^8.0.3",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-day-picker": "^9.13.0",

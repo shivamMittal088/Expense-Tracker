@@ -17,6 +17,7 @@ const TimePicker = lazy(() =>
 );
 const AddTileModal = lazy(() => import("./AddTileModal"));
 import { AxiosError } from "axios";
+import { saveTilesToDB, getTilesFromDB } from "../utils/indexedDB/tilesDB";
 
 interface ApiErrorResponse {
   message?: string;
@@ -106,6 +107,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
   const handleDeleteTile = (tile: Tile, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!navigator.onLine) {
+      showTopToast("All features are not available when offline", { tone: "error", duration: 2000 });
+      return;
+    }
     setTileToDelete(tile);
   };
 
@@ -116,7 +121,9 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     setDeletingTileId(tileId);
     try {
       await Api.delete(`/api/tile/remove/${tileId}`);
-      setTiles((prev) => prev.filter((t) => t._id !== tileId));
+      const updated = tiles.filter((t) => t._id !== tileId);
+      setTiles(updated);
+      saveTilesToDB(updated).catch(() => {});
       if (category === tileToDelete.name) {
         setCategory("");
       }
@@ -139,19 +146,37 @@ export default function AddExpenseModal({ open, onClose }: Props) {
     setSelectedDate(new Date());
     setSelectedTime({ hours: new Date().getHours(), minutes: new Date().getMinutes() });
 
-    Api.get<Tile[]>("/api/tile")
-      .then(({ data }) => {
-        if (cancelled) return;
-        setTiles(data);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        showToast("Unable to load categories right now. Try again.");
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoadingTiles(false);
-      });
+    if (!navigator.onLine) {
+      getTilesFromDB()
+        .then((cached) => {
+          if (cancelled) return;
+          if (cached.length) setTiles(cached);
+          else showToast("You're offline and no cached categories found.");
+        })
+        .catch(() => {
+          if (cancelled) return;
+          showToast("You're offline and no cached categories found.");
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setLoadingTiles(false);
+        });
+    } else {
+      Api.get<Tile[]>("/api/tile")
+        .then(({ data }) => {
+          if (cancelled) return;
+          setTiles(data);
+          saveTilesToDB(data).catch(() => {});
+        })
+        .catch(() => {
+          if (cancelled) return;
+          showToast("Unable to load categories right now. Try again.");
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setLoadingTiles(false);
+        });
+    }
 
     return () => {
       cancelled = true;
@@ -348,7 +373,13 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                       );
                     })}
                     <button
-                      onClick={() => setAddTileOpen(true)}
+                      onClick={() => {
+                        if (!navigator.onLine) {
+                          showTopToast("All features are not available when offline", { tone: "error", duration: 2000 });
+                          return;
+                        }
+                        setAddTileOpen(true);
+                      }}
                       className="p-2 flex flex-col items-center gap-1 rounded-xl border border-dashed border-white/20 hover:border-white/30 transition-colors"
                     >
                       <span className="text-white/40 text-sm">+</span>
@@ -506,7 +537,10 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             onAdded={() => {
               // Refresh tiles after adding new one
               Api.get<Tile[]>("/api/tile")
-                .then(({ data }) => setTiles(data))
+                .then(({ data }) => {
+                  setTiles(data);
+                  saveTilesToDB(data).catch(() => {});
+                })
                 .catch(() => {});
             }}
           />
