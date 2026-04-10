@@ -124,9 +124,13 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 
 # 6. Project Architecture
 
+## Overall System Architecture
+
 ```mermaid
 flowchart LR
-  USER[Browser Client] --> WEB[expense-tracker-frontend React/Vite]
+  USER[Browser Client] --> SW[Service Worker]
+  SW --> WEB[expense-tracker-frontend React/Vite]
+  WEB --> IDB[(IndexedDB)]
   WEB --> API[expense-tracker-backend Express API]
   API --> DB[(MongoDB)]
   API --> REDIS[(Redis)]
@@ -135,7 +139,114 @@ flowchart LR
   WEB -. docker nginx /api proxy .-> API
 ```
 
-Docker runtime view:
+## Online Flow
+
+When the user is connected to the internet, data flows through the API and is cached locally for offline use.
+
+```mermaid
+flowchart TD
+  subgraph Browser
+    APP[React App]
+    SW[Service Worker]
+    IDB[(IndexedDB)]
+  end
+
+  subgraph Backend
+    API[Express API :5000]
+    DB[(MongoDB)]
+    REDIS[(Redis)]
+    CLOUD[(Cloudinary)]
+  end
+
+  APP -- "1 · page navigation" --> SW
+  SW -- "2 · serve cached shell + assets" --> APP
+  SW -- "3 · fetch & dynamic-cache JS/CSS" --> CDN[Network / CDN]
+  APP -- "4 · API requests (axios)" --> API
+  API --> DB
+  API --> REDIS
+  API --> CLOUD
+  API -- "5 · JSON response" --> APP
+  APP -- "6 · cache response" --> IDB
+  APP -- "7 · sync pending offline expenses" --> API
+  APP -- "8 · delete synced items" --> IDB
+```
+
+**Online step-by-step:**
+
+1. User navigates — Service Worker intercepts and serves the cached SPA shell (`/`) and static assets from Static Cache
+2. Any uncached JS/CSS assets are fetched from the network and stored in Dynamic Cache by the Service Worker
+3. React app makes API calls via Axios (`withCredentials: true` for cookie auth)
+4. Backend processes requests (auth → MongoDB/Redis/Cloudinary) and returns JSON
+5. App caches API responses into IndexedDB (tiles, transactions, heatmap data)
+6. On reconnect, `Layout.tsx` syncs any pending offline expenses to the API, then removes them from IndexedDB
+
+## Offline Flow
+
+When the network is unavailable, the Service Worker and IndexedDB work together to keep the app functional.
+
+```mermaid
+flowchart TD
+  subgraph Browser
+    APP[React App]
+    SW[Service Worker]
+    SC[(Static Cache)]
+    DC[(Dynamic Cache)]
+    IDB[(IndexedDB)]
+  end
+
+  APP -- "1 · navigation request" --> SW
+  SW -- "2 · serve cached '/' shell" --> APP
+  SW -- "3 · serve cached JS/CSS/assets" --> APP
+  SC -. pre-cached assets .-> SW
+  DC -. dynamically cached assets .-> SW
+  APP -- "4 · API call fails" --> APP
+  APP -- "5 · read cached data" --> IDB
+  IDB -- "6 · tiles, transactions, heatmap" --> APP
+  APP -- "7 · user adds expense" --> IDB
+  IDB -. "stored as pending expense" .-> IDB
+```
+
+**Offline step-by-step:**
+
+1. User navigates — Service Worker serves the cached SPA shell from Static Cache
+2. JS, CSS, and other assets are served from Static Cache (pre-cached) or Dynamic Cache (previously fetched)
+3. If `'/'` is also not cached, Service Worker falls back to `/offline.html`
+4. React app attempts API calls — they fail (network error, no `response` object)
+5. App falls back to IndexedDB for cached data:
+   - **Tiles** → served from `tiles` store (for Add Expense modal)
+   - **Transactions** → served from `transactions` store (last 100 cached)
+   - **Heatmap** → served from `heatmap` store (keyed by year)
+6. User can still add expenses — saved to `pendingExpenses` store in IndexedDB
+7. Tile add/delete is blocked with a toast ("All features are not available when offline")
+8. When connection returns → `online` event triggers sync of pending expenses to API
+
+## Service Worker Caching Strategy
+
+```mermaid
+flowchart TD
+  REQ[Incoming Request] --> NAV{Navigation?}
+  NAV -- Yes --> CACHE_ROOT[Serve cached '/']
+  CACHE_ROOT -- miss --> FETCH_NAV[Fetch from network]
+  FETCH_NAV -- fail --> OFFLINE[/offline.html/]
+  NAV -- No --> MATCH{Cache match?}
+  MATCH -- hit --> SERVE[Return cached response]
+  MATCH -- miss --> NETWORK[Fetch from network]
+  NETWORK -- success --> IS_ASSET{JS / CSS / asset?}
+  IS_ASSET -- Yes --> DYN_CACHE[Store in Dynamic Cache & return]
+  IS_ASSET -- No --> RETURN[Return response]
+  NETWORK -- fail --> GONE[Request fails]
+
+  style OFFLINE fill:#ef4444,color:#fff
+  style DYN_CACHE fill:#22c55e,color:#fff
+```
+
+| Cache | Contents | Strategy |
+|-------|----------|----------|
+| **Static Cache** (`Static-V2`) | `/`, `/offline.html`, `/manifest.json`, favicons | Pre-cached on install |
+| **Dynamic Cache** (`Dynamic-V2`) | `/assets/*`, runtime JS/CSS | Cache on first fetch |
+| **IndexedDB** (`expense-tracker` v5) | tiles, transactions, heatmap, pendingExpenses | Cache on API success, read on API failure |
+
+## Docker Runtime View
 
 ```mermaid
 flowchart LR
@@ -146,21 +257,38 @@ flowchart LR
   BACKEND --> REDIS[(redis container)]
 ```
 
-Text fallback diagram:
+## Text Fallback Diagram
 
 ```text
-Browser -> Frontend (React + Vite) -> Backend API (Express)
-                                      -> MongoDB
-                                      -> Redis
-                                      -> Cloudinary
+Browser
+  ├── Service Worker
+  │     ├── Static Cache (pre-cached: /, offline.html, manifest, favicons)
+  │     └── Dynamic Cache (runtime: JS, CSS, assets)
+  ├── React App (Vite)
+  │     ├── Online  → API requests → Backend (Express)
+  │     │                              ├── MongoDB
+  │     │                              ├── Redis
+  │     │                              └── Cloudinary
+  │     │            → Cache responses → IndexedDB
+  │     └── Offline → Read from IndexedDB (tiles, transactions, heatmap)
+  │                 → Save expenses to IndexedDB (pendingExpenses)
+  │                 → Sync to API when back online
+  └── IndexedDB (expense-tracker v5)
+        ├── tiles            — cached tile list
+        ├── transactions     — last 100 transactions
+        ├── heatmap          — per-year heatmap data
+        └── pendingExpenses  — expenses saved while offline
 ```
 
-High-level request flow:
+**High-level request flow:**
 
 - User signs in and receives auth cookie from backend
 - Frontend sends credentialed API requests (`withCredentials: true`)
+- Service Worker intercepts navigation and asset requests, serving from cache when possible
+- API responses are cached in IndexedDB for offline fallback
 - Protected routes load profile/session data before rendering app flows
 - Backend performs auth/validation and returns domain data for UI modules
+- When offline, IndexedDB serves cached data; new expenses queue in `pendingExpenses` and sync on reconnect
 
 ---
 
