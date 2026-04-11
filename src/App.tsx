@@ -9,10 +9,8 @@ import Transactions from "./Components/Transactions";
 import Profile from "./Components/Profile";
 import Settings from "./Components/Settings";
 import Login from "./Components/Login";
-import FollowListPage from "./Components/FollowListPage";
 import HelpFAQ from "./Components/HelpFAQ";
 const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
-const PublicProfile = lazy(() => import("./Components/PublicProfile"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
 const App: React.FC = () => {
@@ -36,16 +34,6 @@ const App: React.FC = () => {
               <Route path="analytics" element={<Analytics />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="profile" element={<Profile />} />
-              <Route path="profile/followers" element={<FollowListPage mode="followers" />} />
-              <Route path="profile/following" element={<FollowListPage mode="following" />} />
-              <Route
-                path="profile/:id"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <PublicProfile />
-                  </Suspense>
-                )}
-              />
               <Route path="settings" element={<Settings />} />
               <Route path="help" element={<HelpFAQ />} />
               <Route

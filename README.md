@@ -20,7 +20,7 @@ The app focuses on fast daily usage patterns:
 - Quick expense entry from home actions
 - Date-aware browsing and transaction history
 - Analytics for trends, recurring expenses, and payment behavior
-- Social features like follow requests, public profiles, and notifications
+- Social features like user search and public profiles
 - Export-ready data views for reporting
 
 In production, the app can send relative `/api/*` requests and rely on hosting rewrites/proxy rules to reach backend services.
@@ -76,12 +76,8 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 
 <p align="center">
   <img src="./docs/images/mobile-profile.png" width="220" alt="Mobile Profile"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="./docs/images/mobile-public-profile.png" width="220" alt="Mobile Public Profile"/>
 </p>
 <p align="center">
-  <img src="./docs/images/mobile-public-profile-2.png" width="220" alt="Mobile Public Profile 2"/>
-  &nbsp;&nbsp;&nbsp;
   <img src="./docs/images/mobile-export.png" width="220" alt="Mobile Export"/>
 </p>
 
@@ -97,8 +93,7 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 - Expense mutation flows (hide, restore, update)
 - Category/tile management and seed initialization
 - Offline tile access via IndexedDB caching (tiles cached on fetch, served from IndexedDB when offline)
-- Social graph UX: search users, follow/unfollow, requests, followers/following
-- Profile management: name, status, privacy, avatar upload, hide-amount preference
+- Profile management: name, status, avatar upload, hide-amount preference
 - Excel export by date range
 - Lazy-loaded routes and heavy UI chunks for better initial load performance
 
@@ -450,9 +445,6 @@ The container serves the SPA through Nginx and proxies `/api/*` to `http://backe
 | `/analytics` | Analytics and trend visualizations |
 | `/transactions` | Paginated transaction feed |
 | `/profile` | Current user profile |
-| `/profile/followers` | Followers list |
-| `/profile/following` | Following list |
-| `/profile/:id` | Public user profile view |
 | `/settings` | User/account settings |
 | `/exports` | Excel export workflow |
 
@@ -461,13 +453,11 @@ The container serves the SPA through Nginx and proxies `/api/*` to `http://backe
 | Prefix | Examples |
 | --- | --- |
 | `/api/auth/*` | `signup`, `login`, `logout`, `update/password` |
-| `/api/profile/*` | `view`, `update`, `privacy`, `upload-avatar`, `user/:id` |
+| `/api/profile/*` | `view`, `update`, `upload-avatar` |
 | `/api/expense/*` | `add`, `:date`, `paged` |
 | `/api/expenseMutations/*` | `:id/hide`, `:id/restore`, `:id`, `:date/hidden` |
 | `/api/expenseAnalytics/*` | `range`, `recurring`, `payment-breakdown`, `spending-trends`, `heatmap` |
 | `/api/expenseExport/*` | `excel` |
-| `/api/follow/*` | follow actions, follow requests, followers/following lists |
-| `/api/search/*` | user search and recent searches |
 | `/api/tile/*` | tile list/create |
 | `/api/seed/*` | initial tile seeding |
 

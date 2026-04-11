@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { 
   Calendar, 
   CreditCard, 
@@ -278,6 +278,37 @@ const CATEGORY_COLORS = [
   "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#84cc16"
 ];
 
+// Hook to lazy-load a section when it scrolls into view
+const useLazySection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const ref = useCallback(
+    (el: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      if (!el || isVisible) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      observer.observe(el);
+      observerRef.current = observer;
+    },
+    [isVisible]
+  );
+
+  return { ref, isVisible };
+};
+
 const Analytics = () => {
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("month");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -292,7 +323,7 @@ const Analytics = () => {
   const [paymentBreakdown, setPaymentBreakdown] = useState<PaymentBreakdown[]>([]);
   const [paymentBreakdownLoading, setPaymentBreakdownLoading] = useState(true);
   const [paymentPeriod, setPaymentPeriod] = useState<"week" | "month" | "3month" | "6month" | "year">("month");
-  const [loading, setLoading] = useState(true);
+  const [rangeLoading, setRangeLoading] = useState(true);
   const [recurringLoading, setRecurringLoading] = useState(true);
 
   // Spending Trends State
@@ -303,6 +334,11 @@ const Analytics = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Lazy-load sections when they scroll into view
+  const filtersSection = useLazySection();
+  const paymentSection = useLazySection();
+  const recurringSection = useLazySection();
+
   // Dynamic categories extracted from user's expenses
   const categories = [...new Map(
     allExpenses.map((e) => [e.category.name, { name: e.category.name, emoji: e.category.emoji, color: e.category.color }])
@@ -310,11 +346,13 @@ const Analytics = () => {
 
   const paymentModes = ["cash", "card", "UPI", "bank_transfer", "wallet"];
 
-  // Fetch expenses on mount - using date range endpoint (1 API call instead of 30)
+  // Fetch expenses when filter section becomes visible
   useEffect(() => {
+    if (!filtersSection.isVisible) return;
+
     const fetchExpenses = async () => {
       try {
-        setLoading(true);
+        setRangeLoading(true);
         
         const today = new Date();
         const startDate = new Date(today);
@@ -334,9 +372,16 @@ const Analytics = () => {
       } catch (error) {
         console.error("Failed to fetch expenses:", error);
       } finally {
-        setLoading(false);
+        setRangeLoading(false);
       }
     };
+
+    fetchExpenses();
+  }, [filtersSection.isVisible]);
+
+  // Fetch recurring payments when section becomes visible
+  useEffect(() => {
+    if (!recurringSection.isVisible) return;
 
     const fetchRecurringPayments = async () => {
       try {
@@ -354,12 +399,13 @@ const Analytics = () => {
       }
     };
 
-    fetchExpenses();
     fetchRecurringPayments();
-  }, []);
+  }, [recurringSection.isVisible]);
 
-  // Fetch payment breakdown when period changes
+  // Fetch payment breakdown when section becomes visible or period changes
   useEffect(() => {
+    if (!paymentSection.isVisible) return;
+
     const fetchPaymentBreakdown = async () => {
       try {
         setPaymentBreakdownLoading(true);
@@ -375,7 +421,7 @@ const Analytics = () => {
     };
 
     fetchPaymentBreakdown();
-  }, [paymentPeriod]);
+  }, [paymentPeriod, paymentSection.isVisible]);
 
   // Fetch spending trends when view changes
   useEffect(() => {
@@ -512,8 +558,8 @@ const Analytics = () => {
     setOpenDropdown(openDropdown === type ? null : type);
   };
 
-  // Loading skeleton
-  if (loading) {
+  // Loading skeleton for initial page load
+  if (trendsLoading && spendingTrends.length === 0) {
     return (
       <div className="p-4 pb-28 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -639,7 +685,7 @@ const Analytics = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="relative mb-6" ref={dropdownRef}>
+      <div className="relative mb-6" ref={(el) => { dropdownRef.current = el; filtersSection.ref(el); }}>
         <div className="flex items-center gap-2 mb-3">
           <Filter size={14} className="text-zinc-500" />
           <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Filters</span>
@@ -838,7 +884,16 @@ const Analytics = () => {
             </div>
           </div>
           
-          {stats.categoryData.length > 0 ? (
+          {rangeLoading ? (
+            <div className="flex items-center gap-4">
+              <div className="w-[120px] h-[120px] rounded-full bg-zinc-800/40 animate-pulse" />
+              <div className="flex-1 space-y-2">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-4 bg-zinc-800/40 rounded animate-pulse" />
+                ))}
+              </div>
+            </div>
+          ) : stats.categoryData.length > 0 ? (
             <div className="flex items-center gap-4">
               <DonutChart data={stats.categoryData} />
               <div className="flex-1 space-y-2">
@@ -868,7 +923,7 @@ const Analytics = () => {
       </div>
 
       {/* Payment Mode Breakdown - Compact Premium */}
-      <div className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
+      <div ref={paymentSection.ref} className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
         <div>
           <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -944,7 +999,7 @@ const Analytics = () => {
       </div>
 
       {/* Recurring Payments Section */}
-      <div className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
+      <div ref={recurringSection.ref} className="rounded-2xl p-4 border border-zinc-800 bg-zinc-950 mb-6 overflow-hidden">
         <div>
           <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

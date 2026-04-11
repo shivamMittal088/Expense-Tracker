@@ -1,22 +1,4 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { Search, Heart } from "lucide-react";
-import { useAppSelector } from "../store/hooks";
-
-interface NavBarProps {
-  onSearchClick?: () => void;
-  onNotificationClick?: () => void;
-  notificationCount?: number;
-}
-
-const NavBar: React.FC<NavBarProps> = ({ onSearchClick, onNotificationClick, notificationCount = 0 }) => {
-  const location = useLocation();
-  const isLoggedIn = useAppSelector((state) => state.user.isAuthenticated);
-
-  // Don't show icons on login page
-  const isLoginPage = location.pathname === "/login";
-  const showIcons = isLoggedIn && !isLoginPage;
-
+const NavBar = () => {
   return (
     <>
       <nav className="sticky top-0 z-50 w-full">
@@ -46,39 +28,6 @@ const NavBar: React.FC<NavBarProps> = ({ onSearchClick, onNotificationClick, not
                   </div>
                 </a>
               </div>
-
-              {/* Actions - only show when logged in */}
-              {showIcons && (
-                <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-2 py-1.5">
-                  {/* Search Button */}
-                  <button
-                    className="group relative p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 transition-all duration-300"
-                    onClick={onSearchClick}
-                    aria-label="Search people"
-                  >
-                    <Search size={16} className="text-white/60 group-hover:text-white/90 transition-colors" />
-                  </button>
-
-                  {/* Notification Button */}
-                  <button
-                    className="group relative p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 transition-all duration-300"
-                    onClick={onNotificationClick}
-                    aria-label="View notifications"
-                  >
-                    <Heart
-                      size={16}
-                      className="text-[#ff2d55] group-hover:text-[#ff5b7a] transition-colors"
-                      fill="currentColor"
-                    />
-                    {notificationCount > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-4.5 h-4.5 rounded-full bg-[#ff2d55] text-white text-[10px] font-semibold flex items-center justify-center ring-1 ring-black/50">
-                        {notificationCount}
-                      </span>
-                    )}
-                  </button>
-
-                </div>
-              )}
             </div>
           </div>
         </div>

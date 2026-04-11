@@ -39,9 +39,6 @@ interface AuthResponse {
   emailId: string;
   photoURL?: string;
   statusMessage?: string;
-  isPublic?: boolean;
-  followersCount?: number;
-  followingCount?: number;
   hideAmounts?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -209,9 +206,6 @@ const Login: React.FC = () => {
           emailId,
           photoURL,
           statusMessage,
-          isPublic,
-          followersCount,
-          followingCount,
           hideAmounts,
           createdAt,
           updatedAt,
@@ -224,9 +218,6 @@ const Login: React.FC = () => {
             emailId,
             photoURL,
             statusMessage,
-            isPublic,
-            followersCount,
-            followingCount,
             createdAt,
             updatedAt,
           })
@@ -258,9 +249,6 @@ const Login: React.FC = () => {
           emailId,
           photoURL,
           statusMessage,
-          isPublic,
-          followersCount,
-          followingCount,
           hideAmounts,
           createdAt,
           updatedAt,
@@ -273,9 +261,6 @@ const Login: React.FC = () => {
             emailId,
             photoURL,
             statusMessage,
-            isPublic,
-            followersCount,
-            followingCount,
             createdAt,
             updatedAt,
           })

@@ -72,15 +72,4 @@ export const colorPalette: PaletteColor[] = [
   { hex: "#000000", name: "Black" },
 ];
 
-// Helper to get a random color
-export const getRandomColor = (): PaletteColor => {
-  return colorPalette[Math.floor(Math.random() * colorPalette.length)];
-};
 
-// Helper to find color by hex
-export const findColorByHex = (hex: string): PaletteColor | undefined => {
-  return colorPalette.find(c => c.hex.toLowerCase() === hex.toLowerCase());
-};
-
-// Default color
-export const defaultColor = colorPalette[0]; // Blue

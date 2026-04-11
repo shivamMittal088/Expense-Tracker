@@ -16,10 +16,6 @@ const faqData = [
     answer: "It blurs all monetary values across the app for privacy. You can tap on a blurred amount to reveal it temporarily, or toggle the setting off from here.",
   },
   {
-    question: "How does the private account work?",
-    answer: "When enabled, only users you approve as followers can see your profile and spending activity. Others will see a \"Private Account\" message.",
-  },
-  {
     question: "Does the app work offline?",
     answer: "Yes — pages you've visited before are cached and will load offline. However, actions like adding or editing expenses require an internet connection to sync with the server.",
   },

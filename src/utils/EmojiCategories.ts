@@ -106,12 +106,4 @@ export const emojiCategories = {
 
 export type EmojiCategoryName = keyof typeof emojiCategories;
 
-// Helper to get all emojis as flat array
-export const getAllEmojis = (): string[] => {
-  return Object.values(emojiCategories).flat();
-};
 
-// Helper to get category names
-export const getEmojiCategoryNames = (): EmojiCategoryName[] => {
-  return Object.keys(emojiCategories) as EmojiCategoryName[];
-};

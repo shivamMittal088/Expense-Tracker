@@ -7,9 +7,6 @@ export interface UserProfile {
   emailId: string;
   photoURL?: string;
   statusMessage?: string;
-  isPublic?: boolean;
-  followersCount?: number;
-  followingCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -48,21 +45,11 @@ const userSlice = createSlice({
       state.profile = action.payload;
       state.isAuthenticated = true;
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("isPublic", String(action.payload.isPublic ?? true));
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(action.payload));
     },
     updateUserProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
       if (!state.profile) return;
       state.profile = { ...state.profile, ...action.payload };
-      if (typeof action.payload.isPublic === "boolean") {
-        localStorage.setItem("isPublic", String(action.payload.isPublic));
-      }
-      localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(state.profile));
-    },
-    setUserPrivacy: (state, action: PayloadAction<boolean>) => {
-      if (!state.profile) return;
-      state.profile.isPublic = action.payload;
-      localStorage.setItem("isPublic", String(action.payload));
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(state.profile));
     },
     clearUserProfile: (state) => {
@@ -71,10 +58,9 @@ const userSlice = createSlice({
       localStorage.removeItem(USER_PROFILE_KEY);
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("authToken");
-      localStorage.removeItem("isPublic");
     },
   },
 });
 
-export const { setUserProfile, updateUserProfile, setUserPrivacy, clearUserProfile } = userSlice.actions;
+export const { setUserProfile, updateUserProfile, clearUserProfile } = userSlice.actions;
 export default userSlice.reducer;

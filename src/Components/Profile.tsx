@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import {
   User,
   Mail,
@@ -292,26 +291,6 @@ export default function Profile() {
             </button>
           )}
 
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <Link
-                  to="/profile/followers"
-                  className="rounded-2xl border border-zinc-700 bg-zinc-900 px-3 py-2.5 hover:bg-zinc-800 transition-colors"
-                >
-                  <p className="text-[11px] uppercase tracking-wide text-zinc-500">Followers</p>
-                  <p className="text-lg font-semibold text-white">
-                    {profile.followersCount ?? 0}
-                  </p>
-                </Link>
-                <Link
-                  to="/profile/following"
-                  className="rounded-2xl border border-zinc-700 bg-zinc-900 px-3 py-2.5 hover:bg-zinc-800 transition-colors"
-                >
-                  <p className="text-[11px] uppercase tracking-wide text-zinc-500">Following</p>
-                  <p className="text-lg font-semibold text-white">
-                    {profile.followingCount ?? 0}
-                  </p>
-                </Link>
-              </div>
             </div>
           </div>
         </div>
