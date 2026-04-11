@@ -93,53 +93,6 @@ const HomeTopBar = ({
           <div className="flex items-center gap-2" />
         </div>
 
-        <div className="hidden lg:block mt-1.5">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-white/40">Last 7 Days</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Tap a day</p>
-          </div>
-          <div className="mt-1.5 grid grid-cols-7 gap-1.5">
-            {ribbonLoading ? (
-              Array.from({ length: 7 }).map((_, idx) => (
-                <div key={idx} className="h-9 rounded-lg border border-white/10 bg-white/3" />
-              ))
-            ) : (
-              ribbonDays.map((day) => {
-                const dateKey = getFormattedDate(day);
-                const data = ribbonMap.get(dateKey);
-                const count = data?.count || 0;
-                const isSelected = dateKey === apiDate;
-                const isCurrentDay = day.toDateString() === today.toDateString();
-                const level = Math.min(4, count);
-                const tone = [
-                  "bg-white/[0.04]",
-                  "bg-white/[0.08]",
-                  "bg-white/[0.14]",
-                  "bg-white/[0.22]",
-                  "bg-white/[0.32]",
-                ][level];
-
-                return (
-                  <button
-                    key={dateKey}
-                    onClick={() => onSelectRibbonDay(day)}
-                    className={`rounded-lg border px-1.5 py-1 text-center transition-all ${
-                      isSelected ? "border-white/50" : "border-white/10 hover:border-white/30"
-                    } ${tone}`}
-                  >
-                    <div className={`text-[9px] uppercase ${isCurrentDay ? "text-white" : "text-white/50"}`}>
-                      {day.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2)}
-                    </div>
-                    <div className={`text-[11px] font-semibold ${isCurrentDay ? "text-white" : "text-white/70"}`}>
-                      {day.getDate()}
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-
         <div className="lg:hidden flex flex-col items-center text-center">
           <div className="w-full flex items-center justify-between gap-2 mb-3">
             <button
