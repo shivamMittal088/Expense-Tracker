@@ -4,12 +4,12 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
-import Analytics from "./Components/Analytics";
-import Transactions from "./Components/Transactions";
-import Profile from "./Components/Profile";
-import Settings from "./Components/Settings";
-import Login from "./Components/Login";
-import HelpFAQ from "./Components/HelpFAQ";
+const Analytics = lazy(() => import("./Components/Analytics"));
+const Transactions = lazy(() => import("./Components/Transactions"));
+const Profile = lazy(() => import("./Components/Profile"));
+const Settings = lazy(() => import("./Components/Settings"));
+const Login = lazy(() => import("./Components/Login"));
+const HelpFAQ = lazy(() => import("./Components/HelpFAQ"));
 const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
@@ -25,25 +25,18 @@ const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Suspense fallback={routeFallback}><Login /></Suspense>} />
 
           {/* Protected */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="transactions" element={<Transactions />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="help" element={<HelpFAQ />} />
-              <Route
-                path="exports"
-                element={(
-                  <Suspense fallback={routeFallback}>
-                    <ExportExcelPage />
-                  </Suspense>
-                )}
-              />
+              <Route path="analytics" element={<Suspense fallback={routeFallback}><Analytics /></Suspense>} />
+              <Route path="transactions" element={<Suspense fallback={routeFallback}><Transactions /></Suspense>} />
+              <Route path="profile" element={<Suspense fallback={routeFallback}><Profile /></Suspense>} />
+              <Route path="settings" element={<Suspense fallback={routeFallback}><Settings /></Suspense>} />
+              <Route path="help" element={<Suspense fallback={routeFallback}><HelpFAQ /></Suspense>} />
+              <Route path="exports" element={<Suspense fallback={routeFallback}><ExportExcelPage /></Suspense>} />
             </Route>
           </Route>
         </Routes>
