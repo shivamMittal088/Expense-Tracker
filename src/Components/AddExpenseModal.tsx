@@ -298,7 +298,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
 
       {/* Floating Card Modal */}
       <div
-        className={`fixed left-1/2 top-[44%] -translate-x-1/2 z-50 transition-all duration-300 w-full ${
+        className={`fixed left-1/2 top-[38%] -translate-x-1/2 z-50 transition-all duration-300 w-full ${
           open 
             ? "-translate-y-1/2 opacity-100 scale-100 pointer-events-auto" 
             : "-translate-y-[60%] opacity-0 scale-95 pointer-events-none"
