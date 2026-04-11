@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { cacheHeatmapData, getCachedHeatmapData } from "../utils/indexedDB/heatmapDB";
+import { useAppSelector } from "../store/hooks";
 
 type HeatmapData = {
   date: string;
@@ -16,6 +17,8 @@ type HeatmapProps = {
 const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
   const rupeeSymbol = String.fromCharCode(0x20B9);
   const middleDot = String.fromCharCode(0x00B7);
+  const theme = useAppSelector((state) => state.theme.theme);
+  const isLight = theme === "light";
   const [year, setYear] = useState(new Date().getFullYear());
   const [heatmapData, setHeatmapData] = useState<HeatmapData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -200,7 +203,10 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-white/12 bg-white/[0.03] p-5 backdrop-blur-xl">
+      <div
+        className="force-dark relative overflow-hidden rounded-2xl border border-white/12 bg-white/[0.03] p-5 backdrop-blur-xl"
+        style={isLight ? { background: "#111827", borderColor: "rgba(255,255,255,0.12)" } : undefined}
+      >
         <div className="absolute inset-0 bg-linear-to-br from-white/[0.06] via-transparent to-white/[0.02]" />
         <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/10 blur-[90px]" />
         <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-white/5 blur-[90px]" />
@@ -229,15 +235,24 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
 
         {/* Stats Row */}
         <div className="relative grid grid-cols-3 gap-3 mb-5">
-          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+          <div
+            className="rounded-xl p-3 border border-white/10 bg-white/[0.04]"
+            style={isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" } : undefined}
+          >
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Total Spent</p>
             <p className="text-white font-bold text-sm">{rupeeSymbol}{stats.totalAmount.toLocaleString()}</p>
           </div>
-          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+          <div
+            className="rounded-xl p-3 border border-white/10 bg-white/[0.04]"
+            style={isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" } : undefined}
+          >
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Transactions</p>
             <p className="text-white font-bold text-sm">{stats.totalTransactions}</p>
           </div>
-          <div className="rounded-xl p-3 border border-white/10 bg-white/[0.04]">
+          <div
+            className="rounded-xl p-3 border border-white/10 bg-white/[0.04]"
+            style={isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" } : undefined}
+          >
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Active Days</p>
             <p className="text-white font-bold text-sm">{stats.totalDays}</p>
           </div>

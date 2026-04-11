@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import { useAppSelector } from "./store/hooks";
 import Layout from "./Components/Layout";
 import HomePage from "./Components/HomePage";
 const Analytics = lazy(() => import("./Components/Analytics"));
@@ -13,6 +14,19 @@ const HelpFAQ = lazy(() => import("./Components/HelpFAQ"));
 const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
 
+function ThemeSync() {
+  const theme = useAppSelector((state) => state.theme.theme);
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    root.style.colorScheme = theme;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "dark" ? "#000000" : "#f5f5f5");
+  }, [theme]);
+  return null;
+}
+
 const App: React.FC = () => {
   const routeFallback = (
     <div className="min-h-screen bg-black flex items-start justify-center px-4 pt-6">
@@ -22,6 +36,7 @@ const App: React.FC = () => {
 
   return (
     <Provider store={store}>
+      <ThemeSync />
       <BrowserRouter>
         <Routes>
           {/* Public */}

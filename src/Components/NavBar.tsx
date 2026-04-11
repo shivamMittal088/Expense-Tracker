@@ -1,4 +1,11 @@
+import { Sun, Moon } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { toggleTheme } from "../store/slices/themeSlice";
+
 const NavBar = () => {
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.theme.theme);
+
   return (
     <>
       <nav className="sticky top-0 z-50 w-full">
@@ -28,6 +35,15 @@ const NavBar = () => {
                   </div>
                 </a>
               </div>
+
+              {/* Right side - Theme toggle */}
+              <button
+                onClick={() => dispatch(toggleTheme())}
+                className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
             </div>
           </div>
         </div>

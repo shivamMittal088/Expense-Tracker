@@ -7,6 +7,8 @@ import {
   Eye,
   HelpCircle,
   Bell,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Api from "../routeWrapper/Api";
@@ -14,11 +16,13 @@ import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 import { clearUserProfile } from "../store/slices/userSlice";
+import { toggleTheme } from "../store/slices/themeSlice";
 
 export default function Settings() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
+  const theme = useAppSelector((state) => state.theme.theme);
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [hideAmountsUpdating, setHideAmountsUpdating] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -55,6 +59,22 @@ export default function Settings() {
         <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
         <p className="text-sm text-white/40 mt-1">Personalize your experience and privacy.</p>
       </div>
+
+      {/* User Preferences */}
+      <section className="mb-6">
+        <h2 className="text-[11px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3 px-1">
+          User Preferences
+        </h2>
+        <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
+          <SettingToggle
+            icon={theme === "dark" ? Moon : Sun}
+            label="Dark Mode"
+            description="Switch between light and dark theme"
+            enabled={theme === "dark"}
+            onChange={() => dispatch(toggleTheme())}
+          />
+        </div>
+      </section>
 
       {/* Privacy */}
       <section className="mb-6">

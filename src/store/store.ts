@@ -3,6 +3,7 @@ import amountReducer from "./slices/amountSlice";
 import userReducer from "./slices/userSlice";
 import todayTransactionsReducer from "./slices/todayTransactionsSlice";
 import monthlyTransactionsReducer from "./slices/monthlyTransactionsSlice";
+import themeReducer from "./slices/themeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     user: userReducer,
     todayTransactions: todayTransactionsReducer,
     monthlyTransactions: monthlyTransactionsReducer,
+    theme: themeReducer,
   },
 });
 

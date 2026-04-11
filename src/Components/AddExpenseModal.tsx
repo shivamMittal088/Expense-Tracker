@@ -2,7 +2,7 @@ import { X, Wallet, CreditCard, Smartphone, Building2, Banknote, Calendar, Clock
 import { useEffect, useState, lazy, Suspense } from "react";
 import Api from "../routeWrapper/Api";
 import { showToast, showTopToast } from "../utils/Redirecttoast";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addTodayTransaction, getLocalDateKey, type TodayTransaction } from "../store/slices/todayTransactionsSlice";
 import { addMonthlyTransaction, isWithinLast30Days } from "../store/slices/monthlyTransactionsSlice";
 const CalendarPicker = lazy(() =>
@@ -62,6 +62,8 @@ const paymentModes = [
 
 export default function AddExpenseModal({ open, onClose }: Props) {
   const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.theme.theme);
+  const isLight = theme === "light";
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [loadingTiles, setLoadingTiles] = useState(true);
 
@@ -80,12 +82,19 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   const [deletingTileId, setDeletingTileId] = useState<string | null>(null);
   const [tileToDelete, setTileToDelete] = useState<Tile | null>(null);
 
-  const glassCardStyle = {
-    background: "rgba(15, 15, 15, 0.55)",
-    border: "1px solid rgba(255, 255, 255, 0.18)",
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
-    backdropFilter: "blur(10px)",
-  } as const;
+  const glassCardStyle = isLight
+    ? {
+        background: "rgba(0, 0, 0, 0.04)",
+        border: "1px solid rgba(0, 0, 0, 0.10)",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+        backdropFilter: "blur(10px)",
+      } as const
+    : {
+        background: "rgba(15, 15, 15, 0.55)",
+        border: "1px solid rgba(255, 255, 255, 0.18)",
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45)",
+        backdropFilter: "blur(10px)",
+      } as const;
 
   const buildOccurredAtISO = (date: Date, time: { hours: number; minutes: number }) => {
     const next = new Date(date);
@@ -282,14 +291,14 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{
-          background: "rgba(0, 0, 0, 0.95)",
+          background: isLight ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.95)",
           backdropFilter: "blur(12px)",
         }}
       />
 
       {/* Floating Card Modal */}
       <div
-        className={`fixed left-1/2 top-[52%] -translate-x-1/2 z-50 transition-all duration-300 w-full ${
+        className={`fixed left-1/2 top-[44%] -translate-x-1/2 z-50 transition-all duration-300 w-full ${
           open 
             ? "-translate-y-1/2 opacity-100 scale-100 pointer-events-auto" 
             : "-translate-y-[60%] opacity-0 scale-95 pointer-events-none"
@@ -302,7 +311,13 @@ export default function AddExpenseModal({ open, onClose }: Props) {
         {/* Main Card - Pure Black */}
         <div 
           className="relative overflow-hidden"
-          style={{
+          style={isLight ? {
+            background: "rgba(255, 255, 255, 0.98)",
+            borderRadius: "1.5rem",
+            border: "1px solid rgba(0, 0, 0, 0.12)",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.15)",
+            backdropFilter: "blur(14px)",
+          } : {
             background: "rgba(10, 10, 10, 0.75)",
             borderRadius: "1.5rem",
             border: "1px solid rgba(255, 255, 255, 0.22)",
@@ -314,7 +329,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
           <div 
             className="relative px-4 py-3 flex items-center justify-between"
             style={{ 
-              borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
+              borderBottom: isLight ? "1px solid rgba(0, 0, 0, 0.10)" : "1px solid rgba(255, 255, 255, 0.2)",
               background: "transparent",
             }}
           >
@@ -333,7 +348,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             style={{
               paddingTop: "0.75rem",
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(255, 255, 255, 0.1) transparent",
+              scrollbarColor: isLight ? "rgba(0, 0, 0, 0.15) transparent" : "rgba(255, 255, 255, 0.1) transparent",
               background: "transparent",
             }}
           >
@@ -380,8 +395,12 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                           onClick={() => setCategory(tile.name)}
                           className="group relative p-2 flex flex-col items-center gap-1 rounded-xl transition-all"
                           style={{
-                            background: isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)",
-                            border: isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)",
+                            background: isLight
+                              ? (isSelected ? "rgba(0, 0, 0, 0.08)" : "rgba(0, 0, 0, 0.03)")
+                              : (isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)"),
+                            border: isLight
+                              ? (isSelected ? "1px solid rgba(0, 0, 0, 0.25)" : "1px solid rgba(0, 0, 0, 0.10)")
+                              : (isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)"),
                             opacity: isDeleting ? 0.5 : 1,
                           }}
                           disabled={isDeleting}
@@ -396,7 +415,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                             </button>
                           )}
                           <span className="text-[13px]">{tile.emoji || "✨"}</span>
-                          <span className={`text-[8px] font-medium leading-tight ${isSelected ? "text-white" : "text-white/50"}`}>
+                          <span className={`text-[8px] font-medium leading-tight ${isSelected ? (isLight ? "text-zinc-900" : "text-white") : (isLight ? "text-zinc-500" : "text-white/50")}`}>
                             {tile.name}
                           </span>
                         </button>
@@ -432,12 +451,16 @@ export default function AddExpenseModal({ open, onClose }: Props) {
                         onClick={() => setPaymentMode(mode.id)}
                         className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all min-w-0"
                         style={{
-                          background: isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)",
-                          border: isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)",
+                          background: isLight
+                            ? (isSelected ? "rgba(0, 0, 0, 0.08)" : "rgba(0, 0, 0, 0.03)")
+                            : (isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.04)"),
+                          border: isLight
+                            ? (isSelected ? "1px solid rgba(0, 0, 0, 0.25)" : "1px solid rgba(0, 0, 0, 0.10)")
+                            : (isSelected ? "1px solid rgba(255, 255, 255, 0.32)" : "1px solid rgba(255, 255, 255, 0.15)"),
                         }}
                       >
-                        <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-white/50"}`} />
-                        <span className={`text-[9px] font-medium truncate ${isSelected ? "text-white" : "text-white/50"}`}>{mode.label}</span>
+                        <Icon className={`w-3.5 h-3.5 ${isSelected ? (isLight ? "text-zinc-900" : "text-white") : (isLight ? "text-zinc-500" : "text-white/50")}`} />
+                        <span className={`text-[9px] font-medium truncate ${isSelected ? (isLight ? "text-zinc-900" : "text-white") : (isLight ? "text-zinc-500" : "text-white/50")}`}>{mode.label}</span>
                       </button>
                     );
                   })}

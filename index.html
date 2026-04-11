@@ -11,6 +11,14 @@
     <title>TrackExpense</title>
   </head>
   <body>
+    <script>
+      (function(){
+        var t=localStorage.getItem('theme');
+        if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+        document.documentElement.classList.add(t);
+        document.documentElement.style.colorScheme=t;
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+/* ---------- Dark theme (default) ---------- */
+:root,
+.dark {
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
   --bg-tertiary: #111111;
@@ -18,10 +20,40 @@
   --bg-button-hover: #1d4ed8;
 }
 
+/* ---------- Light theme ---------- */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.08);
+  --border-color: rgba(0, 0, 0, 0.12);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-button: #ffffff;
+  --accent: #2563eb;
+  --bg-button: #2563eb;
+  --bg-button-hover: #1d4ed8;
+}
+
 html, body, #root {
   height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+html.dark body, html.dark #root {
   background-color: #000000;
   color: #ffffff;
+}
+
+html.light body, html.light #root {
+  background-color: #edeef1;
+  color: #111827;
 }
 
 ::-webkit-scrollbar {
@@ -55,4 +87,190 @@ html, body, #root {
   scrollbar-width: thin;
   scrollbar-color: #3b82f6 transparent;
 }
+
+/* ===================================================
+   Light-mode utility overrides
+   The app is authored dark-first with hardcoded Tailwind
+   classes (bg-black, text-white, bg-zinc-*, etc.).
+   These rules remap the most-used utilities when
+   <html class="light">. Tailwind v4 utilities live in
+   @layer utilities, so un-layered rules always win.
+   =================================================== */
+
+/* ---- Page / section backgrounds ---- */
+html.light .bg-black { background-color: #f8f9fa; }
+html.light .bg-zinc-950 { background-color: #ffffff; }
+html.light .bg-zinc-950\/90 { background-color: rgba(255,255,255,0.92); }
+html.light .bg-zinc-950\/95 { background-color: rgba(255,255,255,0.97); }
+html.light .bg-zinc-900 { background-color: #f3f4f6; }
+html.light .bg-zinc-900\/40 { background-color: rgba(243,244,246,0.6); }
+html.light .bg-zinc-900\/50 { background-color: rgba(243,244,246,0.7); }
+html.light .bg-zinc-900\/60 { background-color: rgba(243,244,246,0.8); }
+html.light .bg-zinc-900\/80 { background-color: rgba(243,244,246,0.9); }
+html.light .bg-zinc-900\/90 { background-color: rgba(243,244,246,0.95); }
+html.light .bg-zinc-800 { background-color: #e5e7eb; }
+html.light .bg-zinc-800\/40 { background-color: rgba(229,231,235,0.4); }
+html.light .bg-zinc-800\/50 { background-color: rgba(229,231,235,0.5); }
+html.light .bg-zinc-800\/90 { background-color: rgba(229,231,235,0.95); }
+html.light .bg-zinc-700 { background-color: #d1d5db; }
+html.light .bg-zinc-100 { background-color: #e5e7eb; }
+html.light .bg-zinc-200 { background-color: #d1d5db; }
+html.light .bg-\[\#0a0a0a\] { background-color: #ffffff; }
+html.light .bg-\[\#1a1a1a\] { background-color: #ffffff; }
+html.light .bg-\[\#2a2a2a\] { background-color: #f3f4f6; }
+
+/* white-alpha tints → black-alpha tints (stronger for visibility) */
+html.light .bg-white\/3 { background-color: rgba(0,0,0,0.04); }
+html.light .bg-white\/4 { background-color: rgba(0,0,0,0.05); }
+html.light .bg-white\/5 { background-color: rgba(0,0,0,0.06); }
+html.light .bg-white\/6 { background-color: rgba(0,0,0,0.07); }
+html.light .bg-white\/8 { background-color: rgba(0,0,0,0.08); }
+html.light .bg-white\/10 { background-color: rgba(0,0,0,0.09); }
+html.light .bg-white/\[0\.03\] { background-color: rgba(0,0,0,0.04); }
+html.light .bg-white/\[0\.04\] { background-color: rgba(0,0,0,0.05); }
+
+/* hover / active backgrounds */
+html.light .hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.08); }
+html.light .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.11); }
+html.light .hover\:bg-zinc-700:hover { background-color: #c8cad0; }
+html.light .hover\:bg-zinc-800:hover { background-color: #d8dade; }
+html.light .hover\:bg-zinc-800\/90:hover { background-color: rgba(216,218,222,0.95); }
+html.light .active\:bg-zinc-800:active { background-color: #d8dade; }
+
+/* ring */
+html.light .ring-white\/10 { --tw-ring-color: rgba(0,0,0,0.08); }
+
+/* Prominent white buttons → dark in light mode */
+html.light button.bg-white { background-color: #111827; color: #ffffff; }
+html.light button.bg-white:hover,
+html.light .hover\:bg-white\/90:hover { background-color: #1f2937; color: #ffffff; }
+
+/* ---- Text ---- */
+html.light .text-white { color: #111827; }
+html.light .text-white\/20 { color: rgba(0,0,0,0.28); }
+html.light .text-white\/25 { color: rgba(0,0,0,0.35); }
+html.light .text-white\/30 { color: rgba(0,0,0,0.42); }
+html.light .text-white\/40 { color: rgba(0,0,0,0.55); }
+html.light .text-white\/45 { color: rgba(0,0,0,0.58); }
+html.light .text-white\/50 { color: rgba(0,0,0,0.62); }
+html.light .text-white\/60 { color: rgba(0,0,0,0.68); }
+html.light .text-white\/70 { color: rgba(0,0,0,0.72); }
+html.light .text-zinc-100 { color: #111827; }
+html.light .text-zinc-200 { color: #1f2937; }
+html.light .text-zinc-300 { color: #374151; }
+html.light .text-zinc-400 { color: #6b7280; }
+html.light .text-zinc-500 { color: #4b5563; }
+html.light .text-zinc-600 { color: #374151; }
+html.light .text-gray-300 { color: #374151; }
+html.light .text-gray-400 { color: #4b5563; }
+html.light .text-gray-500 { color: #6b7280; }
+
+/* Very light accent text → readable on white */
+html.light .text-red-200 { color: #ef4444; }
+html.light .text-red-300 { color: #dc2626; }
+html.light .text-rose-300 { color: #e11d48; }
+html.light .text-emerald-200 { color: #059669; }
+
+/* hover text */
+html.light .hover\:text-white:hover { color: #111827; }
+html.light .hover\:text-white\/50:hover { color: rgba(0,0,0,0.5); }
+html.light .hover\:text-white\/60:hover { color: rgba(0,0,0,0.55); }
+
+/* placeholder */
+html.light .placeholder-gray-500::placeholder { color: #9ca3af; }
+html.light .placeholder-zinc-500::placeholder { color: #9ca3af; }
+
+/* ---- Borders ---- */
+html.light .border-white\/5 { border-color: rgba(0,0,0,0.09); }
+html.light .border-white\/10 { border-color: rgba(0,0,0,0.14); }
+html.light .border-white\/15 { border-color: rgba(0,0,0,0.17); }
+html.light .border-white\/20 { border-color: rgba(0,0,0,0.20); }
+html.light .border-white\/25 { border-color: rgba(0,0,0,0.24); }
+html.light .border-white\/30 { border-color: rgba(0,0,0,0.28); }
+html.light .border-white\/50 { border-color: rgba(0,0,0,0.40); }
+html.light .border-zinc-500 { border-color: #9ca3af; }
+html.light .border-zinc-600 { border-color: #b0b7c0; }
+html.light .border-zinc-600\/70 { border-color: rgba(176,183,192,0.7); }
+html.light .border-zinc-700 { border-color: #c4c8d0; }
+html.light .border-zinc-800 { border-color: #ced2d9; }
+html.light .border-zinc-800\/30 { border-color: rgba(206,210,217,0.5); }
+html.light .border-zinc-800\/50 { border-color: rgba(206,210,217,0.7); }
+html.light .border-black { border-color: #c4c8d0; }
+
+/* hover / focus borders */
+html.light .hover\:border-zinc-500:hover { border-color: #6b7280; }
+html.light .hover\:border-zinc-700:hover { border-color: #9ca3af; }
+html.light .hover\:border-white\/30:hover { border-color: rgba(0,0,0,0.30); }
+html.light .hover\:border-white\/50:hover { border-color: rgba(0,0,0,0.42); }
+html.light .focus\:border-white\/30:focus { border-color: rgba(0,0,0,0.32); }
+
+/* ---- Gradients (decorative white→transparent → subtle dark→transparent) ---- */
+html.light [class*="from-white\/"] { --tw-gradient-from: rgba(0,0,0,0.03); }
+html.light [class*="via-white\/"]  { --tw-gradient-via: rgba(0,0,0,0.04); }
+html.light [class*="to-white\/"]   { --tw-gradient-to: rgba(0,0,0,0.02); }
+
+/* ---- Shadows ---- */
+html.light .shadow-\[0_0_24px_rgba\(255\,255\,255\,0\.03\)\] {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+html.light .shadow-2xl { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+html.light .shadow-black\/80 { --tw-shadow-color: rgba(0,0,0,0.12); }
+
+/* ---- Dividers ---- */
+html.light .divide-white\/5 > * + * { border-color: rgba(0,0,0,0.06); }
+html.light .bg-white\/5[class*="h-px"],
+html.light .h-px.bg-white\/5 { background-color: rgba(0,0,0,0.06); }
+
+/* ---- Login autofill hack ---- */
+html.light .\[box-shadow\:0_0_0_1000px_\#111_inset\] {
+  box-shadow: 0 0 0 1000px #f3f4f6 inset !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* ---- Responsive (lg:) overrides ---- */
+@media (min-width: 1024px) {
+  html.light .lg\:border-white\/15 { border-color: rgba(0,0,0,0.1); }
+  html.light .lg\:shadow-\[0_0_40px_rgba\(16\,185\,129\,0\.08\)\] {
+    box-shadow: 0 0 40px rgba(16,185,129,0.05);
+  }
+}
+
+/* ---- Scrollbar (light mode) ---- */
+html.light ::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.03);
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%);
+  box-shadow: 0 0 6px rgba(59,130,246,0.2);
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+}
+html.light * {
+  scrollbar-color: #60a5fa transparent;
+}
+
+/* =====================================================
+   FORCE-DARK: components that are always dark
+   (Heatmap). Extra class selector wins over general
+   html.light overrides (higher specificity).
+   ===================================================== */
+html.light .force-dark .text-white { color: #ffffff; }
+html.light .force-dark .text-white\/30 { color: rgba(255,255,255,0.30); }
+html.light .force-dark .text-white\/35 { color: rgba(255,255,255,0.35); }
+html.light .force-dark .text-white\/40 { color: rgba(255,255,255,0.40); }
+html.light .force-dark .text-white\/50 { color: rgba(255,255,255,0.50); }
+html.light .force-dark .text-white\/70 { color: rgba(255,255,255,0.70); }
+html.light .force-dark .bg-white\/5 { background-color: rgba(255,255,255,0.05); }
+html.light .force-dark .bg-white\/10 { background-color: rgba(255,255,255,0.10); }
+html.light .force-dark .bg-white\/\[0\.03\] { background-color: rgba(255,255,255,0.03); }
+html.light .force-dark .bg-white\/\[0\.04\] { background-color: rgba(255,255,255,0.04); }
+html.light .force-dark .border-white\/10 { border-color: rgba(255,255,255,0.10); }
+html.light .force-dark .border-white\/12 { border-color: rgba(255,255,255,0.12); }
+html.light .force-dark .border-white\/20 { border-color: rgba(255,255,255,0.20); }
+html.light .force-dark .bg-zinc-900 { background-color: #18181b; }
+html.light .force-dark .hover\:bg-white\/5:hover { background-color: rgba(255,255,255,0.05); }
+html.light .force-dark .hover\:bg-white\/10:hover { background-color: rgba(255,255,255,0.10); }
+html.light .force-dark [class*="from-white\/"] { --tw-gradient-from: rgba(255,255,255,0.06); }
+html.light .force-dark [class*="to-white\/"] { --tw-gradient-to: rgba(255,255,255,0.02); }
 
