@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { useAppSelector } from "./store/hooks";
 import Layout from "./Components/Layout";
+import PWAUpdatePrompt from "./Components/PWAUpdatePrompt";
 import HomePage from "./Components/HomePage";
 const Analytics = lazy(() => import("./Components/Analytics"));
 const Transactions = lazy(() => import("./Components/Transactions"));
@@ -37,6 +38,7 @@ const App: React.FC = () => {
   return (
     <Provider store={store}>
       <ThemeSync />
+      <PWAUpdatePrompt />
       <BrowserRouter>
         <Routes>
           {/* Public */}
