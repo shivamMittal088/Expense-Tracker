@@ -54,13 +54,17 @@ self.addEventListener('fetch', (event) => {
   // Skip API requests
   if (url.pathname.startsWith('/api/')) return;
 
-  // SPA navigation fallback: serve cached '/' for HTML navigation requests
-  // If '/' is also not cached, serve offline.html as last resort
+  // SPA navigation fallback: network-first for HTML so new deployments
+  // always deliver the latest index.html (Vite hashes JS/CSS filenames, so
+  // a stale cached index.html would reference missing chunks → white screen).
+  // Fall back to cached '/' when offline, then offline.html as last resort.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      caches.match('/').then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
-      })
+      fetch(event.request).catch(() =>
+        caches.match('/').then((cachedResponse) =>
+          cachedResponse || caches.match('/offline.html')
+        )
+      )
     );
     return;
   }
