@@ -67,7 +67,6 @@ export default function ExpenseTrackerHome() {
   const [dayTotalAmount, setDayTotalAmount] = useState(0);
   const [dayHiddenCount, setDayHiddenCount] = useState(0);
   const [ribbonData, setRibbonData] = useState<RibbonDay[]>([]);
-  const [ribbonLoading, setRibbonLoading] = useState(false);
   const [ribbonRefreshKey, setRibbonRefreshKey] = useState(0);
   const [showActivity, setShowActivity] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -115,11 +114,6 @@ export default function ExpenseTrackerHome() {
 
   const apiDate = getFormattedDate(selectedDate);
   const todayDateKey = getFormattedDate(today);
-
-  const handleRibbonSelect = (date: Date) => {
-    setDayPage(1);
-    setSelectedDate(date);
-  };
 
   const parseLocalDate = (value: string) => {
     const [year, month, day] = value.split("-").map(Number);
@@ -340,7 +334,6 @@ export default function ExpenseTrackerHome() {
 
   useEffect(() => {
     const fetchRibbonData = async () => {
-      setRibbonLoading(true);
       try {
         const year = selectedDate.getFullYear();
         const tzOffsetMinutes = new Date().getTimezoneOffset();
@@ -349,19 +342,11 @@ export default function ExpenseTrackerHome() {
       } catch (err) {
         console.error("Failed to load ribbon data", err);
         setRibbonData([]);
-      } finally {
-        setRibbonLoading(false);
       }
     };
 
     fetchRibbonData();
   }, [selectedDate, ribbonRefreshKey]);
-
-  const ribbonMap = useMemo(() => {
-    const map = new Map<string, RibbonDay>();
-    ribbonData.forEach((d) => map.set(d.date, d));
-    return map;
-  }, [ribbonData]);
 
   const calendarSpendMap = useMemo(() => {
     return ribbonData.reduce((acc: Record<string, number>, day) => {
@@ -369,16 +354,6 @@ export default function ExpenseTrackerHome() {
       return acc;
     }, {});
   }, [ribbonData]);
-
-  const ribbonDays = useMemo(() => {
-    const days: Date[] = [];
-    for (let i = 6; i >= 0; i -= 1) {
-      const d = new Date(selectedDate);
-      d.setDate(selectedDate.getDate() - i);
-      days.push(d);
-    }
-    return days;
-  }, [selectedDate]);
 
   const totalForDay = visibleTotal;
 
@@ -391,15 +366,8 @@ export default function ExpenseTrackerHome() {
           hideAmounts={hideAmounts}
           totalForDay={totalForDay}
           isToday={isToday}
-          ribbonLoading={ribbonLoading}
-          ribbonDays={ribbonDays}
-          ribbonMap={ribbonMap}
-          apiDate={apiDate}
-          today={today}
           onChangeDate={changeDateBy}
           onOpenCalendar={() => setIsCalendarOpen(true)}
-          onSelectRibbonDay={handleRibbonSelect}
-          getFormattedDate={getFormattedDate}
         />
 
         <section className="max-w-5xl mx-auto">

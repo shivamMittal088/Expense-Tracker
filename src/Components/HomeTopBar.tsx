@@ -1,23 +1,10 @@
-type RibbonMapEntry = {
-  count: number;
-};
-
-type RibbonMap = Map<string, RibbonMapEntry>;
-
 interface HomeTopBarProps {
   displayLabel: string;
   hideAmounts: boolean;
   totalForDay: number;
   isToday: boolean;
-  ribbonLoading: boolean;
-  ribbonDays: Date[];
-  ribbonMap: RibbonMap;
-  apiDate: string;
-  today: Date;
   onChangeDate: (days: number) => void;
   onOpenCalendar: () => void;
-  onSelectRibbonDay: (date: Date) => void;
-  getFormattedDate: (date: Date) => string;
 }
 
 const HomeTopBar = ({
@@ -25,15 +12,8 @@ const HomeTopBar = ({
   hideAmounts,
   totalForDay,
   isToday,
-  ribbonLoading,
-  ribbonDays,
-  ribbonMap,
-  apiDate,
-  today,
   onChangeDate,
   onOpenCalendar,
-  onSelectRibbonDay,
-  getFormattedDate,
 }: HomeTopBarProps) => {
   return (
     <section className="relative max-w-5xl mx-auto rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 lg:shadow-[0_0_40px_rgba(16,185,129,0.08)] lg:border-white/15 lg:bg-transparent">
