@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LogOut,
   ChevronRight,
@@ -33,6 +33,20 @@ export default function Settings() {
   const [testingPush, setTestingPush] = useState(false);
   const [dailyReminderTime, setDailyReminderTime] = useState("21:00");
   const [savedReminderTime, setSavedReminderTime] = useState("21:00");
+  const [reminderSaving, setReminderSaving] = useState(false);
+
+  // Load saved reminder time from profile on mount
+  useEffect(() => {
+    Api.get<{ dailyReminderTime?: string }>("/api/profile/view")
+      .then((res) => {
+        const t = res.data?.dailyReminderTime;
+        if (t) {
+          setDailyReminderTime(t);
+          setSavedReminderTime(t);
+        }
+      })
+      .catch(() => {/* non-critical */});
+  }, []);
 
   // Derived hour/minute/period for the custom picker
   const reminderHour24 = parseInt(dailyReminderTime.split(":")[0], 10);
@@ -210,14 +224,22 @@ export default function Settings() {
                         ))}
                       </div>
                       <button
-                        onClick={() => {
-                          setSavedReminderTime(dailyReminderTime);
-                          showTopToast(`Reminder set for ${reminderHour12}:${reminderMinute} ${reminderPeriod}`, { duration: 1500 });
+                        onClick={async () => {
+                          setReminderSaving(true);
+                          try {
+                            await Api.patch("/api/profile/update", { dailyReminderTime });
+                            setSavedReminderTime(dailyReminderTime);
+                            showTopToast(`Reminder set for ${reminderHour12}:${reminderMinute} ${reminderPeriod}`, { duration: 1500 });
+                          } catch {
+                            showTopToast("Failed to save reminder time", { tone: "error" });
+                          } finally {
+                            setReminderSaving(false);
+                          }
                         }}
-                        disabled={savedReminderTime === dailyReminderTime}
+                        disabled={savedReminderTime === dailyReminderTime || reminderSaving}
                         className="ml-auto px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-emerald-500/15 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25"
                       >
-                        Set
+                        {reminderSaving ? "Saving…" : "Set"}
                       </button>
                     </div>
                   </div>
