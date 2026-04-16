@@ -202,9 +202,9 @@ export default function Settings() {
                       <select
                         value={reminderMinute}
                         onChange={(e) => setReminderFromParts(reminderHour12, e.target.value, reminderPeriod)}
-                        className="bg-white/8 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white/80 focus:outline-none focus:border-emerald-500/40 appearance-none text-center w-12 cursor-pointer"
+                        className="bg-white/8 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white/80 focus:outline-none focus:border-emerald-500/40 appearance-none text-center w-14 cursor-pointer"
                       >
-                        {["00", "15", "30", "45"].map((m) => (
+                        {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((m) => (
                           <option key={m} value={m} className="bg-zinc-900">{m}</option>
                         ))}
                       </select>
