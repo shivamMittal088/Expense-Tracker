@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
 import { clearUserProfile } from "../store/slices/userSlice";
 import { toggleTheme } from "../store/slices/themeSlice";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 
 export default function Settings() {
   const dispatch = useAppDispatch();
@@ -27,7 +28,23 @@ export default function Settings() {
   const [hideAmountsUpdating, setHideAmountsUpdating] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [pushEnabled, setPushEnabled] = useState(false);
+  const { isSubscribed: pushEnabled, isLoading: pushLoading, isSupported: pushSupported, isBlocked: pushBlocked, toggle: togglePush } = usePushNotifications();
+  const [testingPush, setTestingPush] = useState(false);
+
+  const sendTestNotification = async () => {
+    setTestingPush(true);
+    try {
+      await Api.post("/api/push/test");
+      showTopToast("Test notification sent! Check your notifications.", { duration: 2500 });
+    } catch (err) {
+      const e = err as { response?: { data?: { reasons?: string[]; reason?: string; message?: string } } };
+      const reason = e?.response?.data?.reasons?.[0] || e?.response?.data?.reason || e?.response?.data?.message || "Unknown error";
+      console.error("Test push failed:", reason, err);
+      showTopToast(`Push failed: ${reason}`, { tone: "error" });
+    } finally {
+      setTestingPush(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -99,16 +116,52 @@ export default function Settings() {
           Notifications
         </h2>
         <div className="rounded-2xl border border-white/10 bg-linear-to-br from-white/4 via-transparent to-white/2 shadow-[0_0_24px_rgba(255,255,255,0.03)] overflow-hidden">
-          <SettingToggle
-            icon={Bell}
-            label="Push Notifications"
-            description="Get notified about expense reminders"
-            enabled={pushEnabled}
-            onChange={() => {
-              showTopToast("Push notifications coming soon!", { duration: 1500 });
-              setPushEnabled(!pushEnabled);
-            }}
-          />
+          {pushBlocked ? (
+            <div className="flex items-start gap-3 px-4 py-4">
+              <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20 shrink-0">
+                <Bell className="w-4 h-4 text-red-400" />
+              </div>
+              <div>
+                <p className="text-sm text-white">Push Notifications</p>
+                <p className="text-[11px] text-red-400 mt-0.5">Blocked by browser</p>
+                <p className="text-[11px] text-white/40 mt-1">
+                  Click the lock icon in your browser's address bar, set Notifications to <span className="text-white/60 font-medium">Allow</span>, then reload the page.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <SettingToggle
+                icon={Bell}
+                label="Push Notifications"
+                description={pushSupported ? "Get notified about expense reminders" : "Not supported in this browser"}
+                enabled={pushEnabled}
+                disabled={pushLoading || !pushSupported}
+                onChange={togglePush}
+              />
+              {pushEnabled && (
+                <>
+                  <div className="h-px bg-white/5" />
+                  <button
+                    onClick={sendTestNotification}
+                    disabled={testingPush}
+                    className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/5 transition-colors disabled:opacity-60"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                        <Bell className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white text-left">Send Test Notification</p>
+                        <p className="text-[11px] text-white/40">Verify push is working</p>
+                      </div>
+                    </div>
+                    {testingPush && <span className="text-[11px] text-white/40">Sending…</span>}
+                  </button>
+                </>
+              )}
+            </>
+          )}
         </div>
       </section>
 

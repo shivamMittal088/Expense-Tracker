@@ -9,10 +9,11 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "prompt",
-      workbox: {
+      strategies: "injectManifest",
+      srcDir: "public",
+      filename: "service-worker.js",
+      injectManifest: {
         globPatterns: ["**/*.{js,css,html,svg,json}"],
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],

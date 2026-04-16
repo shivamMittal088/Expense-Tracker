@@ -1,3 +1,8 @@
+import { precacheAndRoute } from 'workbox-precaching';
+
+// Injected by vite-plugin-pwa at build time — precaches all hashed assets
+precacheAndRoute(self.__WB_MANIFEST);
+
 var STATIC_CACHE_NAME = 'Static-V2';
 var DYNAMIC_CACHE_NAME = 'Dynamic-V2';
 
@@ -87,4 +92,47 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
-})
+});
+
+// Push notification handler
+self.addEventListener('push', (event) => {
+  if (Notification.permission !== 'granted') return;
+
+  let data = { title: 'Expense Tracker', body: 'You have a new notification.' };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch {
+      data.body = event.data.text();
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/logo.svg',
+      badge: '/logo.svg',
+      data: data.url ? { url: data.url } : undefined,
+    })
+  );
+});
+
+// Open the app (or a specific URL) when a notification is clicked
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Focus any already-open window first
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      // No open window — open a new one
+      return clients.openWindow(url);
+    })
+  );
+});
