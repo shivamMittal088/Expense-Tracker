@@ -227,7 +227,10 @@ export default function Settings() {
                         onClick={async () => {
                           setReminderSaving(true);
                           try {
-                            await Api.patch("/api/profile/update", { dailyReminderTime });
+                            await Api.patch("/api/profile/update", {
+                              dailyReminderTime,
+                              tzOffsetMinutes: new Date().getTimezoneOffset(),
+                            });
                             setSavedReminderTime(dailyReminderTime);
                             showTopToast(`Reminder set for ${reminderHour12}:${reminderMinute} ${reminderPeriod}`, { duration: 1500 });
                           } catch {
