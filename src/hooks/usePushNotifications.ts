@@ -58,8 +58,22 @@ export function usePushNotifications() {
         publicKey = data.publicKey;
         if (!publicKey) throw new Error("Empty VAPID key");
       } catch (err) {
-        console.error("VAPID key fetch failed:", err);
-        showTopToast("Could not reach notification server. Is the backend running?", { tone: "error" });
+        const e = err as { response?: { status?: number; data?: { message?: string } }; message?: string; code?: string };
+        console.error("VAPID key fetch failed:", {
+          status: e.response?.status,
+          data: e.response?.data,
+          message: e.message,
+          code: e.code,
+          online: navigator.onLine,
+        });
+        if (e.response) {
+          const msg = e.response.data?.message || "Push notifications unavailable on server.";
+          showTopToast(msg, { tone: "error" });
+        } else if (!navigator.onLine) {
+          showTopToast("You are offline. Connect to the internet and try again.", { tone: "error" });
+        } else {
+          showTopToast("Backend is not reachable. Make sure the server is running.", { tone: "error" });
+        }
         return;
       }
 

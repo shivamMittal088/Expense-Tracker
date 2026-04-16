@@ -9,6 +9,7 @@ import {
   Bell,
   Sun,
   Moon,
+  Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Api from "../routeWrapper/Api";
@@ -30,6 +31,20 @@ export default function Settings() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const { isSubscribed: pushEnabled, isLoading: pushLoading, isSupported: pushSupported, isBlocked: pushBlocked, toggle: togglePush } = usePushNotifications();
   const [testingPush, setTestingPush] = useState(false);
+  const [dailyReminderTime, setDailyReminderTime] = useState("21:00");
+  const [savedReminderTime, setSavedReminderTime] = useState("21:00");
+
+  // Derived hour/minute/period for the custom picker
+  const reminderHour24 = parseInt(dailyReminderTime.split(":")[0], 10);
+  const reminderMinute = dailyReminderTime.split(":")[1] ?? "00";
+  const reminderPeriod = reminderHour24 >= 12 ? "PM" : "AM";
+  const reminderHour12 = reminderHour24 % 12 === 0 ? 12 : reminderHour24 % 12;
+
+  const setReminderFromParts = (h12: number, min: string, period: string) => {
+    let h24 = h12 % 12;
+    if (period === "PM") h24 += 12;
+    setDailyReminderTime(`${String(h24).padStart(2, "0")}:${min}`);
+  };
 
   const sendTestNotification = async () => {
     setTestingPush(true);
@@ -141,6 +156,73 @@ export default function Settings() {
               />
               {pushEnabled && (
                 <>
+                  <div className="h-px bg-white/5" />
+                  {/* Daily reminder time picker */}
+                  <div className="flex items-center justify-between px-4 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                        <Clock className="w-4 h-4 text-white/60" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white">Daily Reminder</p>
+                        <p className="text-[11px] text-white/40">
+                          {savedReminderTime === dailyReminderTime
+                            ? `Set to ${savedReminderTime}`
+                            : "Get notified at this time every day"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      {/* Hour */}
+                      <select
+                        value={reminderHour12}
+                        onChange={(e) => setReminderFromParts(Number(e.target.value), reminderMinute, reminderPeriod)}
+                        className="bg-white/8 border border-white/10 rounded-lg px-2 py-1.5 text-white/80 focus:outline-none focus:border-emerald-500/40 appearance-none text-center w-12 cursor-pointer"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                          <option key={h} value={h} className="bg-zinc-900">{String(h).padStart(2, "0")}</option>
+                        ))}
+                      </select>
+                      <span className="text-white/30 font-medium">:</span>
+                      {/* Minute */}
+                      <select
+                        value={reminderMinute}
+                        onChange={(e) => setReminderFromParts(reminderHour12, e.target.value, reminderPeriod)}
+                        className="bg-white/8 border border-white/10 rounded-lg px-2 py-1.5 text-white/80 focus:outline-none focus:border-emerald-500/40 appearance-none text-center w-12 cursor-pointer"
+                      >
+                        {["00", "15", "30", "45"].map((m) => (
+                          <option key={m} value={m} className="bg-zinc-900">{m}</option>
+                        ))}
+                      </select>
+                      {/* AM / PM */}
+                      <div className="flex rounded-lg border border-white/10 overflow-hidden">
+                        {(["AM", "PM"] as const).map((p) => (
+                          <button
+                            key={p}
+                            onClick={() => setReminderFromParts(reminderHour12, reminderMinute, p)}
+                            className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                              reminderPeriod === p
+                                ? "bg-emerald-500/20 text-emerald-400"
+                                : "bg-white/5 text-white/40 hover:text-white/60"
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Set button — only active when time has changed */}
+                      <button
+                        onClick={() => {
+                          setSavedReminderTime(dailyReminderTime);
+                          showTopToast(`Reminder set for ${reminderHour12}:${reminderMinute} ${reminderPeriod}`, { duration: 1500 });
+                        }}
+                        disabled={savedReminderTime === dailyReminderTime}
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors disabled:opacity-30 disabled:cursor-not-allowed bg-emerald-500/15 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25"
+                      >
+                        Set
+                      </button>
+                    </div>
+                  </div>
                   <div className="h-px bg-white/5" />
                   <button
                     onClick={sendTestNotification}
