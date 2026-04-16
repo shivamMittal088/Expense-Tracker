@@ -62,13 +62,16 @@ self.addEventListener('fetch', (event) => {
   // SPA navigation fallback: network-first for HTML so new deployments
   // always deliver the latest index.html (Vite hashes JS/CSS filenames, so
   // a stale cached index.html would reference missing chunks → white screen).
-  // Fall back to cached '/' when offline, then offline.html as last resort.
+  // Fallback chain when offline:
+  //   1. workbox-precached /index.html (ignoreSearch strips the ?__WB_REVISION__= hash)
+  //   2. manually cached '/' from Static-V2 install cache
+  //   3. /offline.html as last resort
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() =>
-        caches.match('/').then((cachedResponse) =>
-          cachedResponse || caches.match('/offline.html')
-        )
+        caches.match('/index.html', { ignoreSearch: true })
+          .then((res) => res || caches.match('/'))
+          .then((res) => res || caches.match('/offline.html'))
       )
     );
     return;

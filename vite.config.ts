@@ -15,6 +15,10 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ["**/*.{js,css,html,svg,json}"],
       },
+      devOptions: {
+        enabled: true,          // allows testing SW/offline in `npm run dev`
+        type: "module",
+      },
     }),
   ],
   build: {
