@@ -93,8 +93,11 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 - Expense mutation flows (hide, restore, update)
 - Category/tile management and seed initialization
 - Offline tile access via IndexedDB caching (tiles cached on fetch, served from IndexedDB when offline)
+- Offline expense queuing — expenses saved to IndexedDB while offline, synced on reconnect
+- Push notifications via Web Push API (VAPID) with service-worker delivery
 - Profile management: name, status, avatar upload, hide-amount preference
 - Excel export by date range
+- PWA installable — service worker, web app manifest, offline fallback page
 - Lazy-loaded routes and heavy UI chunks for better initial load performance
 
 ---
@@ -106,12 +109,17 @@ In production, the app can send relative `/api/*` requests and rely on hosting r
 | React 19 | Frontend app | Component-driven UI and stateful rendering |
 | TypeScript | Frontend app | Type safety for components, state, and API calls |
 | Vite 7 | Frontend tooling | Fast local dev server and modern build pipeline |
+| vite-plugin-pwa | PWA build | Generates service worker and injects web app manifest |
 | React Router DOM 7 | Routing | SPA route composition and protected route boundaries |
 | Redux Toolkit | Global state | Predictable app state for auth/user and transaction slices |
 | React Redux | State bindings | Hooks-based Redux integration in components |
 | Axios | API layer | Centralized HTTP client with auth/error interceptors |
 | Tailwind CSS 4 | Styling | Utility-first, responsive UI development |
 | Day.js | Date handling | Lightweight date operations for analytics and UI |
+| idb | IndexedDB wrapper | Typed IndexedDB access for offline caching |
+| react-day-picker | Date selection | Date-range picker for export and analytics filters |
+| lucide-react | Icons | Consistent icon set across the UI |
+| html-to-image | Image export | Renders DOM nodes to PNG for sharing/export |
 | Nginx | Container runtime | Serves static SPA and proxies `/api/*` to backend in Docker |
 | Vercel rewrites | Production routing | Routes frontend calls to backend API without exposing CORS complexity |
 
@@ -460,6 +468,7 @@ The container serves the SPA through Nginx and proxies `/api/*` to `http://backe
 | `/api/expenseExport/*` | `excel` |
 | `/api/tile/*` | tile list/create |
 | `/api/seed/*` | initial tile seeding |
+| `/api/push/*` | VAPID key, subscribe, unsubscribe, test notification |
 
 ---
 
@@ -467,10 +476,12 @@ The container serves the SPA through Nginx and proxies `/api/*` to `http://backe
 
 - Add focused unit and integration tests for route-level UI behavior
 - Improve error boundaries and empty-state UX coverage
-- Expand offline-first/PWA capabilities (currently tiles are cached via IndexedDB)
 - Harden accessibility checks across modals and dynamic lists
 - Add stronger telemetry for frontend performance and failure diagnostics
 - Continue bundle splitting and lazy-load tuning for slower mobile networks
+- Add scheduled push notification preferences (reminders at user-defined times)
+- Integrate Google Sign-In
+- Add email verification flow
 
 ---
 
