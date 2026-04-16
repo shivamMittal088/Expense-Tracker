@@ -72,6 +72,10 @@ self.addEventListener('fetch', (event) => {
         caches.match('/index.html', { ignoreSearch: true })
           .then((res) => res || caches.match('/'))
           .then((res) => res || caches.match('/offline.html'))
+          .then((res) => res || new Response('App is offline. Please reload when connected.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' },
+          }))
       )
     );
     return;
