@@ -3,8 +3,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 // Injected by vite-plugin-pwa at build time — precaches all hashed assets
 precacheAndRoute(self.__WB_MANIFEST);
 
-var STATIC_CACHE_NAME = 'Static-V2';
-var DYNAMIC_CACHE_NAME = 'Dynamic-V2';
+var STATIC_CACHE_NAME = 'Static-V4';
+var DYNAMIC_CACHE_NAME = 'Dynamic-V4';
 
 self.addEventListener('install', (event) => {
   console.log("[Service Worker] Installed");
@@ -37,12 +37,18 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   console.log("[Service Worker] Activated");
 
-  const allowedCaches = [STATIC_CACHE_NAME, DYNAMIC_CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames
-          .filter((name) => !allowedCaches.includes(name))
+          // Only delete OUR old versioned caches (Static-*, Dynamic-*).
+          // Workbox's own cache (workbox-precache-v2-*) must be preserved —
+          // deleting it removes all precached hashed JS/CSS assets and breaks offline.
+          .filter((name) => {
+            const isOurCache = name.startsWith('Static-') || name.startsWith('Dynamic-');
+            const isCurrent = name === STATIC_CACHE_NAME || name === DYNAMIC_CACHE_NAME;
+            return isOurCache && !isCurrent;
+          })
           .map((name) => caches.delete(name))
       )
     ).then(() => self.clients.claim())
