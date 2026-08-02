@@ -10,6 +10,7 @@ import {
   Sun,
   Moon,
   Clock,
+  Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Api from "../routeWrapper/Api";
@@ -28,6 +29,7 @@ export default function Settings() {
   const setHideAmounts = (value: boolean) => dispatch(setHideAmountsAction(value));
   const [hideAmountsUpdating, setHideAmountsUpdating] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const { isSubscribed: pushEnabled, isLoading: pushLoading, isSupported: pushSupported, isBlocked: pushBlocked, toggle: togglePush } = usePushNotifications();
   const [testingPush, setTestingPush] = useState(false);
@@ -82,6 +84,19 @@ export default function Settings() {
       window.location.href = "/login";
     } catch {
       showTopToast("Failed to logout", { tone: "error" });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await Api.delete("/api/profile/delete");
+      dispatch(clearUserProfile());
+      window.location.href = "/login";
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string; message?: string } } };
+      const message = error.response?.data?.error || error.response?.data?.message || "Failed to delete account";
+      setShowDeleteConfirm(false);
+      showTopToast(message, { tone: "error" });
     }
   };
 
@@ -287,6 +302,13 @@ export default function Settings() {
             label="Log Out"
             onClick={() => setShowLogoutConfirm(true)}
           />
+          <div className="h-px bg-white/5" />
+          <SettingButton
+            icon={Trash2}
+            label="Delete Account"
+            danger
+            onClick={() => setShowDeleteConfirm(true)}
+          />
         </div>
       </section>
 
@@ -312,6 +334,18 @@ export default function Settings() {
           confirmLabel="Log Out"
           onCancel={() => setShowLogoutConfirm(false)}
           onConfirm={handleLogout}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmModal
+          title="Delete Account?"
+          message="This permanently deletes your account, expenses, tiles, and profile photo."
+          confirmLabel="Delete"
+          confirmNote="Supports rollback"
+          danger
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDeleteAccount}
         />
       )}
 
@@ -395,12 +429,13 @@ interface ConfirmModalProps {
   title: string;
   message: string;
   confirmLabel: string;
+  confirmNote?: string;
   danger?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
-function ConfirmModal({ title, message, confirmLabel, danger, onCancel, onConfirm }: ConfirmModalProps) {
+function ConfirmModal({ title, message, confirmLabel, confirmNote, danger, onCancel, onConfirm }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
       <div className="w-full max-w-70 rounded-xl border border-white/25 bg-[#1a1a1a] p-4 text-center">
@@ -415,11 +450,12 @@ function ConfirmModal({ title, message, confirmLabel, danger, onCancel, onConfir
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 py-2 text-[11px] font-semibold text-white rounded-lg transition-colors ${
+            className={`flex-1 min-h-10 py-1.5 text-[11px] font-semibold text-white rounded-lg transition-colors flex flex-col items-center justify-center ${
               danger ? "bg-red-500/90 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
             }`}
           >
-            {confirmLabel}
+            <span>{confirmLabel}</span>
+            {confirmNote && <span className="text-[9px] font-normal text-white/70">{confirmNote}</span>}
           </button>
         </div>
       </div>
