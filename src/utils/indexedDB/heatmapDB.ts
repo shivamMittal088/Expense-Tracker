@@ -1,4 +1,4 @@
-import { dbPromise } from "./tilesDB";
+import { getAccountDB } from "./tilesDB";
 
 const STORE_NAME = "heatmap";
 
@@ -9,11 +9,11 @@ export type CachedHeatmapEntry = {
 };
 
 export async function cacheHeatmapData(year: number, data: CachedHeatmapEntry[]): Promise<void> {
-  const idb = await dbPromise;
+  const idb = await getAccountDB();
   await idb.put(STORE_NAME, data, year);
 }
 
 export async function getCachedHeatmapData(year: number): Promise<CachedHeatmapEntry[] | undefined> {
-  const idb = await dbPromise;
+  const idb = await getAccountDB();
   return idb.get(STORE_NAME, year);
 }

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { clearUserProfile } from "./userSlice";
+import { clearUserProfile, setUserProfile } from "./userSlice";
 
 export type MonthlyTransaction = {
   _id: string;
@@ -49,6 +49,9 @@ const monthlyTransactionsSlice = createSlice({
   name: "monthlyTransactions",
   initialState,
   reducers: {
+    invalidateMonthlyTransactions: (state) => {
+      state.isLoaded = false;
+    },
     setMonthlyTransactionsLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -82,10 +85,12 @@ const monthlyTransactionsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(clearUserProfile, () => initialState);
+    builder.addCase(setUserProfile, () => initialState);
   },
 });
 
 export const {
+  invalidateMonthlyTransactions,
   setMonthlyTransactionsLoading,
   setMonthlyTransactions,
   appendMonthlyTransactions,

@@ -482,8 +482,8 @@ function PasswordModal({ onClose }: PasswordModalProps) {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters");
+    if (newPassword.length < 8 || new TextEncoder().encode(newPassword).length > 72) {
+      setError("New password must have at least 8 characters and at most 72 bytes");
       return;
     }
 

@@ -17,7 +17,7 @@ const TimePicker = lazy(() =>
 );
 const AddTileModal = lazy(() => import("./AddTileModal"));
 import { AxiosError } from "axios";
-import { saveTilesToDB, getTilesFromDB } from "../utils/indexedDB/tilesDB";
+import { saveTilesToDB, getTilesFromDB, getActiveAccountId } from "../utils/indexedDB/tilesDB";
 import { savePendingExpense } from "../utils/indexedDB/expensesDB";
 
 interface ApiErrorResponse {
@@ -202,6 +202,8 @@ export default function AddExpenseModal({ open, onClose }: Props) {
   }, [open]);
 
   const handleSave = async () => {
+    const ownerId = getActiveAccountId();
+    if (!ownerId) return;
     if (!amount || !category || !paymentMode) {
       showTopToast("Please fill amount, category and payment mode", { tone: "error", duration: 2200 });
       return;
@@ -254,6 +256,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
       window.dispatchEvent(new CustomEvent("expense:changed"));
       onClose();
     } catch (err) {
+      if (getActiveAccountId() !== ownerId) return;
       const axiosError = err as AxiosError<ApiErrorResponse>;
       // If network error (offline/no connection), save to IndexedDB
       if (!axiosError.response) {
@@ -264,7 +267,7 @@ export default function AddExpenseModal({ open, onClose }: Props) {
             payment_mode: payload.payment_mode,
             notes: payload.notes || "",
             occurredAt: payload.occurredAt,
-          });
+          }, ownerId);
           showTopToast("You're offline. Expense saved locally and will sync when back online.", { duration: 2500 });
           setAmount("");
           setCategory("");

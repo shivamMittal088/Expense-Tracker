@@ -11,6 +11,7 @@ const Transactions = lazy(() => import("./Components/Transactions"));
 const Profile = lazy(() => import("./Components/Profile"));
 const Settings = lazy(() => import("./Components/Settings"));
 const Login = lazy(() => import("./Components/Login"));
+const ResetPassword = lazy(() => import("./Components/ResetPassword"));
 const HelpFAQ = lazy(() => import("./Components/HelpFAQ"));
 const ExportExcelPage = lazy(() => import("./Components/ExportExcelPage"));
 import ProtectedRoute from "./routeWrapper/ProtectedRoute";
@@ -28,6 +29,20 @@ function ThemeSync() {
   return null;
 }
 
+function AccountSync() {
+  useEffect(() => {
+    const sync = (event: StorageEvent) => {
+      if (event.storageArea === localStorage &&
+          (event.key === null || event.key === "userProfile" || event.key === "isLoggedIn")) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
+  return null;
+}
+
 const App: React.FC = () => {
   const routeFallback = (
     <div className="min-h-screen bg-black flex items-start justify-center px-4 pt-6">
@@ -38,11 +53,13 @@ const App: React.FC = () => {
   return (
     <Provider store={store}>
       <ThemeSync />
+      <AccountSync />
       <PWAUpdatePrompt />
       <BrowserRouter>
         <Routes>
           {/* Public */}
           <Route path="/login" element={<Suspense fallback={routeFallback}><Login /></Suspense>} />
+          <Route path="/reset-password" element={<Suspense fallback={routeFallback}><ResetPassword /></Suspense>} />
 
           {/* Protected */}
           <Route element={<ProtectedRoute />}>

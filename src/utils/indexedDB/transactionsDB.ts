@@ -1,4 +1,4 @@
-import { dbPromise } from "./tilesDB";
+import { getAccountDB } from "./tilesDB";
 
 const STORE_NAME = "transactions";
 const MAX_CACHED = 100;
@@ -13,7 +13,7 @@ export type CachedTransaction = {
 };
 
 export async function cacheTransactions(transactions: CachedTransaction[]): Promise<void> {
-  const idb = await dbPromise;
+  const idb = await getAccountDB();
   const tx = idb.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);
   await store.clear();
@@ -25,7 +25,7 @@ export async function cacheTransactions(transactions: CachedTransaction[]): Prom
 }
 
 export async function appendCachedTransactions(transactions: CachedTransaction[]): Promise<void> {
-  const idb = await dbPromise;
+  const idb = await getAccountDB();
   const tx = idb.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);
   const existingCount = await store.count();
@@ -38,6 +38,6 @@ export async function appendCachedTransactions(transactions: CachedTransaction[]
 }
 
 export async function getCachedTransactions(): Promise<CachedTransaction[]> {
-  const idb = await dbPromise;
+  const idb = await getAccountDB();
   return idb.getAll(STORE_NAME);
 }

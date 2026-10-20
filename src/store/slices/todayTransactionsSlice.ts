@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { clearUserProfile } from "./userSlice";
+import { clearUserProfile, setUserProfile } from "./userSlice";
 
 export type TodayTransaction = {
   _id: string;
@@ -45,6 +45,9 @@ const todayTransactionsSlice = createSlice({
   name: "todayTransactions",
   initialState,
   reducers: {
+    invalidateTodayTransactions: (state) => {
+      state.isLoaded = false;
+    },
     setTodayTransactions: (
       state,
       action: PayloadAction<{ dateKey: string; items: TodayTransaction[]; hiddenCount?: number }>
@@ -94,10 +97,12 @@ const todayTransactionsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(clearUserProfile, () => initialState);
+    builder.addCase(setUserProfile, () => initialState);
   },
 });
 
 export const {
+  invalidateTodayTransactions,
   setTodayTransactions,
   addTodayTransaction,
   updateTodayTransaction,

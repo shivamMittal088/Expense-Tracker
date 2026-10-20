@@ -134,6 +134,9 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [resetSending, setResetSending] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
+  const [resetError, setResetError] = useState("");
   const [lockoutSecondsLeft, setLockoutSecondsLeft] = useState<number>(() => getInitialLockoutSeconds());
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -177,6 +180,24 @@ const Login: React.FC = () => {
   };
 
   /* -------- API Submit -------- */
+
+  const handleResetRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (resetSending) return;
+    setResetSending(true);
+    setResetError("");
+    setResetMessage("");
+    try {
+      const response = await api.post<{ message: string }>("/api/auth/forgot-password", { emailId: resetEmail.trim().toLowerCase() });
+      setResetMessage(response.data.message);
+    } catch (error) {
+      setResetError(axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message || "Could not send the link. Please try again."
+        : "Could not send the link. Please try again.");
+    } finally {
+      setResetSending(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -419,7 +440,11 @@ const Login: React.FC = () => {
                 <div className="text-right">
                   <button
                     type="button"
-                    onClick={() => setShowForgot(true)}
+                    onClick={() => {
+                      setResetMessage("");
+                      setResetError("");
+                      setShowForgot(true);
+                    }}
                     className="text-[10px] text-zinc-400 hover:text-zinc-200"
                   >
                     Forgot password?
@@ -465,9 +490,11 @@ const Login: React.FC = () => {
         {/* Forgot Password Modal */}
         {showForgot && (
           <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4">
-            <div className="bg-zinc-950 border border-zinc-700 rounded-xl w-full max-w-[280px] p-5">
+            <form onSubmit={handleResetRequest} role="dialog" aria-modal="true" aria-labelledby="reset-password-title" className="relative bg-zinc-950 border border-zinc-700 rounded-xl w-full max-w-[280px] p-5">
                 
                 <button
+                  type="button"
+                  aria-label="Close password reset"
                   onClick={() => setShowForgot(false)}
                   className="absolute top-3 right-3 text-zinc-500 hover:text-zinc-200"
                 >
@@ -478,21 +505,27 @@ const Login: React.FC = () => {
                   <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-zinc-100 mb-3">
                     <Mail size={16} className="text-black" />
                   </div>
-                  <h2 className="text-sm font-semibold text-zinc-100">Reset Password</h2>
+                  <h2 id="reset-password-title" className="text-sm font-semibold text-zinc-100">Reset Password</h2>
                   <p className="text-[11px] text-zinc-400 mt-0.5">We'll send you a reset link</p>
                 </div>
 
                 <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  aria-label="Email address"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-700 rounded-lg py-2.5 px-3 text-zinc-100 text-sm mb-3 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                   placeholder="you@example.com"
                 />
 
-                <button className="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-black text-sm font-semibold rounded-lg transition-colors">
-                  Send Reset Link
+                {resetMessage && <p role="status" className="text-xs text-zinc-400 mb-3">{resetMessage}</p>}
+                {resetError && <p role="alert" className="text-xs text-red-400 mb-3">{resetError}</p>}
+                <button type="submit" disabled={resetSending} className="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-black text-sm font-semibold rounded-lg transition-colors disabled:opacity-60">
+                  {resetSending ? "Sending…" : "Send Reset Link"}
                 </button>
-              </div>
+              </form>
           </div>
         )}
       </div>

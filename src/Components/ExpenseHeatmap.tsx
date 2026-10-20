@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import api from "../routeWrapper/Api";
 import { cacheHeatmapData, getCachedHeatmapData } from "../utils/indexedDB/heatmapDB";
 import { useAppSelector } from "../store/hooks";
+import { formatRupees } from "../utils/money";
 
 type HeatmapData = {
   date: string;
@@ -15,7 +16,7 @@ type HeatmapProps = {
 };
 
 const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
-  const rupeeSymbol = String.fromCharCode(0x20B9);
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const middleDot = String.fromCharCode(0x00B7);
   const theme = useAppSelector((state) => state.theme.theme);
   const isLight = theme === "light";
@@ -240,7 +241,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
             style={isLight ? { background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" } : undefined}
           >
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Total Spent</p>
-            <p className="text-white font-bold text-sm">{rupeeSymbol}{stats.totalAmount.toLocaleString()}</p>
+            <p className="text-white font-bold text-sm">{formatRupees(stats.totalAmount, hideAmounts)}</p>
           </div>
           <div
             className="rounded-xl p-3 border border-white/10 bg-white/[0.04]"
@@ -381,7 +382,7 @@ const ExpenseHeatmap = ({ onDateClick }: HeatmapProps) => {
                 })}
               </p>
               <p className="text-emerald-400 text-[11px]">
-                {hoveredDay.count} transaction{hoveredDay.count !== 1 ? "s" : ""} {middleDot} {rupeeSymbol}{hoveredDay.amount.toLocaleString()}
+                {hoveredDay.count} transaction{hoveredDay.count !== 1 ? "s" : ""} {middleDot} {formatRupees(hoveredDay.amount, hideAmounts)}
               </p>
             </div>
           )}

@@ -126,8 +126,8 @@ html.light .bg-white\/5 { background-color: rgba(0,0,0,0.06); }
 html.light .bg-white\/6 { background-color: rgba(0,0,0,0.07); }
 html.light .bg-white\/8 { background-color: rgba(0,0,0,0.08); }
 html.light .bg-white\/10 { background-color: rgba(0,0,0,0.09); }
-html.light .bg-white/\[0\.03\] { background-color: rgba(0,0,0,0.04); }
-html.light .bg-white/\[0\.04\] { background-color: rgba(0,0,0,0.05); }
+html.light .bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.04); }
+html.light .bg-white\/\[0\.04\] { background-color: rgba(0,0,0,0.05); }
 
 /* hover / active backgrounds */
 html.light .hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.08); }

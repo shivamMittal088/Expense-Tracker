@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { clearUserProfile, setUserProfile } from "./userSlice";
 
 interface AmountState {
   hideAmounts: boolean;
 }
 
 const initialState: AmountState = {
-  hideAmounts: false,
+  // Keep values private until the saved preference has been hydrated.
+  hideAmounts: true,
 };
 
 const amountSlice = createSlice({
@@ -19,6 +21,10 @@ const amountSlice = createSlice({
     toggleHideAmounts: (state) => {
       state.hideAmounts = !state.hideAmounts;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(clearUserProfile, () => initialState);
+    builder.addCase(setUserProfile, () => initialState);
   },
 });
 

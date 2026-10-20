@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import api from "../routeWrapper/Api";
+import { useAppSelector } from "../store/hooks";
+import { formatRupees } from "../utils/money";
+import { getLocalDateKey } from "../store/slices/todayTransactionsSlice";
 
 type DropdownType = "date" | "payment" | "category" | "amount" | null;
 
@@ -76,7 +79,7 @@ type SpendingTrendsSummary = {
 };
 
 // Donut Chart Component
-const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number; color: string; emoji?: string }[]; size?: number }) => {
+const DonutChart = ({ data, hideAmounts, size = 120 }: { data: { name: string; value: number; color: string; emoji?: string }[]; hideAmounts: boolean; size?: number }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -114,7 +117,7 @@ const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number;
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-lg font-bold">₹{(total / 1000).toFixed(1)}k</p>
+          <p className="text-white text-lg font-bold">{hideAmounts ? "₹•••••" : `₹${(total / 1000).toFixed(1)}k`}</p>
           <p className="text-zinc-500 text-[10px]">Total</p>
         </div>
       </div>
@@ -126,9 +129,11 @@ const DonutChart = ({ data, size = 120 }: { data: { name: string; value: number;
 const SpendingTrendsChart = ({ 
   data, 
   view,
+  hideAmounts,
 }: { 
   data: SpendingTrend[]; 
   view: "daily" | "monthly" | "yearly";
+  hideAmounts: boolean;
 }) => {
   const maxAmount = Math.max(...data.map(d => d.totalAmount), 1);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -182,9 +187,9 @@ const SpendingTrendsChart = ({
     <div className="relative">
       {/* Y-axis labels */}
       <div className="absolute left-0 top-0 h-32 w-10 flex flex-col justify-between text-[9px] text-zinc-500">
-        <span>₹{maxAmount >= 1000 ? `${(maxAmount / 1000).toFixed(0)}k` : maxAmount}</span>
-        <span>₹{maxAmount >= 2000 ? `${(maxAmount / 2000).toFixed(0)}k` : Math.round(maxAmount / 2)}</span>
-        <span>₹0</span>
+        <span>{hideAmounts ? "₹•••••" : `₹${maxAmount >= 1000 ? `${(maxAmount / 1000).toFixed(0)}k` : maxAmount}`}</span>
+        <span>{hideAmounts ? "₹•••••" : `₹${maxAmount >= 2000 ? `${(maxAmount / 2000).toFixed(0)}k` : Math.round(maxAmount / 2)}`}</span>
+        <span>{hideAmounts ? "₹•••••" : "₹0"}</span>
       </div>
       
       {/* Chart area */}
@@ -209,7 +214,7 @@ const SpendingTrendsChart = ({
               {/* Tooltip */}
               {hoveredIndex === index && (
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 shadow-xl z-20 whitespace-nowrap">
-                  <p className="text-white text-xs font-semibold">₹{item.totalAmount.toLocaleString()}</p>
+                  <p className="text-white text-xs font-semibold">{formatRupees(item.totalAmount, hideAmounts)}</p>
                   <p className="text-zinc-400 text-[10px]">{item.count} transactions</p>
                   <p className="text-zinc-500 text-[10px]">{item.period}</p>
                 </div>
@@ -310,6 +315,7 @@ const useLazySection = () => {
 };
 
 const Analytics = () => {
+  const hideAmounts = useAppSelector((state) => state.amount.hideAmounts);
   const [dateRange, setDateRange] = useState<"week" | "month" | "year" | "all">("month");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
@@ -358,12 +364,12 @@ const Analytics = () => {
         const startDate = new Date(today);
         startDate.setDate(today.getDate() - 365); // Fetch 1 year of data
         
-        const formatDate = (d: Date) => d.toISOString().split("T")[0];
         
         const response = await api.get('/api/expenseAnalytics/range', {
           params: {
-            startDate: formatDate(startDate),
-            endDate: formatDate(today),
+            startDate: getLocalDateKey(startDate),
+            endDate: getLocalDateKey(today),
+            tzOffsetMinutes: today.getTimezoneOffset(),
           },
         });
         
@@ -429,7 +435,7 @@ const Analytics = () => {
       try {
         setTrendsLoading(true);
         const response = await api.get('/api/expenseAnalytics/spending-trends', {
-          params: { view: trendsView },
+          params: { view: trendsView, tzOffsetMinutes: new Date().getTimezoneOffset() },
         });
         setSpendingTrends(response.data?.data || []);
         setSpendingTrendsSummary(response.data?.summary || null);
@@ -539,6 +545,7 @@ const Analytics = () => {
 
   const getAmountLabel = () => {
     if (!minAmount && !maxAmount) return "Any";
+    if (hideAmounts) return "₹•••••";
     if (minAmount && maxAmount) return `₹${minAmount}-${maxAmount}`;
     if (minAmount) return `₹${minAmount}+`;
     return `≤₹${maxAmount}`;
@@ -638,7 +645,7 @@ const Analytics = () => {
               No data available
             </div>
           ) : (
-            <SpendingTrendsChart data={spendingTrends} view={trendsView} />
+            <SpendingTrendsChart data={spendingTrends} view={trendsView} hideAmounts={hideAmounts} />
           )}
 
           {/* Summary Stats */}
@@ -647,9 +654,7 @@ const Analytics = () => {
               <div className="text-center">
                 <p className="text-[10px] text-zinc-500 mb-0.5">Total</p>
                 <p className="text-white text-sm font-bold">
-                  ₹{spendingTrendsSummary.totalSpent >= 100000 
-                    ? `${(spendingTrendsSummary.totalSpent / 100000).toFixed(1)}L` 
-                    : spendingTrendsSummary.totalSpent.toLocaleString()}
+                  {formatRupees(spendingTrendsSummary.totalSpent, hideAmounts)}
                 </p>
               </div>
               <div className="text-center">
@@ -657,9 +662,7 @@ const Analytics = () => {
                   Avg/{trendsView === "daily" ? "Day" : trendsView === "monthly" ? "Month" : "Year"}
                 </p>
                 <p className="text-white text-sm font-bold">
-                  ₹{spendingTrendsSummary.avgPerPeriod >= 1000 
-                    ? `${(spendingTrendsSummary.avgPerPeriod / 1000).toFixed(1)}K` 
-                    : spendingTrendsSummary.avgPerPeriod.toLocaleString()}
+                  {formatRupees(spendingTrendsSummary.avgPerPeriod, hideAmounts)}
                 </p>
               </div>
               <div className="text-center">
@@ -839,7 +842,8 @@ const Analytics = () => {
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
                   <input
-                    type="number"
+                    type={hideAmounts ? "password" : "number"}
+                    inputMode="decimal"
                     placeholder="0"
                     value={minAmount}
                     onChange={(e) => setMinAmount(e.target.value)}
@@ -853,7 +857,8 @@ const Analytics = () => {
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">₹</span>
                   <input
-                    type="number"
+                    type={hideAmounts ? "password" : "number"}
+                    inputMode="decimal"
                     placeholder="Any"
                     value={maxAmount}
                     onChange={(e) => setMaxAmount(e.target.value)}
@@ -895,7 +900,7 @@ const Analytics = () => {
             </div>
           ) : stats.categoryData.length > 0 ? (
             <div className="flex items-center gap-4">
-              <DonutChart data={stats.categoryData} />
+              <DonutChart data={stats.categoryData} hideAmounts={hideAmounts} />
               <div className="flex-1 space-y-2">
                 {stats.categoryData.slice(0, 4).map((cat, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -904,7 +909,7 @@ const Analytics = () => {
                       style={{ backgroundColor: cat.color }}
                     />
                     <span className="text-xs text-zinc-400 flex-1 truncate">{cat.emoji} {cat.name}</span>
-                    <span className="text-xs text-white font-medium">₹{cat.value.toLocaleString()}</span>
+                    <span className="text-xs text-white font-medium">{formatRupees(cat.value, hideAmounts)}</span>
                   </div>
                 ))}
                 {stats.categoryData.length > 4 && (
@@ -988,7 +993,7 @@ const Analytics = () => {
                     />
                     <span className="text-[10px] text-zinc-400 font-medium">{item.label}</span>
                   </div>
-                  <p className="text-white text-sm font-bold">₹{item.totalAmount >= 1000 ? `${(item.totalAmount / 1000).toFixed(1)}k` : item.totalAmount}</p>
+                  <p className="text-white text-sm font-bold">{formatRupees(item.totalAmount, hideAmounts)}</p>
                   <p className="text-zinc-600 text-[9px]">{item.percentage}% • {item.count}x</p>
                 </div>
               ))}
@@ -1049,8 +1054,8 @@ const Analytics = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-zinc-100 text-[12px] sm:text-sm font-semibold">₹{item.amount.toLocaleString()}</p>
-                    <p className="text-[8px] text-zinc-500 sm:hidden">~₹{item.estimatedMonthlyAmount.toLocaleString()}/mo</p>
+                    <p className="text-zinc-100 text-[12px] sm:text-sm font-semibold">{formatRupees(item.amount, hideAmounts)}</p>
+                    <p className="text-[8px] text-zinc-500 sm:hidden">~{formatRupees(item.estimatedMonthlyAmount, hideAmounts)}/mo</p>
                     {item.nextExpectedDate && (
                       <p className={`hidden sm:block text-[10px] ${item.nextExpectedDate.includes('Overdue') ? 'text-rose-400' : 'text-amber-400'}`}>
                         {item.nextExpectedDate}
@@ -1063,7 +1068,7 @@ const Analytics = () => {
             
             <div className="mt-4 pt-3 border-t border-zinc-800/50 flex items-center justify-between">
               <span className="text-xs text-zinc-500">Estimated monthly total</span>
-              <span className="text-emerald-400 font-bold text-sm">₹{totalMonthlyRecurring.toLocaleString()}/month</span>
+              <span className="text-emerald-400 font-bold text-sm">{formatRupees(totalMonthlyRecurring, hideAmounts)}/month</span>
             </div>
           </>
         )}

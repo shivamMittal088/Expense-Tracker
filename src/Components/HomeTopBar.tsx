@@ -1,3 +1,5 @@
+import { formatRupees } from "../utils/money";
+
 interface HomeTopBarProps {
   displayLabel: string;
   hideAmounts: boolean;
@@ -66,7 +68,7 @@ const HomeTopBar = ({
           <div className="flex-1 text-center">
             <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">Today's Spending</p>
             <p className="text-[22px] font-bold tracking-wide leading-tight">
-              {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
+              {formatRupees(totalForDay, hideAmounts)}
             </p>
           </div>
 
@@ -114,7 +116,7 @@ const HomeTopBar = ({
           <div className="mb-1.5">
             <p className="text-[10px] text-zinc-400 uppercase tracking-[0.18em] mb-0.5">Today's Spending</p>
             <p className="text-base font-bold tracking-wide leading-tight">
-              {hideAmounts ? "₹•••••" : `₹${totalForDay.toFixed(0)}`}
+              {formatRupees(totalForDay, hideAmounts)}
             </p>
           </div>
 

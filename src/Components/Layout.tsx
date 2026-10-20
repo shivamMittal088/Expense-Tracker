@@ -7,10 +7,14 @@ import { getPendingExpenses, deletePendingExpense } from "../utils/indexedDB/exp
 import { showTopToast } from "../utils/Redirecttoast";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { setHideAmounts as setHideAmountsAction } from "../store/slices/amountSlice";
+import { getActiveAccountId } from "../utils/indexedDB/tilesDB";
+import { invalidateTodayTransactions } from "../store/slices/todayTransactionsSlice";
+import { invalidateMonthlyTransactions } from "../store/slices/monthlyTransactionsSlice";
 
 export default function Layout() {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
+  const userId = useAppSelector((state) => state.user.profile?._id);
   const hideAmountsHydrated = useRef(false);
 
   useEffect(() => {
@@ -31,7 +35,8 @@ export default function Layout() {
   }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
-    const seedKey = "seedTilesOnce";
+    if (!userId) return;
+    const seedKey = `seedTilesOnce:${userId}`;
     if (localStorage.getItem(seedKey) === "true") {
       return;
     }
@@ -72,17 +77,21 @@ export default function Layout() {
         clearTimeout(timeoutId);
       }
     };
-  }, []);
+  }, [userId]);
 
   // Sync pending offline expenses when back online
   useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    let syncing = false;
     const syncPendingExpenses = async () => {
-      const pending = await getPendingExpenses();
-      if (!pending.length) return;
-
+      if (syncing || cancelled || getActiveAccountId() !== userId) return;
+      syncing = true;
       let synced = 0;
-      for (const expense of pending) {
-        try {
+      try {
+        const pending = await getPendingExpenses(userId);
+        for (const expense of pending) {
+          if (cancelled || getActiveAccountId() !== userId) break;
           await api.post("/api/expense/add", {
             amount: expense.amount,
             category: expense.category,
@@ -90,27 +99,34 @@ export default function Layout() {
             notes: expense.notes,
             occurredAt: expense.occurredAt,
           }, {
+            headers: { "X-Account-Id": userId },
             params: { tzOffsetMinutes: new Date().getTimezoneOffset() },
           });
-          if (expense.id != null) await deletePendingExpense(expense.id);
+          if (expense.id != null) await deletePendingExpense(expense.id, userId);
           synced++;
-        } catch {
-          // Stop syncing on first failure — will retry next time online
-          break;
         }
+      } catch {
+        // Keep unsent records with their owner and retry on the next connection.
+      } finally {
+        syncing = false;
       }
-      if (synced > 0) {
+      if (synced > 0 && !cancelled && getActiveAccountId() === userId) {
+        dispatch(invalidateTodayTransactions());
+        dispatch(invalidateMonthlyTransactions());
         showTopToast(`${synced} expense${synced > 1 ? "s" : ""} moved from locally to database`, { duration: 2500 });
+        window.dispatchEvent(new CustomEvent("expense:changed"));
       }
-      window.dispatchEvent(new CustomEvent("expense:changed"));
     };
 
     window.addEventListener("online", syncPendingExpenses);
     // Also try syncing on mount in case we came online before this mounted
     if (navigator.onLine) syncPendingExpenses();
 
-    return () => window.removeEventListener("online", syncPendingExpenses);
-  }, []);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("online", syncPendingExpenses);
+    };
+  }, [dispatch, userId]);
 
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
